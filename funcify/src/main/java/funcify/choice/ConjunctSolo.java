@@ -8,6 +8,6 @@ import java.util.function.Function;
  */
 public interface ConjunctSolo<W, A> {
 
-    <B> B fold(Function<A, B> mapper);
+    <B> B fold(Function<? super A, ? extends B> mapper);
 
 }

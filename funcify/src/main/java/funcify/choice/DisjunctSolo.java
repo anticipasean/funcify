@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 public interface DisjunctSolo<W, A> {
 
     <B> B fold(Function<? super A, ? extends B> ifPresent,
-               Supplier<B> ifAbsent);
+               Supplier<? extends B> ifAbsent);
 
     default A orElse(A defaultIfAbsent) {
         return fold(a -> a,

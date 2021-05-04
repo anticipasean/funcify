@@ -8,6 +8,6 @@ import java.util.function.BiFunction;
  */
 public interface ConjunctDuet<W, A, B> {
 
-    <C> C fold(BiFunction<A, B, C> mapper);
+    <C> C fold(BiFunction<? super A, ? super B, ? extends C> mapper);
 
 }

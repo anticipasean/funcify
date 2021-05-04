@@ -2,12 +2,12 @@ package funcify.function;
 
 import static java.util.Objects.requireNonNull;
 
-import funcify.ensemble.Solo;
 import funcify.ensemble.Duet;
+import funcify.ensemble.FlattenableDuet;
+import funcify.ensemble.FlattenableFunctionalDuet;
+import funcify.ensemble.Solo;
 import funcify.function.Fn1.Fn1W;
 import funcify.function.factory.Fn1Factory;
-import funcify.ensemble.FlattenableFunctionalDuet;
-import funcify.ensemble.FlattenableDuet;
 import funcify.template.duet.FlattenableFunctionalTypeDuetTemplate;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -16,7 +16,7 @@ import java.util.function.Function;
  * @author smccarron
  * @created 2021-04-28
  */
-public interface Fn1<A, B> extends FlattenableFunctionalDuet<Fn1<?, ?>, Fn1W, A, B>, Function<A, B> {
+public interface Fn1<A, B> extends FlattenableFunctionalDuet<Fn1W, A, B>, Function<A, B> {
 
     static enum Fn1W {
 
@@ -60,14 +60,14 @@ public interface Fn1<A, B> extends FlattenableFunctionalDuet<Fn1<?, ?>, Fn1W, A,
     }
 
     @Override
-    default <C> Fn1<A, C> zip(final FlattenableDuet<Fn1<?, ?>, Fn1W, A, B> container2,
+    default <C> Fn1<A, C> zip(final FlattenableDuet<Fn1W, A, B> container2,
                               final BiFunction<? super B, ? super B, ? extends C> combiner) {
         return narrowK(FlattenableFunctionalDuet.super.zip(container2,
                                                            combiner));
     }
 
     @Override
-    default <C> Fn1<A, C> flatMap(final Function<? super B, ? extends FlattenableFunctionalDuet<Fn1<?, ?>, Fn1W, A, C>> flatMapper) {
+    default <C> Fn1<A, C> flatMap(final Function<? super B, ? extends FlattenableFunctionalDuet<Fn1W, A, C>> flatMapper) {
         return narrowK(FlattenableFunctionalDuet.super.flatMap(flatMapper));
     }
 }

@@ -8,12 +8,13 @@ import funcify.option.factory.OptionFactory;
 import funcify.template.solo.FlattenableSoloTemplate;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author smccarron
  * @created 2021-04-28
  */
-public interface Option<A> extends FlattenableSolo<Option<?>, OptionW, A>, Solo<OptionW, A>, DisjunctSolo<OptionW, A> {
+public interface Option<A> extends FlattenableSolo<OptionW, A>, DisjunctSolo<OptionW, A> {
 
     static enum OptionW {
 
@@ -33,7 +34,7 @@ public interface Option<A> extends FlattenableSolo<Option<?>, OptionW, A>, Solo<
     }
 
     @Override
-    default <B> Option<B> flatMap(final Function<? super A, ? extends FlattenableSolo<Option<?>, OptionW, B>> flatMapper) {
+    default <B> Option<B> flatMap(final Function<? super A, ? extends FlattenableSolo<OptionW, B>> flatMapper) {
         return narrowK(FlattenableSolo.super.flatMap(flatMapper));
     }
 
@@ -43,7 +44,7 @@ public interface Option<A> extends FlattenableSolo<Option<?>, OptionW, A>, Solo<
     }
 
     @Override
-    default <B, C> Option<C> zip(final FlattenableSolo<Option<?>, OptionW, B> container2,
+    default <B, C> Option<C> zip(final FlattenableSolo<OptionW, B> container2,
                                  final BiFunction<? super A, ? super B, ? extends C> combiner) {
         return narrowK(FlattenableSolo.super.zip(container2,
                                                  combiner));

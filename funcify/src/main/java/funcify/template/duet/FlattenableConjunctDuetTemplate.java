@@ -12,15 +12,27 @@ import java.util.function.Function;
  */
 public interface FlattenableConjunctDuetTemplate<W> extends ZippableConjunctDuetTemplate<W>, FlattenableDuetTemplate<W> {
 
-    <A, B> Duet<W, A, B> first(A value1);
+    <A, B, C> C fold(Duet<W, A, B> container,
+                     BiFunction<? super A, ? super B, ? extends C> mapper);
 
-    <A, B> Duet<W, A, B> second(B value2);
+    default <A, B, C, D> Duet<W, C, D> flatMap(final Duet<W, A, B> container,
+                                               final BiFunction<? super A, ? super B, ? extends Duet<W, C, D>> flatMapper) {
+        return fold(requireNonNull(container,
+                                   () -> "container"),
+                    (A paramA, B paramB) -> {
+                        return widenK(requireNonNull(flatMapper,
+                                                     () -> "flatMapper").apply(paramA,
+                                                                               paramB));
+                    });
+    }
 
-    <A, B> Duet<W, A, B> both(A value1,
-                              B value2);
-
-    <A, B, C, D> Duet<W, C, D> flatMap(final Duet<W, A, B> container,
-                                       final BiFunction<? super A, ? super B, ? extends Duet<W, C, D>> flatMapper);
+    @Override
+    default <A, B, C> Duet<W, A, C> flatMap(final Duet<W, A, B> container,
+                                            final Function<? super B, ? extends Duet<W, A, C>> flatMapper) {
+        return flatMap(container,
+                       (A paramA, B paramB) -> requireNonNull(flatMapper,
+                                                              () -> "flatMapper").apply(paramB));
+    }
 
     default <A, B> Duet<W, A, B> flatten1(final Duet<W, Duet<W, A, B>, B> container) {
         return flatMap(requireNonNull(container,

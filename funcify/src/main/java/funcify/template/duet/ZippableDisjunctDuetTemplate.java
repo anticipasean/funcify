@@ -5,16 +5,13 @@ import java.util.function.BiFunction;
 
 /**
  * @author smccarron
- * @created 2021-04-30
+ * @created 2021-05-03
  */
-public interface ZippableConjunctDuetTemplate<W> extends ZippableDuetTemplate<W>, MappableConjunctDuetTemplate<W> {
+public interface ZippableDisjunctDuetTemplate<W> extends ZippableDuetTemplate<W>, MappableDisjunctDuetTemplate<W> {
 
     <A, B> Duet<W, A, B> first(A value1);
 
     <A, B> Duet<W, A, B> second(B value2);
-
-    <A, B> Duet<W, A, B> both(A value1,
-                              B value2);
 
     @Override
     default <A, B, C> Duet<W, A, C> zip(Duet<W, A, B> container1,
@@ -32,6 +29,4 @@ public interface ZippableConjunctDuetTemplate<W> extends ZippableDuetTemplate<W>
     <A, B, C> Duet<W, A, C> zipSecond(Duet<W, A, B> container1,
                                       Duet<W, A, B> container2,
                                       BiFunction<? super B, ? super B, ? extends C> combiner);
-
-
 }
