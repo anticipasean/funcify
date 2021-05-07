@@ -1,8 +1,10 @@
-package funcify.choice;
+package funcify.conjunct;
 
 import java.util.function.BiFunction;
 
 /**
+ * A Duet that can hold values for <b>both</b> type parameters, A and B, at the same time
+ *
  * @author smccarron
  * @created 2021-05-02
  */

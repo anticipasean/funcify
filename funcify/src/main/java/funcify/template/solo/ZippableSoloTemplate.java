@@ -10,10 +10,8 @@ import java.util.function.Function;
  */
 public interface ZippableSoloTemplate<W> extends MappableSoloTemplate<W> {
 
-    <B> Solo<W, B> from(B value);
-
-    <A, B, F extends Function<A, B>> Solo<W, B> ap(Solo<W, A> container,
-                                                   Solo<W, F> containerWithFunction);
+    <A, B, F extends Function<? super A, ? extends B>> Solo<W, B> ap(Solo<W, A> container,
+                                                                     Solo<W, F> containerWithFunction);
 
     <A, B, C> Solo<W, C> zip(Solo<W, A> container1,
                              Solo<W, B> container2,

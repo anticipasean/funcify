@@ -9,20 +9,10 @@ import java.util.function.Function;
  */
 public interface FlattenableDuetTemplate<W> extends ZippableDuetTemplate<W> {
 
-    default <A, B> Duet<W, A, B> widenK(final Duet<W, ? extends A, ? extends B> container) {
-        return Duet.widen(container);
-    }
+    <A, B, C> Duet<W, C, B> flatMapFirst(final Duet<W, A, B> container,
+                                         final Function<? super A, ? extends Duet<W, C, B>> flatMapper);
 
-    default <A, B> Duet<W, A, B> narrowK(final Duet<W, ? super A, ? super B> container) {
-        return Duet.narrow(container);
-    }
-
-    <A, B, C> Duet<W, A, C> flatMap(final Duet<W, A, B> container,
-                                    final Function<? super B, ? extends Duet<W, A, C>> flatMapper);
-
-    default <A, B> Duet<W, A, B> flatten(final Duet<W, A, Duet<W, A, B>> container) {
-        return flatMap(container,
-                       b -> b);
-    }
+    <A, B, C> Duet<W, A, C> flatMapSecond(final Duet<W, A, B> container,
+                                          final Function<? super B, ? extends Duet<W, A, C>> flatMapper);
 
 }

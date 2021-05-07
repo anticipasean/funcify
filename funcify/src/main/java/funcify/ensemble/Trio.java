@@ -5,6 +5,15 @@ import static java.util.Objects.requireNonNull;
 import java.util.function.Function;
 
 /**
+ * Simulated Higher Kinded Typing in Java
+ * <br>
+ * Trio => a Higher Kinded Type with the obligatory <b>W</b>itness type parameter and
+ * <b>three</b> value type parameters
+ *
+ * @param <W> - Witness type parameter
+ * @param <A> - First value type parameter
+ * @param <B> - Second value type parameter
+ * @param <C> - Third value type parameter
  * @author smccarron
  * @created 2021-04-28
  */

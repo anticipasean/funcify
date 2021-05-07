@@ -9,7 +9,13 @@ import java.util.function.Function;
  */
 public interface MappableDuetTemplate<W> {
 
-    <A, B, C> Duet<W, A, C> map(Duet<W, A, B> container,
-                                Function<? super B, ? extends C> mapper);
+    <A, B, C> Duet<W, C, B> mapFirst(Duet<W, A, B> container,
+                                     Function<? super A, ? extends C> mapper);
 
+    <A, B, C> Duet<W, A, C> mapSecond(Duet<W, A, B> container,
+                                      Function<? super B, ? extends C> mapper);
+
+    <A, B, C, D> Duet<W, C, D> bimap(Duet<W, A, B> container,
+                                     Function<? super A, ? extends C> mapper1,
+                                     Function<? super B, ? extends D> mapper2);
 }

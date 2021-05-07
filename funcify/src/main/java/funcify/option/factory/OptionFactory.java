@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 import funcify.ensemble.Solo;
 import funcify.option.Option;
 import funcify.option.Option.OptionW;
-import funcify.template.solo.FlattenableSoloDisjunctTemplate;
+import funcify.template.solo.FlattenableDisjunctSoloTemplate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -13,7 +13,28 @@ import java.util.function.Supplier;
  * @author smccarron
  * @created 2021-04-28
  */
-public class OptionFactory implements FlattenableSoloDisjunctTemplate<OptionW> {
+public class OptionFactory implements FlattenableDisjunctSoloTemplate<OptionW> {
+
+    private static enum FactoryHolder {
+        INSTANCE(new OptionFactory());
+
+        private final OptionFactory optionFactory;
+
+        FactoryHolder(final OptionFactory optionFactory) {
+            this.optionFactory = optionFactory;
+        }
+
+        public OptionFactory getOptionFactory() {
+            return optionFactory;
+        }
+    }
+
+    private OptionFactory() {
+    }
+
+    public static OptionFactory getInstance() {
+        return FactoryHolder.INSTANCE.getOptionFactory();
+    }
 
     @Override
     public <B> Solo<OptionW, B> empty() {
