@@ -47,8 +47,8 @@ public class Fn2Factory {
                                                       () -> "biFunction"));
     }
 
-    public <A, B, C, D> Fn2<A, B, D> map(Trio<Fn2W, A, B, C> container,
-                                         Function<? super C, ? extends D> mapper) {
+    public <A, B, C, D> Trio<Fn2W, A, B, D> map(Trio<Fn2W, A, B, C> container,
+                                                Function<? super C, ? extends D> mapper) {
         return fromFunction((A paramA, B paramB) -> requireNonNull(mapper,
                                                                    () -> "mapper").apply(requireNonNull(container,
                                                                                                         () -> "container").convert(Fn2::narrowK)
@@ -56,8 +56,8 @@ public class Fn2Factory {
                                                                                                                                  paramB)));
     }
 
-    public <A, B, C, D> Fn2<A, B, D> flatMap(Trio<Fn2W, A, B, C> container,
-                                             Function<? super C, ? extends Trio<Fn2W, A, B, D>> flatMapper) {
+    public <A, B, C, D> Trio<Fn2W, A, B, D> flatMap(Trio<Fn2W, A, B, C> container,
+                                                    Function<? super C, ? extends Trio<Fn2W, A, B, D>> flatMapper) {
         return fromFunction((A paramA, B paramB) -> {
             return requireNonNull(flatMapper,
                                   () -> "flatMapper").apply(requireNonNull(container,
@@ -70,14 +70,14 @@ public class Fn2Factory {
         });
     }
 
-    public <A, B, C> Fn2<A, B, C> flatten(Trio<Fn2W, A, B, Trio<Fn2W, A, B, C>> container) {
+    public <A, B, C> Trio<Fn2W, A, B, C> flatten(Trio<Fn2W, A, B, Trio<Fn2W, A, B, C>> container) {
         return flatMap(container,
                        f -> f);
     }
 
-    public <Y, Z, A, B, C, D> Fn2<Y, Z, D> dimap(Trio<Fn2W, A, B, C> container,
-                                                 BiFunction<? super Y, ? super Z, ? extends Tuple2<A, B>> mapper1,
-                                                 Function<? super C, ? extends D> mapper2) {
+    public <Y, Z, A, B, C, D> Trio<Fn2W, Y, Z, D> dimap(Trio<Fn2W, A, B, C> container,
+                                                        BiFunction<? super Y, ? super Z, ? extends Tuple2<A, B>> mapper1,
+                                                        Function<? super C, ? extends D> mapper2) {
         return fromFunction((Y paramY, Z paramZ) -> {
             return requireNonNull(mapper1,
                                   () -> "mapper1").apply(paramY,
@@ -92,8 +92,24 @@ public class Fn2Factory {
                               () -> "mapper2"));
     }
 
-    public <Z, A, B, C> Fn2<Z, B, C> contraMapFirst(Trio<Fn2W, A, B, C> container,
-                                                    Function<? super Z, ? extends A> mapper) {
+    public <A, B, C, D, F extends Trio<Fn2W, ? super A, ? super B, ? extends D>> Trio<Fn2W, A, B, D> ap(final Trio<Fn2W, A, B, C> container,
+                                                                                                        final Trio<Fn2W, ? super A, ? super C, ? extends F> applicativeContainer) {
+        return fromFunction((A paramA, B paramB) -> {
+            return requireNonNull(applicativeContainer,
+                                  () -> "applicativeContainer").convert(Fn2::narrowK)
+                                                               .apply(paramA,
+                                                                      requireNonNull(container,
+                                                                                     () -> "container").convert(Fn2::narrowK)
+                                                                                                       .apply(paramA,
+                                                                                                              paramB))
+                                                               .convert(Fn2::narrowK)
+                                                               .apply(paramA,
+                                                                      paramB);
+        });
+    }
+
+    public <Z, A, B, C> Trio<Fn2W, Z, B, C> contraMapFirst(Trio<Fn2W, A, B, C> container,
+                                                           Function<? super Z, ? extends A> mapper) {
         return dimap(container,
                      (Z paramZ, B paramB) -> {
                          return Tuple2.of(requireNonNull(mapper,
@@ -103,8 +119,8 @@ public class Fn2Factory {
                      c -> c);
     }
 
-    public <Z, A, B, C> Fn2<A, Z, C> contraMapSecond(Trio<Fn2W, A, B, C> container,
-                                                     Function<? super Z, ? extends B> mapper) {
+    public <Z, A, B, C> Trio<Fn2W, A, Z, C> contraMapSecond(Trio<Fn2W, A, B, C> container,
+                                                            Function<? super Z, ? extends B> mapper) {
         return dimap(container,
                      (A paramA, Z paramZ) -> {
                          return Tuple2.of(paramA,
@@ -114,8 +130,8 @@ public class Fn2Factory {
                      c -> c);
     }
 
-    public <Y, Z, A, B, C> Fn2<Y, Z, C> contraMap(Trio<Fn2W, A, B, C> container,
-                                                  BiFunction<? super Y, ? super Z, ? extends Tuple2<A, B>> mapper) {
+    public <Y, Z, A, B, C> Trio<Fn2W, Y, Z, C> contraMap(Trio<Fn2W, A, B, C> container,
+                                                         BiFunction<? super Y, ? super Z, ? extends Tuple2<A, B>> mapper) {
         return dimap(container,
                      mapper,
                      c -> c);

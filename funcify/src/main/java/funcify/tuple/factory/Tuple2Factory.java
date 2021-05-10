@@ -3,7 +3,7 @@ package funcify.tuple.factory;
 import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Duet;
-import funcify.template.duet.FlattenableConjunctDuetTemplate;
+import funcify.template.duet.conjunct.FlattenableConjunctDuetTemplate;
 import funcify.tuple.Tuple2;
 import funcify.tuple.Tuple2.Tuple2W;
 import java.util.function.BiFunction;

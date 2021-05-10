@@ -1,8 +1,8 @@
 package funcify.tuple;
 
 import funcify.ensemble.Solo;
-import funcify.flattenable.FlattenableConjunctSolo;
-import funcify.flattenable.FlattenableSolo;
+import funcify.design.solo.conjunct.FlattenableConjunctSolo;
+import funcify.design.solo.FlattenableSolo;
 import funcify.tuple.Tuple1.Tuple1W;
 import funcify.tuple.factory.Tuple1Factory;
 import java.util.Iterator;

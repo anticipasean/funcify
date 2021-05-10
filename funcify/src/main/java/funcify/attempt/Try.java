@@ -2,10 +2,10 @@ package funcify.attempt;
 
 import funcify.attempt.Try.TryW;
 import funcify.attempt.factory.TryFactory;
+import funcify.design.duet.FlattenableDuet;
+import funcify.design.duet.disjunct.FlattenableDisjunctDuet;
 import funcify.ensemble.Duet;
 import funcify.ensemble.Solo;
-import funcify.flattenable.FlattenableDisjunctDuet;
-import funcify.flattenable.FlattenableDuet;
 import funcify.function.Fn0;
 import funcify.function.Fn0.ErrableFn0;
 import funcify.function.Fn1.ErrableFn1;
@@ -23,11 +23,11 @@ public interface Try<S> extends FlattenableDisjunctDuet<TryW, S, Throwable>, Ite
 
     }
 
-    static <S, F extends Throwable> Try<S> narrowK(Solo<Solo<TryW, S>, F> soloInstance) {
+    static <S, F extends Throwable> Try<S> narrowK(final Solo<Solo<TryW, S>, F> soloInstance) {
         return (Try<S>) soloInstance;
     }
 
-    static <S, F extends Throwable> Try<S> narrowK(Duet<TryW, S, F> duetInstance) {
+    static <S, F extends Throwable> Try<S> narrowK(final Duet<TryW, S, F> duetInstance) {
         return (Try<S>) duetInstance;
     }
 
@@ -61,11 +61,11 @@ public interface Try<S> extends FlattenableDisjunctDuet<TryW, S, Throwable>, Ite
         return TryFactory.getInstance().<S, Throwable>first(value).narrowT1();
     }
 
-    static <S, T extends Throwable> Try<S> failure(final T throwable) {
+    static <S> Try<S> failure(final Throwable throwable) {
         return TryFactory.getInstance().<S, Throwable>second(throwable).narrowT1();
     }
 
-    default <C, X extends Throwable> Try<C> flatMapCatching(final Function<? super S, ? extends Try<C>> flatMapper,
+    default <B, X extends Throwable> Try<B> flatMapCatching(final Function<? super S, ? extends Try<B>> flatMapper,
                                                             final Class<X> allowedErrorType) {
         return factory().flatMapCatchingOnly(this,
                                              flatMapper,
@@ -73,19 +73,19 @@ public interface Try<S> extends FlattenableDisjunctDuet<TryW, S, Throwable>, Ite
                         .narrowT1();
     }
 
-    default <C, T extends Throwable> Try<C> checkedMap(final ErrableFn1<? super S, ? extends C, T> mapper) {
+    default <B, T extends Throwable> Try<B> checkedMap(final ErrableFn1<? super S, ? extends B, T> mapper) {
         return factory().checkedMap(this,
                                     mapper)
                         .narrowT2();
     }
 
-    default <C, T extends Throwable> Try<C> checkedFlatMap(final ErrableFn1<? super S, ? extends Try<C>, T> flatMapper) {
+    default <B, T extends Throwable> Try<B> checkedFlatMap(final ErrableFn1<? super S, ? extends Try<B>, T> flatMapper) {
         return factory().checkedFlatMap(this,
                                         flatMapper)
                         .narrowT1();
     }
 
-    default <C> Try<C> flatMapSuccess(final Function<? super S, ? extends FlattenableDuet<TryW, C, Throwable>> flatMapper) {
+    default <B> Try<B> flatMapSuccess(final Function<? super S, ? extends FlattenableDuet<TryW, B, Throwable>> flatMapper) {
         return flatMapFirst(flatMapper).narrowT1();
     }
 
@@ -100,12 +100,12 @@ public interface Try<S> extends FlattenableDisjunctDuet<TryW, S, Throwable>, Ite
         return flatMapSecond(flatMapper).narrowT1();
     }
 
-    default <C> Try<C> mapSuccess(final Function<? super S, ? extends C> mapper) {
+    default <B> Try<B> mapSuccess(final Function<? super S, ? extends B> mapper) {
         return mapFirst(mapper).narrowT2();
     }
 
 
-    default <C extends Throwable> Try<S> mapFailure(final Function<? super Throwable, ? extends C> mapper) {
+    default <F extends Throwable> Try<S> mapFailure(final Function<? super Throwable, ? extends F> mapper) {
         return mapSecond(mapper).narrowT1();
     }
 
@@ -115,18 +115,18 @@ public interface Try<S> extends FlattenableDisjunctDuet<TryW, S, Throwable>, Ite
                         combiner).narrowT2();
     }
 
-    default <C extends Throwable> Try<S> zipFailure(final Try<S> container,
-                                                    final BiFunction<? super Throwable, ? super Throwable, ? extends C> combiner) {
+    default <F extends Throwable> Try<S> zipFailure(final Try<S> container,
+                                                    final BiFunction<? super Throwable, ? super Throwable, ? extends F> combiner) {
         return zipSecond(container,
                          combiner).narrowT1();
     }
 
-    default <B, C extends Throwable> Try<B> bimap(final Function<? super S, ? extends B> mapper1,
-                                                  final Function<? super Throwable, ? extends C> mapper2) {
-        return factory().bimap(this,
-                               mapper1,
-                               mapper2)
-                        .narrowT2();
+
+    default <B, F extends Throwable> Try<B> bimap(final Function<? super S, ? extends B> mapper1,
+                                                  final Function<? super Throwable, ? extends F> mapper2) {
+        return factory().<S, Throwable, B, Throwable>bimap(this,
+                                                           mapper1,
+                                                           mapper2).narrowT2();
     }
 
     @Override

@@ -15,7 +15,7 @@ import java.util.function.Function;
  * @author smccarron
  * @created 2021-04-28
  */
-public interface Solo<W, A> {
+public interface Solo<W, A> extends Ensemble<W> {
 
     default <R> R convert(Function<Solo<W, A>, R> converter) {
         return requireNonNull(converter,
@@ -33,8 +33,8 @@ public interface Solo<W, A> {
     }
 
     @SuppressWarnings("unchecked")
-    default <B extends Solo<W, ? super A>> B narrowT1() {
-        return (B) this;
+    default <S extends Solo<W, ? super A>> S narrowT1() {
+        return (S) this;
     }
 
 }

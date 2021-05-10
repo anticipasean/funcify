@@ -17,7 +17,7 @@ import java.util.function.Function;
  * @author smccarron
  * @created 2021-04-28
  */
-public interface Trio<W, A, B, C> extends Duet<Solo<W, A>, B, C> {
+public interface Trio<W, A, B, C> extends Solo<Solo<Solo<W, A>, B>, C> {
 
     @Override
     default <R> R convert(Function<Solo<Solo<Solo<W, A>, B>, C>, R> converter) {
@@ -26,7 +26,17 @@ public interface Trio<W, A, B, C> extends Duet<Solo<W, A>, B, C> {
     }
 
     @SuppressWarnings("unchecked")
-    default <T extends Trio<W, ? super A, ? super B, ? super C>> T narrowT3() {
+    static <W, A extends E, B extends F, C extends G, E, F, G> Trio<W, E, F, G> widenP(Trio<W, A, B, C> trio) {
+        return (Trio<W, E, F, G>) trio;
+    }
+
+    @SuppressWarnings("unchecked")
+    static <W, E extends A, F extends B, G extends C, A, B, C, D> Trio<W, E, F, G> narrowP(Trio<W, A, B, C> trio) {
+        return (Trio<W, E, F, G>) trio;
+    }
+
+    @SuppressWarnings("unchecked")
+    default <T extends Trio<W, ? extends A, ? extends B, ? super C>> T narrowT3() {
         return (T) this;
     }
 }

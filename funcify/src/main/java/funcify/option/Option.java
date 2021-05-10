@@ -1,8 +1,9 @@
 package funcify.option;
 
+import funcify.design.solo.FlattenableSolo;
+import funcify.design.solo.disjunct.DisjunctSolo;
+import funcify.design.solo.disjunct.FlattenableDisjunctSolo;
 import funcify.ensemble.Solo;
-import funcify.flattenable.FlattenableDisjunctSolo;
-import funcify.flattenable.FlattenableSolo;
 import funcify.option.Option.OptionW;
 import funcify.option.factory.OptionFactory;
 import funcify.tuple.Tuple2;
@@ -10,7 +11,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * @author smccarron
@@ -22,8 +23,8 @@ public interface Option<A> extends Iterable<A>, FlattenableDisjunctSolo<OptionW,
 
     }
 
-    static <T> Option<T> narrowK(Solo<OptionW, T> wideInstance) {
-        return (Option<T>) wideInstance;
+    static <T> Option<T> narrowK(Solo<OptionW, T> soloInstance) {
+        return (Option<T>) soloInstance;
     }
 
     static <T> Option<T> of(T value) {
@@ -43,6 +44,12 @@ public interface Option<A> extends Iterable<A>, FlattenableDisjunctSolo<OptionW,
     }
 
     @Override
+    default <B> Option<B> from(final B value) {
+        return factory().from(value)
+                        .narrowT1();
+    }
+
+    @Override
     default Option<A> empty() {
         return Option.none();
     }
@@ -50,12 +57,6 @@ public interface Option<A> extends Iterable<A>, FlattenableDisjunctSolo<OptionW,
     @Override
     default OptionFactory factory() {
         return OptionFactory.getInstance();
-    }
-
-    @Override
-    default Option<A> filter(Predicate<? super A> condition) {
-        return FlattenableDisjunctSolo.super.filter(condition)
-                                            .narrowT1();
     }
 
     @Override
@@ -87,5 +88,11 @@ public interface Option<A> extends Iterable<A>, FlattenableDisjunctSolo<OptionW,
     @Override
     default Iterator<A> iterator() {
         return factory().toIterator(this);
+    }
+
+    @Override
+    default Option<A> orElseUse(Supplier<? extends DisjunctSolo<OptionW, A>> alternativeSupplier) {
+        return FlattenableDisjunctSolo.super.orElseUse(alternativeSupplier)
+                                            .narrowT1();
     }
 }

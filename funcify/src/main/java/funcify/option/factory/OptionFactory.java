@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 import funcify.ensemble.Solo;
 import funcify.option.Option;
 import funcify.option.Option.OptionW;
-import funcify.template.solo.FlattenableDisjunctSoloTemplate;
+import funcify.template.solo.disjunct.FlattenableDisjunctSoloTemplate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 

@@ -54,6 +54,11 @@ public class Fn1Factory {
                                                                             .apply(paramA));
     }
 
+    public <A, B> Duet<Fn1W, A, B> flatten(final Duet<Fn1W, A, Duet<Fn1W, A, B>> container) {
+        return flatMap(container,
+                       f -> f);
+    }
+
 
     public <A, B, C> Duet<Fn1W, A, C> zip(final Duet<Fn1W, A, B> container1,
                                           final Duet<Fn1W, A, B> container2,

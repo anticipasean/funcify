@@ -2,8 +2,8 @@ package funcify.tuple;
 
 import funcify.ensemble.Duet;
 import funcify.ensemble.Solo;
-import funcify.flattenable.FlattenableConjunctDuet;
-import funcify.flattenable.FlattenableDuet;
+import funcify.design.duet.conjunct.FlattenableConjunctDuet;
+import funcify.design.duet.FlattenableDuet;
 import funcify.tuple.Tuple2.Tuple2W;
 import funcify.tuple.factory.Tuple2Factory;
 import java.util.Iterator;

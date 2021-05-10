@@ -5,8 +5,8 @@ import static java.util.Objects.requireNonNull;
 import funcify.either.Either;
 import funcify.either.Either.EitherW;
 import funcify.ensemble.Duet;
-import funcify.template.duet.FlattenableDisjunctDuetTemplate;
-import funcify.template.duet.IterableDisjunctDuetTemplate;
+import funcify.template.duet.disjunct.FlattenableDisjunctDuetTemplate;
+import funcify.template.duet.disjunct.IterableDisjunctDuetTemplate;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 

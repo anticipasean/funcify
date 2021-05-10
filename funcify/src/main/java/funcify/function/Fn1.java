@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Duet;
 import funcify.ensemble.Solo;
-import funcify.flattenable.FlattenableDuet;
 import funcify.function.Fn1.Fn1W;
 import funcify.function.factory.Fn1Factory;
 import java.util.function.BiFunction;
@@ -35,6 +34,12 @@ public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
         }
         return Fn1Factory.getInstance()
                          .fromFunction(function)
+                         .narrowT1();
+    }
+
+    static <A, B, F extends Fn1<A, Fn1<A, B>>> Fn1<A, B> flatten(final F nestedFunc) {
+        return Fn1Factory.getInstance()
+                         .flatten(Duet.widenP(nestedFunc))
                          .narrowT1();
     }
 
@@ -73,7 +78,7 @@ public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
                         .narrowT1();
     }
 
-    default <C> Fn1<A, C> flatMap(final Function<? super B, ? extends Duet<Fn1W, A, C>> flatMapper) {
+    default <C> Fn1<A, C> flatMap(final Function<? super B, ? extends Fn1<A, C>> flatMapper) {
         return factory().flatMap(this,
                                  flatMapper)
                         .narrowT1();

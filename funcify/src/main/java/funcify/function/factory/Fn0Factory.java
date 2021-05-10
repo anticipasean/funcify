@@ -61,6 +61,10 @@ public class Fn0Factory {
                                                                     .get());
     }
 
+    public <A> Solo<Fn0W, A> flatten(final Solo<Fn0W, Solo<Fn0W, A>> nestedFunc) {
+        return flatMap(nestedFunc,
+                       f -> f);
+    }
 
     public <A, B> Solo<Fn0W, B> map(Solo<Fn0W, A> container,
                                     Function<? super A, ? extends B> mapper) {
@@ -103,7 +107,7 @@ public class Fn0Factory {
         private final Supplier<A> function;
 
         @Override
-        public A get() {
+        public A apply() {
             return function.get();
         }
     }

@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Trio;
 import funcify.function.Fn3;
-import funcify.template.trio.FlattenableConjunctTrioTemplate;
+import funcify.template.trio.conjunct.FlattenableConjunctTrioTemplate;
 import funcify.tuple.Tuple3;
 import funcify.tuple.Tuple3.Tuple3W;
 import lombok.AllArgsConstructor;
@@ -46,9 +46,10 @@ public class Tuple3Factory implements FlattenableConjunctTrioTemplate<Tuple3W> {
                                    value3);
     }
 
+
     @Override
     public <A, B, C, D> D fold(final Trio<Tuple3W, A, B, C> container,
-                               final Fn3<A, B, C, D> mapper) {
+                               final Fn3<? super A, ? super B, ? super C, ? extends D> mapper) {
         return null;
     }
 

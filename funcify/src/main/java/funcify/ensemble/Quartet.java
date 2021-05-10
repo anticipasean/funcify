@@ -18,7 +18,7 @@ import java.util.function.Function;
  * @author smccarron
  * @created 2021-04-28
  */
-public interface Quartet<W, A, B, C, D> extends Trio<Solo<W, A>, B, C, D> {
+public interface Quartet<W, A, B, C, D> extends Solo<Solo<Solo<Solo<W, A>, B>, C>, D> {
 
     @Override
     default <R> R convert(Function<Solo<Solo<Solo<Solo<W, A>, B>, C>, D>, R> converter) {
@@ -26,6 +26,20 @@ public interface Quartet<W, A, B, C, D> extends Trio<Solo<W, A>, B, C, D> {
                               () -> "converter").apply(this);
     }
 
+    @SuppressWarnings("unchecked")
+    static <W, A extends E, B extends F, C extends G, D extends H, E, F, G, H> Quartet<W, E, F, G, H> widenP(Quartet<W, A, B, C, D> quartet) {
+        return (Quartet<W, E, F, G, H>) quartet;
+    }
+
+    @SuppressWarnings("unchecked")
+    static <W, E extends A, F extends B, G extends C, H extends D, A, B, C, D> Quartet<W, E, F, G, H> narrowP(Quartet<W, A, B, C, D> quartet) {
+        return (Quartet<W, E, F, G, H>) quartet;
+    }
+
+    @SuppressWarnings("unchecked")
+    default <Q extends Quartet<W, ? super A, ? super B, ? super C, ? super D>> Q narrowT4() {
+        return (Q) this;
+    }
 
 
 }

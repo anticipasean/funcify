@@ -1,14 +1,17 @@
 package funcify.either;
 
+import funcify.design.duet.FilterableDuet;
+import funcify.design.duet.disjunct.FlattenableDisjunctDuet;
 import funcify.either.Either.EitherW;
 import funcify.either.factory.EitherFactory;
 import funcify.ensemble.Duet;
 import funcify.ensemble.Solo;
-import funcify.flattenable.FlattenableDisjunctDuet;
+import funcify.function.Fn1;
 import funcify.option.Option;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -128,5 +131,33 @@ public interface Either<L, R> extends FlattenableDisjunctDuet<EitherW, L, R>, It
 
     default Option<R> getRight() {
         return getSecond();
+    }
+
+
+    default Option<L> filterLeft(final Predicate<? super L> condition) {
+        return getLeft().filter(condition);
+    }
+
+
+    default Either<L, R> filterLeft(final Predicate<? super L> condition,
+                                    final Fn1<? super L, ? extends FilterableDuet<EitherW, L, R>> ifNotFitsCondition) {
+        return factory().filterFirst(this,
+                                     ifNotFitsCondition,
+                                     condition)
+                        .narrowT1();
+    }
+
+
+    default Option<R> filterRight(final Predicate<? super R> condition) {
+        return getRight().filter(condition);
+    }
+
+
+    default Either<L, R> filterRight(final Predicate<? super R> condition,
+                                     final Fn1<? super R, ? extends FilterableDuet<EitherW, L, R>> ifNotFitsCondition) {
+        return factory().filterSecond(this,
+                                      ifNotFitsCondition,
+                                      condition)
+                        .narrowT1();
     }
 }

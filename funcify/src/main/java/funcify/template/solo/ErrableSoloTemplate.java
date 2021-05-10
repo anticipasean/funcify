@@ -16,7 +16,7 @@ public interface ErrableSoloTemplate<W> {
     default <A, T extends Throwable> A checkedSupplierCall(ErrableFn0<A, T> errableSupplier) throws T {
         try {
             return requireNonNull(errableSupplier,
-                                  () -> "errableSupplier").get();
+                                  () -> "errableSupplier").apply();
         } catch (Throwable t) {
             throw throwUncheckedThrowable(t);
         }

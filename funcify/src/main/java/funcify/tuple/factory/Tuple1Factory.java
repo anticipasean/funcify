@@ -3,7 +3,7 @@ package funcify.tuple.factory;
 import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Solo;
-import funcify.template.solo.FlattenableConjunctSoloTemplate;
+import funcify.template.solo.conjunct.FlattenableConjunctSoloTemplate;
 import funcify.tuple.Tuple1;
 import funcify.tuple.Tuple1.Tuple1W;
 import java.util.function.Function;

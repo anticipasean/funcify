@@ -10,7 +10,7 @@ import funcify.function.Fn0.ErrableFn0;
 import funcify.function.Fn1;
 import funcify.function.Fn1.ErrableFn1;
 import funcify.option.Option;
-import funcify.template.duet.FlattenableDisjunctDuetTemplate;
+import funcify.template.duet.disjunct.FlattenableDisjunctDuetTemplate;
 import funcify.template.error.Errable;
 import java.util.Optional;
 import java.util.function.Function;
@@ -101,7 +101,7 @@ public class TryFactory implements FlattenableDisjunctDuetTemplate<TryW> {
                                                                             final Class<? extends Throwable>... allowedErrorTypes) {
         try {
             return this.<A, Throwable>first(requireNonNull(errableOperation,
-                                                           () -> "errableOperation").get());
+                                                           () -> "errableOperation").apply());
         } catch (final Throwable t) {
             if (allowedErrorTypes == null || allowedErrorTypes.length == 0) {
                 return this.<A, Throwable>second(t);

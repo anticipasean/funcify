@@ -1,6 +1,6 @@
 package funcify.template.solo;
 
-import funcify.disjunct.DisjunctSolo;
+import funcify.design.solo.disjunct.DisjunctSolo;
 import funcify.ensemble.Solo;
 import funcify.function.Fn0;
 import funcify.function.Fn1;

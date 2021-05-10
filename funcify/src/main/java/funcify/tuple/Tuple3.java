@@ -1,6 +1,6 @@
 package funcify.tuple;
 
-import funcify.flattenable.FlattenableConjunctTrio;
+import funcify.design.trio.conjunct.FlattenableConjunctTrio;
 import funcify.tuple.Tuple3.Tuple3W;
 import funcify.tuple.factory.Tuple3Factory;
 
