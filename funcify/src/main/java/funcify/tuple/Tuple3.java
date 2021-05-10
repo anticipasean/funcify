@@ -61,4 +61,6 @@ public interface Tuple3<A, B, C> extends FlattenableConjunctTrio<Tuple3W, A, B, 
         return factory().swapSecondThird(this)
                         .narrowT1();
     }
+
+
 }

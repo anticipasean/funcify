@@ -6,7 +6,6 @@ import funcify.either.Either;
 import funcify.either.Either.EitherW;
 import funcify.ensemble.Duet;
 import funcify.template.duet.disjunct.FlattenableDisjunctDuetTemplate;
-import funcify.template.duet.disjunct.IterableDisjunctDuetTemplate;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 
@@ -14,7 +13,7 @@ import lombok.AllArgsConstructor;
  * @author smccarron
  * @created 2021-05-06
  */
-public class EitherFactory implements FlattenableDisjunctDuetTemplate<EitherW>, IterableDisjunctDuetTemplate<EitherW> {
+public class EitherFactory implements FlattenableDisjunctDuetTemplate<EitherW> {
 
     private static enum FactoryHolder {
         INSTANCE(new EitherFactory());

@@ -87,14 +87,14 @@ public class TryFactory implements FlattenableDisjunctDuetTemplate<TryW> {
         }
     }
 
-//    public final <A> Duet<TryW, A, Throwable> catching(final ErrableFn0<? extends A, Throwable> errableOperation) {
-//        try {
-//            return first(requireNonNull(errableOperation,
-//                                        () -> "errableOperation").get());
-//        } catch (final Throwable t) {
-//            return second(t);
-//        }
-//    }
+    //    public final <A> Duet<TryW, A, Throwable> catching(final ErrableFn0<? extends A, Throwable> errableOperation) {
+    //        try {
+    //            return first(requireNonNull(errableOperation,
+    //                                        () -> "errableOperation").get());
+    //        } catch (final Throwable t) {
+    //            return second(t);
+    //        }
+    //    }
 
     @SafeVarargs
     public final <A, T extends Throwable> Duet<TryW, A, Throwable> catching(final ErrableFn0<? extends A, T> errableOperation,
@@ -118,15 +118,16 @@ public class TryFactory implements FlattenableDisjunctDuetTemplate<TryW> {
     }
 
     @SafeVarargs
-    public final <A, B extends Throwable, C> Duet<TryW, C, Throwable> flatMapCatchingOnly(final Duet<TryW, A, B> container,
-                                                                                          final Function<? super A, ? extends Duet<TryW, C, Throwable>> flatMapper,
+    public final <A, B extends Throwable, C> Duet<TryW, C, Throwable> flatMapCatchingOnly(final Duet<TryW, A, Throwable> container,
+                                                                                          final Fn1<? super A, ? extends Duet<TryW, ? extends C, Throwable>> flatMapper,
                                                                                           final Class<? extends Throwable>... allowedErrorType) {
         return fold(container,
                     (A a) -> {
                         return requireNonNull(flatMapper,
-                                              () -> "flatMapper").apply(a);
+                                              () -> "flatMapper").apply(a)
+                                                                 .narrowT2();
                     },
-                    (B b) -> {
+                    (Throwable b) -> {
                         return Option.fromOptional(Option.of(allowedErrorType)
                                                          .map(Stream::of)
                                                          .orElseGet(Stream::empty)
@@ -139,57 +140,43 @@ public class TryFactory implements FlattenableDisjunctDuetTemplate<TryW> {
     }
 
     @SafeVarargs
-    public final <A, B extends Throwable, C> Duet<TryW, C, Throwable> mapCatchingOnly(final Duet<TryW, A, B> container,
+    public final <A, B extends Throwable, C> Duet<TryW, C, Throwable> mapCatchingOnly(final Duet<TryW, A, Throwable> container,
                                                                                       final Fn1<? super A, ? extends C> mapper,
                                                                                       final Class<? extends Throwable>... allowedErrorType) {
-        return fold(container,
-                    (A a) -> {
-                        return flatMapCatchingOnly(container,
-                                                   (A paramA) -> this.<C>catching(Fn0.of(() -> requireNonNull(mapper,
-                                                                                                              () -> "mapper").apply(paramA))).narrowT1(),
-                                                   allowedErrorType);
-                    },
-                    (B b) -> {
-                        return Option.fromOptional(Option.of(allowedErrorType)
-                                                         .map(Stream::of)
-                                                         .orElseGet(Stream::empty)
-                                                         .filter(xType -> xType.isAssignableFrom(b.getClass()))
-                                                         .findFirst())
-                                     .map(xType -> xType.cast(b))
-                                     .map(this::<C, Throwable>second)
-                                     .orElseThrow(b);
-                    });
+        return flatMapCatchingOnly(container,
+                                   requireNonNull(mapper,
+                                                  () -> "mapper").andThen(this::first),
+                                   allowedErrorType);
     }
 
 
-    @SuppressWarnings("unchecked")
-    public <A, B extends Throwable, C> Duet<TryW, C, B> checkedMap(final Duet<TryW, A, B> container,
-                                                                   final ErrableFn1<? super A, ? extends C, ? extends B> mapper) {
+    public <A, B extends Throwable, C> Duet<TryW, C, Throwable> checkedMap(final Duet<TryW, A, Throwable> container,
+                                                                           final ErrableFn1<? super A, ? extends C, ? extends B> mapper) {
         return fold(container,
                     (A paramA) -> {
                         try {
                             return first(requireNonNull(mapper,
                                                         () -> "mapper").apply(paramA));
                         } catch (final Throwable b) {
-                            return this.<C, B>second((B) b);
+                            return this.<C, Throwable>second(b);
                         }
                     },
-                    this::<C, B>second);
+                    this::<C, Throwable>second);
     }
 
-    @SuppressWarnings("unchecked")
-    public <A, B extends Throwable, C> Duet<TryW, C, B> checkedFlatMap(final Duet<TryW, A, B> container,
-                                                                       final ErrableFn1<? super A, ? extends Try<C>, ? extends B> flatMapper) {
+    public <A, B extends Throwable, C> Duet<TryW, C, Throwable> checkedFlatMap(final Duet<TryW, A, Throwable> container,
+                                                                               final ErrableFn1<? super A, ? extends Try<? extends C>, ? extends B> flatMapper) {
         return fold(container,
                     (A a) -> {
                         try {
-                            return (Duet<TryW, C, B>) requireNonNull(flatMapper,
-                                                                     () -> "flatMapper").apply(a);
+                            return requireNonNull(flatMapper,
+                                                  () -> "flatMapper").apply(a)
+                                                                     .narrowT2();
                         } catch (Throwable b) {
-                            return this.<C, B>second((B) b);
+                            return this.<C, Throwable>second(b);
                         }
                     },
-                    this::<C, B>second);
+                    this::<C, Throwable>second);
     }
 
 

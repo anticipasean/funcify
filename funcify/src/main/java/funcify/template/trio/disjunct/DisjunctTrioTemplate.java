@@ -1,4 +1,4 @@
-package funcify.template.trio;
+package funcify.template.trio.disjunct;
 
 import funcify.ensemble.Trio;
 import java.util.function.Function;
