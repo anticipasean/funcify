@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Duet;
 import funcify.option.Option;
+import funcify.tuple.Tuple2;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -14,6 +15,10 @@ import java.util.function.Supplier;
  * @created 2021-04-28
  */
 public interface DisjunctDuet<W, A, B> extends Duet<W, A, B> {
+
+    Duet<W, A, B> first(final A value);
+
+    Duet<W, A, B> second(final B value);
 
     <C> C fold(Function<? super A, ? extends C> ifFirstPresent,
                Function<? super B, ? extends C> ifSecondPresent);
@@ -48,6 +53,13 @@ public interface DisjunctDuet<W, A, B> extends Duet<W, A, B> {
     default Option<B> getSecond() {
         return fold(l -> Option.none(),
                     Option::of);
+    }
+
+    default Tuple2<Option<A>, Option<B>> project() {
+        return fold(f -> Tuple2.of(Option.of(f),
+                                   Option.none()),
+                    s -> Tuple2.of(Option.none(),
+                                   Option.of(s)));
     }
 
 }

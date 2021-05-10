@@ -3,8 +3,7 @@ package funcify.disjunct;
 import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Solo;
-import funcify.flattenable.FlattenableSolo;
-import java.util.function.BiFunction;
+import funcify.template.error.Errable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -17,6 +16,7 @@ import java.util.function.Supplier;
 public interface DisjunctSolo<W, A> extends Solo<W, A> {
 
     <B> DisjunctSolo<W, B> from(final B value);
+
     /**
      * Only disjunct solo types can have a valid empty or "none" state Conjunct types should not be empty
      *
@@ -39,7 +39,17 @@ public interface DisjunctSolo<W, A> extends Solo<W, A> {
                                    () -> "defaultIfAbsent"));
     }
 
-    default <E extends Throwable> A orElseThrow(E throwable) throws E {
+    default <T extends Throwable> A orElseThrow(T throwable) {
+        final A result = fold(a -> a,
+                              () -> null);
+        if (result != null) {
+            return result;
+        } else {
+            throw Errable.throwUncheckedThrowable(throwable);
+        }
+    }
+
+    default <T extends Throwable> A orElseThrowChecked(T throwable) throws T {
         final A result = fold(a -> a,
                               () -> null);
         if (result != null) {

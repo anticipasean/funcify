@@ -12,6 +12,7 @@ import java.util.function.Function;
  * @author smccarron
  * @created 2021-05-06
  */
+@FunctionalInterface
 public interface Fn2<A, B, C> extends Trio<Fn2W, A, B, C>, BiFunction<A, B, C> {
 
     static enum Fn2W {
@@ -39,8 +40,8 @@ public interface Fn2<A, B, C> extends Trio<Fn2W, A, B, C>, BiFunction<A, B, C> {
     }
 
     @Override
-    C apply(A parameter1,
-            B parameter2);
+    C apply(A a,
+            B b);
 
     default Fn1<B, C> applyFirst(final A firstParameter) {
         return Fn1.of((B paramB) -> this.apply(firstParameter,

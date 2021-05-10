@@ -127,10 +127,10 @@ public class Fn2Factory {
         private final BiFunction<A, B, C> biFunction;
 
         @Override
-        public C apply(final A parameter1,
-                       final B parameter2) {
-            return biFunction.apply(parameter1,
-                                    parameter2);
+        public C apply(final A a,
+                       final B b) {
+            return biFunction.apply(a,
+                                    b);
         }
     }
 }

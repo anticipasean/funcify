@@ -20,11 +20,11 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
 
     }
 
-    static <A, B> Tuple2<A, B> of(final A parameter1,
-                                  final B parameter2) {
+    static <A, B> Tuple2<A, B> of(final A first,
+                                  final B second) {
         return Tuple2Factory.getInstance()
-                            .both(parameter1,
-                                  parameter2)
+                            .from(first,
+                                  second)
                             .narrowT1();
     }
 
@@ -54,12 +54,6 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
     }
 
     @Override
-    default <C, D> Tuple2<C, D> flatMap(final BiFunction<? super A, ? super B, ? extends FlattenableConjunctDuet<Tuple2W, C, D>> flatMapper) {
-        return FlattenableConjunctDuet.super.flatMap(flatMapper)
-                                            .narrowT1();
-    }
-
-    @Override
     default <C> Tuple2<C, B> mapFirst(final Function<? super A, ? extends C> mapper) {
         return FlattenableConjunctDuet.super.mapFirst(mapper)
                                             .narrowT2();
@@ -80,8 +74,8 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
     }
 
     @Override
-    default <C> Tuple2<C, B> zipFirst(final FlattenableDuet<Tuple2W, A, B> container,
-                                      final BiFunction<? super A, ? super A, ? extends C> combiner) {
+    default <C, D> Tuple2<D, B> zipFirst(final FlattenableDuet<Tuple2W, C, B> container,
+                                         final BiFunction<? super A, ? super C, ? extends D> combiner) {
         return FlattenableConjunctDuet.super.zipFirst(container,
                                                       combiner)
                                             .narrowT2();
@@ -89,12 +83,24 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
     }
 
     @Override
-    default <C> Tuple2<A, C> zipSecond(final FlattenableDuet<Tuple2W, A, B> container,
-                                       final BiFunction<? super B, ? super B, ? extends C> combiner) {
+    default <C> Tuple2<Tuple2<A, C>, B> zipFirst(final FlattenableDuet<Tuple2W, C, B> container) {
+        return FlattenableConjunctDuet.super.zipFirst(container)
+                                            .narrowT1();
+    }
+
+    @Override
+    default <C, D> Tuple2<A, D> zipSecond(final FlattenableDuet<Tuple2W, A, C> container,
+                                          final BiFunction<? super B, ? super C, ? extends D> combiner) {
         return FlattenableConjunctDuet.super.zipSecond(container,
                                                        combiner)
                                             .narrowT1();
 
+    }
+
+    @Override
+    default <C> Tuple2<A, Tuple2<B, C>> zipSecond(final FlattenableDuet<Tuple2W, A, C> container) {
+        return FlattenableConjunctDuet.super.zipSecond(container)
+                                            .narrowT1();
     }
 
     @Override
@@ -106,6 +112,8 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
                                                      combiner2)
                                             .narrowT2();
     }
+
+    //TODO: zip all method (1, 2, 3, 4)
 
     @Override
     default <C> Tuple2<C, B> flatMapFirst(final Function<? super A, ? extends FlattenableDuet<Tuple2W, C, B>> flatMapper) {
@@ -120,7 +128,20 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
     }
 
     @Override
+    default <C, D> Tuple2<C, D> flatMap(final BiFunction<? super A, ? super B, ? extends FlattenableConjunctDuet<Tuple2W, C, D>> flatMapper) {
+        return FlattenableConjunctDuet.super.flatMap(flatMapper)
+                                            .narrowT1();
+    }
+
+    @Override
     default Iterator<Tuple2<A, B>> iterator() {
         return factory().toIterator(this);
     }
+
+    @Override
+    default Tuple2<B, A> swap() {
+        return FlattenableConjunctDuet.super.swap()
+                                            .narrowT1();
+    }
+
 }

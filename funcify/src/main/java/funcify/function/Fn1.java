@@ -14,6 +14,7 @@ import java.util.function.Function;
  * @author smccarron
  * @created 2021-04-28
  */
+@FunctionalInterface
 public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
 
     static enum Fn1W {
@@ -64,7 +65,7 @@ public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
                         .narrowT1();
     }
 
-    default <C> Fn1<A, C> zip(final FlattenableDuet<Fn1W, A, B> container2,
+    default <C> Fn1<A, C> zip(final Fn1<A, B> container2,
                               final BiFunction<? super B, ? super B, ? extends C> combiner) {
         return factory().zip(this,
                              container2,
@@ -76,6 +77,13 @@ public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
         return factory().flatMap(this,
                                  flatMapper)
                         .narrowT1();
+    }
+
+    default <Z, C> Fn1<Z, C> dimap(final Function<? super Z, ? extends A> mapper1,
+                                   final Function<? super B, ? extends C> mapper2) {
+        return factory().<Z, A, B, C>dimap(this,
+                                           mapper1,
+                                           mapper2).narrowT1();
     }
 
     @FunctionalInterface

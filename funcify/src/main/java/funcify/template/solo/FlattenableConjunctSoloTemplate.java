@@ -2,15 +2,20 @@ package funcify.template.solo;
 
 import static java.util.Objects.requireNonNull;
 
+import funcify.disjunct.DisjunctSolo;
 import funcify.ensemble.Solo;
+import funcify.function.Fn0;
+import funcify.function.Fn1;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author smccarron
  * @created 2021-05-01
  */
-public interface FlattenableConjunctSoloTemplate<W> extends IterableConjunctSoloTemplate<W>, FlattenableSoloTemplate<W> {
+public interface FlattenableConjunctSoloTemplate<W> extends IterableConjunctSoloTemplate<W>, FlattenableSoloTemplate<W>,
+                                                            FilterableSoloTemplate<W> {
 
     @Override
     default <A, B> Solo<W, B> flatMap(final Solo<W, A> container,
@@ -62,4 +67,18 @@ public interface FlattenableConjunctSoloTemplate<W> extends IterableConjunctSolo
                        });
     }
 
+    @Override
+    default <A, WDS, DS extends DisjunctSolo<WDS, A>> DS filter(Solo<W, A> container,
+                                                                Fn1<? super A, ? extends DS> ifFitsCondition,
+                                                                Fn0<? extends DS> ifNotFitsCondition,
+                                                                Predicate<? super A> condition) {
+        return fold(container,
+                    (A paramA) -> {
+                        return requireNonNull(condition,
+                                              () -> "condition").test(paramA) ? requireNonNull(ifFitsCondition,
+                                                                                               () -> "ifFitsCondition").apply(paramA)
+                            : requireNonNull(ifNotFitsCondition,
+                                             () -> "ifNotFitsCondition").get();
+                    });
+    }
 }

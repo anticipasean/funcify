@@ -2,15 +2,21 @@ package funcify.template.duet;
 
 import static java.util.Objects.requireNonNull;
 
+import funcify.disjunct.DisjunctSolo;
 import funcify.ensemble.Duet;
+import funcify.function.Fn0;
+import funcify.function.Fn1;
+import funcify.tuple.Tuple2;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
  * @author smccarron
  * @created 2021-04-30
  */
-public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTemplate<W>, IterableConjunctDuetTemplate<W> {
+public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTemplate<W>, IterableConjunctDuetTemplate<W>,
+                                                            FilterableConjunctDuetTemplate<W> {
 
 
     default <A, B, C, D> Duet<W, C, D> flatMap(final Duet<W, A, B> container,
@@ -47,7 +53,7 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
                        (Duet<W, A, B> paramA, B paramB) -> {
                            return flatMap(paramA,
                                           (A paramA1, B paramB1) -> {
-                                              return both(paramA1,
+                                              return from(paramA1,
                                                           paramB);
                                           });
                        });
@@ -59,7 +65,7 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
                        (A paramA, Duet<W, A, B> paramB) -> {
                            return flatMap(paramB,
                                           (A paramA2, B paramB2) -> {
-                                              return both(paramA,
+                                              return from(paramA,
                                                           paramB2);
                                           });
                        });
@@ -73,7 +79,7 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
                                           (A paramA1, B paramB1) -> {
                                               return flatMap(paramB,
                                                              (A paramA2, B paramB2) -> {
-                                                                 return both(paramA1,
+                                                                 return from(paramA1,
                                                                              paramB2);
                                                              });
                                           });
@@ -87,7 +93,7 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
         return flatMap(requireNonNull(container,
                                       () -> "container"),
                        (A paramA, B paramB) -> requireNonNull(mapper,
-                                                              () -> "mapper").andThen(c -> this.<C, B>both(c,
+                                                              () -> "mapper").andThen(c -> this.<C, B>from(c,
                                                                                                            paramB))
                                                                              .apply(paramA));
     }
@@ -98,7 +104,7 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
         return flatMap(requireNonNull(container,
                                       () -> "container"),
                        (A paramA, B paramB) -> requireNonNull(mapper,
-                                                              () -> "mapper").andThen(c -> this.<A, C>both(paramA,
+                                                              () -> "mapper").andThen(c -> this.<A, C>from(paramA,
                                                                                                            c))
                                                                              .apply(paramB));
     }
@@ -109,7 +115,7 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
                                              Function<? super B, ? extends D> mapper2) {
         return flatMap(requireNonNull(container,
                                       () -> "container"),
-                       (A paramA, B paramB) -> both(requireNonNull(mapper1,
+                       (A paramA, B paramB) -> from(requireNonNull(mapper1,
                                                                    () -> "mapper1").apply(paramA),
                                                     requireNonNull(mapper2,
                                                                    () -> "mapper2").apply(paramB)));
@@ -126,7 +132,7 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
                            return flatMap(requireNonNull(container2,
                                                          () -> "container2"),
                                           (C paramC, B paramB2) -> {
-                                              return both(requireNonNull(combiner,
+                                              return from(requireNonNull(combiner,
                                                                          () -> "combiner").apply(paramA,
                                                                                                  paramC),
                                                           paramB1);
@@ -144,7 +150,7 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
                            return flatMap(requireNonNull(container2,
                                                          () -> "container2"),
                                           (A paramA2, C paramC) -> {
-                                              return both(paramA,
+                                              return from(paramA,
                                                           requireNonNull(combiner,
                                                                          () -> "combiner").apply(paramB,
                                                                                                  paramC));
@@ -162,7 +168,7 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
                            return flatMap(requireNonNull(container2,
                                                          () -> "container2"),
                                           (C paramC, D paramD) -> {
-                                              return both(requireNonNull(combiner1,
+                                              return from(requireNonNull(combiner1,
                                                                          () -> "combiner1").apply(paramA,
                                                                                                   paramC),
                                                           requireNonNull(combiner2,
@@ -170,5 +176,22 @@ public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTempl
                                                                                                   paramD));
                                           });
                        });
+    }
+
+    @Override
+    default <A, B, WDS, DS extends DisjunctSolo<WDS, Tuple2<A, B>>> DS filter(Duet<W, A, B> container,
+                                                                              Fn1<Tuple2<A, B>, ? extends DS> ifFitsCondition,
+                                                                              Fn0<? extends DS> ifNotFitsCondition,
+                                                                              BiPredicate<? super A, ? super B> condition) {
+        return fold(requireNonNull(container,
+                                   () -> "container"),
+                    (A paramA, B paramB) -> {
+                        return requireNonNull(condition,
+                                              () -> "condition").test(paramA,
+                                                                      paramB) ? ifFitsCondition.apply(Tuple2.of(paramA,
+                                                                                                                paramB))
+                            : requireNonNull(ifNotFitsCondition,
+                                             () -> "ifNotFitsCondition").get();
+                    });
     }
 }

@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import funcify.ensemble.Solo;
 import funcify.function.Fn0;
 import funcify.function.Fn0.Fn0W;
-import funcify.template.solo.FlattenableSoloTemplate;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -15,7 +14,7 @@ import lombok.AllArgsConstructor;
  * @author smccarron
  * @created 2021-05-04
  */
-public class Fn0Factory implements FlattenableSoloTemplate<Fn0W> {
+public class Fn0Factory {
 
     private static enum FactoryHolder {
         INSTANCE(new Fn0Factory());
@@ -51,7 +50,7 @@ public class Fn0Factory implements FlattenableSoloTemplate<Fn0W> {
                                                () -> "function"));
     }
 
-    @Override
+
     public <A, B> Solo<Fn0W, B> flatMap(Solo<Fn0W, A> container,
                                         Function<? super A, ? extends Solo<Fn0W, B>> flatMapper) {
         return fromFunction(() -> requireNonNull(flatMapper,
@@ -62,7 +61,7 @@ public class Fn0Factory implements FlattenableSoloTemplate<Fn0W> {
                                                                     .get());
     }
 
-    @Override
+
     public <A, B> Solo<Fn0W, B> map(Solo<Fn0W, A> container,
                                     Function<? super A, ? extends B> mapper) {
         return fromFunction(() -> requireNonNull(mapper,
@@ -71,7 +70,7 @@ public class Fn0Factory implements FlattenableSoloTemplate<Fn0W> {
                                                                                                         .get()));
     }
 
-    @Override
+
     public <A, B, F extends Function<? super A, ? extends B>> Solo<Fn0W, B> ap(final Solo<Fn0W, A> container,
                                                                                final Solo<Fn0W, F> containerWithFunction) {
         return fromFunction(() -> requireNonNull(containerWithFunction,
@@ -82,7 +81,7 @@ public class Fn0Factory implements FlattenableSoloTemplate<Fn0W> {
                                                                                                                        .get()));
     }
 
-    @Override
+
     public <A, B, C> Solo<Fn0W, C> zip(Solo<Fn0W, A> container1,
                                        Solo<Fn0W, B> container2,
                                        BiFunction<? super A, ? super B, ? extends C> mapper) {

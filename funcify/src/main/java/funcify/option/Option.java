@@ -5,7 +5,9 @@ import funcify.flattenable.FlattenableDisjunctSolo;
 import funcify.flattenable.FlattenableSolo;
 import funcify.option.Option.OptionW;
 import funcify.option.factory.OptionFactory;
+import funcify.tuple.Tuple2;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -33,6 +35,11 @@ public interface Option<A> extends Iterable<A>, FlattenableDisjunctSolo<OptionW,
     static <T> Option<T> none() {
         return narrowK(OptionFactory.getInstance()
                                     .empty());
+    }
+
+    static <T> Option<T> fromOptional(Optional<T> optional) {
+        return of(optional).flatMap(opt -> opt.map(Option::of)
+                                              .orElseGet(Option::none));
     }
 
     @Override
@@ -68,6 +75,12 @@ public interface Option<A> extends Iterable<A>, FlattenableDisjunctSolo<OptionW,
                                  final BiFunction<? super A, ? super B, ? extends C> combiner) {
         return FlattenableDisjunctSolo.super.zip(container2,
                                                  combiner)
+                                            .narrowT1();
+    }
+
+    @Override
+    default <B> Option<Tuple2<A, B>> zip(final FlattenableSolo<OptionW, B> container2) {
+        return FlattenableDisjunctSolo.super.zip(container2)
                                             .narrowT1();
     }
 

@@ -36,6 +36,8 @@ public interface Tuple1<A> extends FlattenableConjunctSolo<Tuple1W, A>, Iterable
         return Tuple1Factory.getInstance();
     }
 
+    //TODO: append method conjunct solo to duet to trio...
+
     @Override
     default <B> Tuple1<B> from(final B value) {
         return factory().from(value)

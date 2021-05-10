@@ -1,5 +1,6 @@
 package funcify.conjunct;
 
+import funcify.ensemble.Duet;
 import java.util.function.BiFunction;
 
 /**
@@ -8,7 +9,7 @@ import java.util.function.BiFunction;
  * @author smccarron
  * @created 2021-05-02
  */
-public interface ConjunctDuet<W, A, B> {
+public interface ConjunctDuet<W, A, B> extends Duet<W, A, B> {
 
     <C> C fold(BiFunction<? super A, ? super B, ? extends C> mapper);
 

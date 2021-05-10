@@ -10,12 +10,13 @@ import java.util.function.Supplier;
  */
 public interface DisjunctSoloTemplate<W> {
 
-    <B> Solo<W, B> from(B value);
+    <A> Solo<W, A> from(A value);
 
     <A> Solo<W, A> empty();
 
     <A, B> B fold(Solo<W, A> container,
                   Function<? super A, ? extends B> ifPresent,
                   Supplier<B> ifAbsent);
+
 
 }

@@ -38,4 +38,6 @@ public interface Duet<W, A, B> extends Solo<Solo<W, A>, B> {
     default <C extends Duet<W, ? super A, ? super B>> C narrowT2() {
         return (C) this;
     }
+
+
 }

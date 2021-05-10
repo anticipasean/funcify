@@ -11,6 +11,7 @@ import java.util.function.Supplier;
  * @author smccarron
  * @created 2021-05-04
  */
+@FunctionalInterface
 public interface Fn0<A> extends Solo<Fn0W, A>, Supplier<A> {
 
     static enum Fn0W {

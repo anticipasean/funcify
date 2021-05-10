@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 public class Tuple1Factory implements FlattenableConjunctSoloTemplate<Tuple1W> {
 
     private static enum FactoryHolder {
+
         INSTANCE(new Tuple1Factory());
 
         private final Tuple1Factory tuple1Factory;

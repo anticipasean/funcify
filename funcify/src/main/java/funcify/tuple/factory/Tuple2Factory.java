@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Duet;
 import funcify.template.duet.FlattenableConjunctDuetTemplate;
-import funcify.template.duet.IterableConjunctDuetTemplate;
 import funcify.tuple.Tuple2;
 import funcify.tuple.Tuple2.Tuple2W;
 import java.util.function.BiFunction;
@@ -17,6 +16,7 @@ import lombok.AllArgsConstructor;
 public class Tuple2Factory implements FlattenableConjunctDuetTemplate<Tuple2W> {
 
     private static enum FactoryHolder {
+
         INSTANCE(new Tuple2Factory());
 
         private final Tuple2Factory tuple2Factory;
@@ -46,19 +46,7 @@ public class Tuple2Factory implements FlattenableConjunctDuetTemplate<Tuple2W> {
     }
 
     @Override
-    public <A, B> Duet<Tuple2W, A, B> first(final A value1) {
-        return both(value1,
-                    null);
-    }
-
-    @Override
-    public <A, B> Duet<Tuple2W, A, B> second(final B value2) {
-        return both(null,
-                    value2);
-    }
-
-    @Override
-    public <A, B> Duet<Tuple2W, A, B> both(final A value1,
+    public <A, B> Duet<Tuple2W, A, B> from(final A value1,
                                            final B value2) {
         return new DefaultTuple2<>(value1,
                                    value2);

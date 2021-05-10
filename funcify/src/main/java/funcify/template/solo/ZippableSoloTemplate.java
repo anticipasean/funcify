@@ -1,6 +1,7 @@
 package funcify.template.solo;
 
 import funcify.ensemble.Solo;
+import funcify.tuple.Tuple2;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -16,5 +17,12 @@ public interface ZippableSoloTemplate<W> extends MappableSoloTemplate<W> {
     <A, B, C> Solo<W, C> zip(Solo<W, A> container1,
                              Solo<W, B> container2,
                              BiFunction<? super A, ? super B, ? extends C> combiner);
+
+    default <A, B> Solo<W, Tuple2<A, B>> zip(Solo<W, A> container1,
+                                             Solo<W, B> container2) {
+        return zip(container1,
+                   container2,
+                   Tuple2::of);
+    }
 
 }
