@@ -48,7 +48,7 @@ public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
     }
 
     @Override
-    B apply(A parameter);
+    B apply(A a);
 
     @Override
     default <Z> Fn1<Z, B> compose(final Function<? super Z, ? extends A> before) {
@@ -64,28 +64,28 @@ public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
                         .narrowT1();
     }
 
-    default <C> Fn1<A, C> map(final Function<? super B, ? extends C> mapper) {
+    default <C> Fn1<A, C> map(final Fn1<? super B, ? extends C> mapper) {
         return factory().map(this,
                              mapper)
                         .narrowT1();
     }
 
     default <C> Fn1<A, C> zip(final Fn1<A, B> container2,
-                              final BiFunction<? super B, ? super B, ? extends C> combiner) {
+                              final Fn2<? super B, ? super B, ? extends C> combiner) {
         return factory().zip(this,
                              container2,
                              combiner)
                         .narrowT1();
     }
 
-    default <C> Fn1<A, C> flatMap(final Function<? super B, ? extends Fn1<A, C>> flatMapper) {
+    default <C> Fn1<A, C> flatMap(final Fn1<? super B, ? extends Fn1<A, C>> flatMapper) {
         return factory().flatMap(this,
                                  flatMapper)
                         .narrowT1();
     }
 
-    default <Z, C> Fn1<Z, C> dimap(final Function<? super Z, ? extends A> mapper1,
-                                   final Function<? super B, ? extends C> mapper2) {
+    default <Z, C> Fn1<Z, C> dimap(final Fn1<? super Z, ? extends A> mapper1,
+                                   final Fn1<? super B, ? extends C> mapper2) {
         return factory().<Z, A, B, C>dimap(this,
                                            mapper1,
                                            mapper2).narrowT1();

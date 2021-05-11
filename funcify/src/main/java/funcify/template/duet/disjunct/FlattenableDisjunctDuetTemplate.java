@@ -14,7 +14,7 @@ import java.util.function.Predicate;
  * @created 2021-04-30
  */
 public interface FlattenableDisjunctDuetTemplate<W> extends FlattenableDuetTemplate<W>, IterableDisjunctDuetTemplate<W>,
-                                                            FilterableDisjunctDuetTemplate<W> {
+                                                            FilterableDisjunctDuetTemplate<W>, PeekableDisjunctDuetTemplate<W> {
 
     @Override
     default <A, B, C> Duet<W, C, B> flatMapFirst(final Duet<W, A, B> container,

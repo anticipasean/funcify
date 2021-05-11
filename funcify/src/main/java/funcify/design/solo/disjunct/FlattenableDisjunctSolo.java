@@ -2,6 +2,7 @@ package funcify.design.solo.disjunct;
 
 import funcify.design.solo.FilterableSolo;
 import funcify.design.solo.FlattenableSolo;
+import funcify.design.solo.PeekableSolo;
 import funcify.template.solo.disjunct.FlattenableDisjunctSoloTemplate;
 import java.util.function.Function;
 
@@ -9,7 +10,8 @@ import java.util.function.Function;
  * @author smccarron
  * @created 2021-05-06
  */
-public interface FlattenableDisjunctSolo<W, A> extends DisjunctSolo<W, A>, FlattenableSolo<W, A>, FilterableSolo<W, A> {
+public interface FlattenableDisjunctSolo<W, A> extends DisjunctSolo<W, A>, FlattenableSolo<W, A>, FilterableSolo<W, A>,
+                                                       PeekableSolo<W, A> {
 
     @Override
     FlattenableDisjunctSoloTemplate<W> factory();

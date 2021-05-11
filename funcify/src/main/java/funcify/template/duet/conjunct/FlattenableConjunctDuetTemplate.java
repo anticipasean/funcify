@@ -17,7 +17,7 @@ import java.util.function.Function;
  * @created 2021-04-30
  */
 public interface FlattenableConjunctDuetTemplate<W> extends FlattenableDuetTemplate<W>, IterableConjunctDuetTemplate<W>,
-                                                            FilterableConjunctDuetTemplate<W> {
+                                                            FilterableConjunctDuetTemplate<W>, PeekableConjunctDuetTemplate<W> {
 
 
     default <A, B, C, D> Duet<W, C, D> flatMap(final Duet<W, A, B> container,

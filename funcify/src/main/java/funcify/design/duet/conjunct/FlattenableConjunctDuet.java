@@ -22,7 +22,8 @@ import java.util.function.Predicate;
  * @author smccarron
  * @created 2021-05-04
  */
-public interface FlattenableConjunctDuet<W, A, B> extends FlattenableDuet<W, A, B>, FilterableConjunctDuet<W, A, B> {
+public interface FlattenableConjunctDuet<W, A, B> extends FlattenableDuet<W, A, B>, FilterableConjunctDuet<W, A, B>,
+                                                          PeekableConjunctDuet<W, A, B> {
 
     @Override
     FlattenableConjunctDuetTemplate<W> factory();

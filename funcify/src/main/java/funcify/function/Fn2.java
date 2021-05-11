@@ -64,19 +64,23 @@ public interface Fn2<A, B, C> extends Trio<Fn2W, A, B, C>, BiFunction<A, B, C> {
     C apply(A a,
             B b);
 
-    default Fn1<B, C> applyFirst(final A firstParameter) {
-        return Fn1.of((B paramB) -> this.apply(firstParameter,
-                                               paramB));
+    default Fn1<B, C> applyFirst(final A a) {
+        return Fn1.of((B b) -> this.apply(a,
+                                               b));
     }
 
-    default Fn1<A, C> applySecond(final B secondParameter) {
+    default Fn1<A, C> applySecond(final B b) {
         return Fn1.of((A paramA) -> this.apply(paramA,
-                                               secondParameter));
+                                               b));
     }
 
     default Fn1<A, Fn1<B, C>> curry() {
         return Fn1.of((A a) -> (B b) -> apply(a,
                                               b));
+    }
+
+    default Fn2<B, A, C> swapFirstSecond(){
+        return Fn2.of((B b, A a) -> apply(a, b));
     }
 
     default <D> Fn2<A, B, D> map(final Function<? super C, ? extends D> mapper) {
@@ -116,10 +120,9 @@ public interface Fn2<A, B, C> extends Trio<Fn2W, A, B, C>, BiFunction<A, B, C> {
 
     default <Y, Z, D> Fn2<Y, Z, D> dimap(BiFunction<? super Y, ? super Z, ? extends Tuple2<A, B>> mapper1,
                                          Function<? super C, ? extends D> mapper2) {
-        return factory().dimap(this,
-                               mapper1,
-                               mapper2)
-                        .narrowT3();
+        return factory().<Y, Z, A, B, C, D>dimap(this,
+                                                 mapper1,
+                                                 mapper2).narrowT1();
     }
 
     default <D> Fn2<A, B, D> ap(final Fn2<? super A, ? super C, ? extends Fn2<? super A, ? super B, ? extends D>> applicative) {

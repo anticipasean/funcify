@@ -10,6 +10,7 @@ import funcify.function.Fn1;
 import funcify.option.Option;
 import java.util.Iterator;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -159,5 +160,23 @@ public interface Either<L, R> extends FlattenableDisjunctDuet<EitherW, L, R>, It
                                       ifNotFitsCondition,
                                       condition)
                         .narrowT1();
+    }
+
+    @Override
+    default Either<L, R> bipeek(final Consumer<? super L> consumer1,
+                                final Consumer<? super R> consumer2) {
+        return FlattenableDisjunctDuet.super.bipeek(consumer1,
+                                                    consumer2)
+                                            .narrowT1();
+    }
+
+    default Either<L, R> peekLeft(final Consumer<? super L> consumer) {
+        return FlattenableDisjunctDuet.super.peekFirst(consumer)
+                                            .narrowT1();
+    }
+
+    default Either<L, R> peekRight(final Consumer<? super R> consumer) {
+        return FlattenableDisjunctDuet.super.peekSecond(consumer)
+                                            .narrowT1();
     }
 }
