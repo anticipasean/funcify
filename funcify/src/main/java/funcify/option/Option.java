@@ -43,10 +43,22 @@ public interface Option<A> extends Iterable<A>, FlattenableDisjunctSolo<OptionW,
                                               .orElseGet(Option::none));
     }
 
+    static <I extends Iterable<? extends T>, T> Option<T> ofIterable(final I iterable) {
+        return OptionFactory.getInstance()
+                            .fromIterable(iterable)
+                            .narrowT1();
+    }
+
     @Override
     default <B> Option<B> from(final B value) {
-        return factory().from(value)
-                        .narrowT1();
+        return FlattenableDisjunctSolo.super.from(value)
+                                            .narrowT1();
+    }
+
+    @Override
+    default <B> Option<B> fromIterable(Iterable<? extends B> iterable) {
+        return FlattenableDisjunctSolo.super.fromIterable(iterable)
+                                            .narrowT1();
     }
 
     @Override
@@ -87,7 +99,7 @@ public interface Option<A> extends Iterable<A>, FlattenableDisjunctSolo<OptionW,
 
     @Override
     default Iterator<A> iterator() {
-        return factory().toIterator(this);
+        return FlattenableDisjunctSolo.super.iterator();
     }
 
     @Override

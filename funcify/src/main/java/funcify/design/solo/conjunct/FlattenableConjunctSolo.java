@@ -10,7 +10,7 @@ import funcify.template.solo.conjunct.FlattenableConjunctSoloTemplate;
  * @created 2021-05-06
  */
 public interface FlattenableConjunctSolo<W, A> extends ConjunctSolo<W, A>, FlattenableSolo<W, A>, FilterableSolo<W, A>,
-                                                       PeekableSolo<W, A> {
+                                                       PeekableSolo<W, A>, IterableConjunctSolo<W, A> {
 
     @Override
     FlattenableConjunctSoloTemplate<W> factory();
@@ -21,4 +21,9 @@ public interface FlattenableConjunctSolo<W, A> extends ConjunctSolo<W, A>, Flatt
                         .narrowT1();
     }
 
+    @Override
+    default <B> FlattenableConjunctSolo<W, B> fromIterable(Iterable<? extends B> iterable) {
+        return factory().fromIterable(iterable)
+                        .narrowT1();
+    }
 }

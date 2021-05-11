@@ -66,12 +66,32 @@ public interface FilterableConjunctDuetTemplate<W> extends ConjunctDuetTemplate<
                                                                       Fn0<? extends DS> ifNotFitsCondition,
                                                                       BiPredicate<? super A, ? super B> condition);
 
+    default <A, B, WDS, DS extends DisjunctSolo<WDS, Tuple2<A, B>>> DS filterNot(Duet<W, A, B> container,
+                                                                                 Fn1<Tuple2<A, B>, ? extends DS> ifFitsCondition,
+                                                                                 Fn0<? extends DS> ifNotFitsCondition,
+                                                                                 BiPredicate<? super A, ? super B> condition) {
+        return filter(container,
+                      ifFitsCondition,
+                      ifNotFitsCondition,
+                      Objects.requireNonNull(condition,
+                                             () -> "condition")
+                             .negate());
+    }
+
     default <A, B> Option<Tuple2<A, B>> filter(Duet<W, A, B> container,
                                                BiPredicate<? super A, ? super B> condition) {
         return this.<A, B, OptionW, Option<Tuple2<A, B>>>filter(container,
                                                                 Option::of,
                                                                 Option::none,
                                                                 condition);
+    }
+
+    default <A, B> Option<Tuple2<A, B>> filterNot(Duet<W, A, B> container,
+                                                  BiPredicate<? super A, ? super B> condition) {
+        return this.<A, B, OptionW, Option<Tuple2<A, B>>>filterNot(container,
+                                                                   Option::of,
+                                                                   Option::none,
+                                                                   condition);
     }
 
 }

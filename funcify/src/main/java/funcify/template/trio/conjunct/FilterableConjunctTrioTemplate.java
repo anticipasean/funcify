@@ -1,5 +1,7 @@
 package funcify.template.trio.conjunct;
 
+import static java.util.Objects.requireNonNull;
+
 import funcify.design.solo.disjunct.DisjunctSolo;
 import funcify.ensemble.Trio;
 import funcify.function.Fn0;
@@ -8,7 +10,6 @@ import funcify.function.Fn3;
 import funcify.option.Option;
 import funcify.option.Option.OptionW;
 import funcify.tuple.Tuple3;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -25,9 +26,8 @@ public interface FilterableConjunctTrioTemplate<W> extends ConjunctTrioTemplate<
                       ifFitsCondition,
                       ifNotFitsCondition,
                       (A paramA, B paramB, C paramC) -> {
-                          return Objects.requireNonNull(condition,
-                                                        () -> "condition")
-                                        .test(paramA);
+                          return requireNonNull(condition,
+                                                () -> "condition").test(paramA);
                       });
     }
 
@@ -47,9 +47,8 @@ public interface FilterableConjunctTrioTemplate<W> extends ConjunctTrioTemplate<
                       ifFitsCondition,
                       ifNotFitsCondition,
                       (A paramA, B paramB, C paramC) -> {
-                          return Objects.requireNonNull(condition,
-                                                        () -> "condition")
-                                        .test(paramB);
+                          return requireNonNull(condition,
+                                                () -> "condition").test(paramB);
                       });
     }
 
@@ -66,12 +65,31 @@ public interface FilterableConjunctTrioTemplate<W> extends ConjunctTrioTemplate<
                                                                             Fn0<? extends DS> ifNotFitsCondition,
                                                                             Fn3<? super A, ? super B, ? super C, Boolean> condition);
 
+    default <A, B, C, WDS, DS extends DisjunctSolo<WDS, Tuple3<A, B, C>>> DS filterNot(Trio<W, A, B, C> container,
+                                                                                       Fn1<Tuple3<A, B, C>, ? extends DS> ifFitsCondition,
+                                                                                       Fn0<? extends DS> ifNotFitsCondition,
+                                                                                       Fn3<? super A, ? super B, ? super C, Boolean> condition) {
+        return filter(container,
+                      ifFitsCondition,
+                      ifNotFitsCondition,
+                      requireNonNull(condition,
+                                     () -> "condition").andThen(b -> !b));
+    }
+
     default <A, B, C> Option<Tuple3<A, B, C>> filter(Trio<W, A, B, C> container,
                                                      Fn3<? super A, ? super B, ? super C, Boolean> condition) {
         return this.<A, B, C, OptionW, Option<Tuple3<A, B, C>>>filter(container,
                                                                       Option::of,
                                                                       Option::none,
                                                                       condition);
+    }
+
+    default <A, B, C> Option<Tuple3<A, B, C>> filterNot(Trio<W, A, B, C> container,
+                                                        Fn3<? super A, ? super B, ? super C, Boolean> condition) {
+        return this.<A, B, C, OptionW, Option<Tuple3<A, B, C>>>filterNot(container,
+                                                                         Option::of,
+                                                                         Option::none,
+                                                                         condition);
     }
 
 }

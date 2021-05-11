@@ -41,11 +41,46 @@ public interface Either<L, R> extends FlattenableDisjunctDuet<EitherW, L, R>, It
         return EitherFactory.getInstance().<L, R>second(rightValue).narrowT1();
     }
 
+    static <L, R> Either<L, R> left(final L leftValue,
+                                    final Class<R> rightType) {
+        return EitherFactory.getInstance().<L, R>first(leftValue).narrowT1();
+    }
+
+    static <L, R> Either<L, R> right(final Class<L> leftType,
+                                     final R rightValue) {
+        return EitherFactory.getInstance().<L, R>second(rightValue).narrowT1();
+    }
+
+    static <I extends Iterable<? extends L>, L, R> Either<L, R> ofLeftIterable(final I iterable,
+                                                                               final R defaultRight) {
+        return EitherFactory.getInstance().<I, L, R>firstFromIterable(iterable,
+                                                                      defaultRight).narrowT1();
+    }
+
+    static <I extends Iterable<? extends R>, L, R> Either<L, R> ofRightIterable(final I iterable,
+                                                                                final L defaultLeft) {
+        return EitherFactory.getInstance().<I, L, R>secondFromIterable(iterable,
+                                                                       defaultLeft).narrowT1();
+    }
+
+
     @Override
     default EitherFactory factory() {
         return EitherFactory.getInstance();
     }
 
+
+    default <C, D> Either<C, D> leftFromIterable(final Iterable<? extends C> iterable,
+                                                 final D defaultRight) {
+        return FlattenableDisjunctDuet.super.<C, D>firstFromIterable(iterable,
+                                                                     defaultRight).narrowT1();
+    }
+
+    default <C, D> Either<C, D> rightFromIterable(final Iterable<? extends D> iterable,
+                                                  final C defaultLeft) {
+        return FlattenableDisjunctDuet.super.<C, D>secondFromIterable(iterable,
+                                                                      defaultLeft).narrowT1();
+    }
 
     default <C> Either<C, R> mapLeft(final Function<? super L, ? extends C> mapper) {
         return factory().mapFirst(this,
@@ -107,7 +142,7 @@ public interface Either<L, R> extends FlattenableDisjunctDuet<EitherW, L, R>, It
 
     @Override
     default Iterator<R> iterator() {
-        return factory().secondIterator(this);
+        return factory().iteratorForSecond(this);
     }
 
     default L orElseLeft(final L alternative) {

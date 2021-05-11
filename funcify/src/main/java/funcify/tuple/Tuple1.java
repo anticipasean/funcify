@@ -1,8 +1,8 @@
 package funcify.tuple;
 
-import funcify.ensemble.Solo;
-import funcify.design.solo.conjunct.FlattenableConjunctSolo;
 import funcify.design.solo.FlattenableSolo;
+import funcify.design.solo.conjunct.FlattenableConjunctSolo;
+import funcify.ensemble.Solo;
 import funcify.tuple.Tuple1.Tuple1W;
 import funcify.tuple.factory.Tuple1Factory;
 import java.util.Iterator;
@@ -29,6 +29,12 @@ public interface Tuple1<A> extends FlattenableConjunctSolo<Tuple1W, A>, Iterable
                             .narrowT1();
     }
 
+    static <I extends Iterable<? extends A>, A> Tuple1<A> ofIterable(final I iterable) {
+        return Tuple1Factory.getInstance()
+                            .fromIterable(iterable)
+                            .narrowT1();
+    }
+
     A _1();
 
     @Override
@@ -41,6 +47,12 @@ public interface Tuple1<A> extends FlattenableConjunctSolo<Tuple1W, A>, Iterable
     @Override
     default <B> Tuple1<B> from(final B value) {
         return factory().from(value)
+                        .narrowT1();
+    }
+
+    @Override
+    default <B> Tuple1<B> fromIterable(final Iterable<? extends B> iterable) {
+        return factory().fromIterable(iterable)
                         .narrowT1();
     }
 
@@ -75,6 +87,6 @@ public interface Tuple1<A> extends FlattenableConjunctSolo<Tuple1W, A>, Iterable
 
     @Override
     default Iterator<A> iterator() {
-        return factory().toIterator(this);
+        return FlattenableConjunctSolo.super.iterator();
     }
 }

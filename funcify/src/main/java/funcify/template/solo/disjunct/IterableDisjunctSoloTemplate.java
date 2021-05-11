@@ -12,6 +12,15 @@ import java.util.Iterator;
  */
 public interface IterableDisjunctSoloTemplate<W> extends DisjunctSoloTemplate<W> {
 
+    default <I extends Iterable<? extends A>, A> Solo<W, A> fromIterable(final I iterable) {
+        if (iterable != null) {
+            for (final A current : iterable) {
+                return from(current);
+            }
+        }
+        return empty();
+    }
+
     default <A> Iterator<A> toIterator(Solo<W, A> container) {
         return fold(requireNonNull(container,
                                    () -> "container"),

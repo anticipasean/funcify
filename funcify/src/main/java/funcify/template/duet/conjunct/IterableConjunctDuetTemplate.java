@@ -6,6 +6,7 @@ import funcify.ensemble.Duet;
 import funcify.tuple.Tuple2;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author smccarron
@@ -23,6 +24,18 @@ public interface IterableConjunctDuetTemplate<W> extends ConjunctDuetTemplate<W>
 
     default <A, B> Iterable<Tuple2<A, B>> toIterable(Duet<W, A, B> container) {
         return () -> toIterator(container);
+    }
+
+    default <IA extends Iterable<? extends A>, IB extends Iterable<? extends B>, A, B> Tuple2<A, B> fromIterables(final IA firstIterable,
+                                                                                                                  final IB secondIterable) {
+        if (firstIterable != null && secondIterable != null) {
+            for (A currentA : firstIterable) {
+                for (B currentB : secondIterable) {
+                    return Tuple2.of(currentA, currentB);
+                }
+            }
+        }
+        throw new NoSuchElementException("unable to extract a first and/or second parameter value for creating a tuple from first and second iterables");
     }
 
 }

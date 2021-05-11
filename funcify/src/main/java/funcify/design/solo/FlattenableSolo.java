@@ -14,12 +14,6 @@ public interface FlattenableSolo<W, A> extends Solo<W, A> {
 
     FlattenableSoloTemplate<W> factory();
 
-    default <B, S extends Solo<W, B>> S flatMap1(final Function<? super A, ? extends S> flatMapper) {
-        return factory().flatMap(this,
-                                 flatMapper)
-                        .narrowT1();
-    }
-
     default <B> FlattenableSolo<W, B> flatMap(final Function<? super A, ? extends FlattenableSolo<W, B>> flatMapper) {
         return factory().flatMap(this,
                                  flatMapper)

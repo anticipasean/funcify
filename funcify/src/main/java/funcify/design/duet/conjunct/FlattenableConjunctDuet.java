@@ -1,29 +1,23 @@
 package funcify.design.duet.conjunct;
 
-import static java.util.Objects.requireNonNull;
-
-import funcify.design.duet.FilterableDuet;
 import funcify.design.duet.FlattenableDuet;
 import funcify.design.solo.conjunct.ConjunctSolo;
 import funcify.design.trio.conjunct.ConjunctTrio;
 import funcify.ensemble.Duet;
 import funcify.function.Fn1;
 import funcify.function.Fn3;
-import funcify.option.Option;
 import funcify.template.duet.conjunct.FlattenableConjunctDuetTemplate;
 import funcify.tuple.Tuple1;
 import funcify.tuple.Tuple3;
 import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * @author smccarron
  * @created 2021-05-04
  */
 public interface FlattenableConjunctDuet<W, A, B> extends FlattenableDuet<W, A, B>, FilterableConjunctDuet<W, A, B>,
-                                                          PeekableConjunctDuet<W, A, B> {
+                                                          PeekableConjunctDuet<W, A, B>, IterableConjunctDuet<W, A, B> {
 
     @Override
     FlattenableConjunctDuetTemplate<W> factory();
@@ -102,46 +96,5 @@ public interface FlattenableConjunctDuet<W, A, B> extends FlattenableDuet<W, A, 
         return factory().swap(this);
     }
 
-    @Override
-    default Option<FilterableConjunctDuet<W, A, B>> filter(final BiPredicate<? super A, ? super B> condition) {
-        return fold((A a, B b) -> {
-            return requireNonNull(condition,
-                                  () -> "condition").test(a,
-                                                          b) ? Option.of(factory().from(a,
-                                                                                        b)
-                                                                                  .narrowT2()) : Option.none();
-        });
-    }
 
-    @Override
-    default Option<A> filterFirst(final Predicate<? super A> condition) {
-        return first().filter(condition);
-    }
-
-    @Override
-    default FilterableDuet<W, A, B> filterFirst(final Predicate<? super A> condition,
-                                                final Fn1<? super A, ? extends FilterableDuet<W, A, B>> ifNotFitsCondition) {
-        requireNonNull(ifNotFitsCondition,
-                       () -> "ifNotFitsCondition");
-        return fold((A paramA, B paramB) -> {
-            return requireNonNull(condition,
-                                  () -> "condition").test(paramA) ? this : ifNotFitsCondition.apply(paramA);
-        });
-    }
-
-    @Override
-    default Option<B> filterSecond(final Predicate<? super B> condition) {
-        return second().filter(condition);
-    }
-
-    @Override
-    default FilterableDuet<W, A, B> filterSecond(final Predicate<? super B> condition,
-                                                 final Fn1<? super B, ? extends FilterableDuet<W, A, B>> ifNotFitsCondition) {
-        requireNonNull(ifNotFitsCondition,
-                       () -> "ifNotFitsCondition");
-        return fold((A paramA, B paramB) -> {
-            return requireNonNull(condition,
-                                  () -> "condition").test(paramB) ? this : ifNotFitsCondition.apply(paramB);
-        });
-    }
 }

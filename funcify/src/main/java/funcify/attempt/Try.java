@@ -139,6 +139,6 @@ public interface Try<S> extends FlattenableDisjunctDuet<TryW, S, Throwable>, Ite
 
     @Override
     default Iterator<S> iterator() {
-        return factory().firstIterator(this);
+        return factory().iteratorForFirst(this);
     }
 }

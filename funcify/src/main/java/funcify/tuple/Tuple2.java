@@ -1,9 +1,9 @@
 package funcify.tuple;
 
+import funcify.design.duet.FlattenableDuet;
+import funcify.design.duet.conjunct.FlattenableConjunctDuet;
 import funcify.ensemble.Duet;
 import funcify.ensemble.Solo;
-import funcify.design.duet.conjunct.FlattenableConjunctDuet;
-import funcify.design.duet.FlattenableDuet;
 import funcify.tuple.Tuple2.Tuple2W;
 import funcify.tuple.factory.Tuple2Factory;
 import java.util.Iterator;
@@ -26,6 +26,13 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
                             .from(first,
                                   second)
                             .narrowT1();
+    }
+
+    static <IA extends Iterable<? extends A>, IB extends Iterable<? extends B>, A, B> Tuple2<A, B> ofIterables(final IA firstIterable,
+                                                                                                               final IB secondIterable) {
+        return Tuple2Factory.getInstance()
+                            .fromIterables(firstIterable,
+                                           secondIterable);
     }
 
     static <A, B> Tuple2<A, B> narrowK(Solo<Solo<Tuple2W, A>, B> wideDuetInstance) {
@@ -51,6 +58,13 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
 
     default Tuple1<B> second() {
         return Tuple1.of(_2());
+    }
+
+    @Override
+    default Tuple2<A, B> fromIterables(final Iterable<? extends A> firstIterable,
+                                       final Iterable<? extends B> secondIterable) {
+        return FlattenableConjunctDuet.super.fromIterables(firstIterable,
+                                                           secondIterable);
     }
 
     @Override
@@ -134,14 +148,13 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
     }
 
     @Override
-    default Iterator<Tuple2<A, B>> iterator() {
-        return factory().toIterator(this);
-    }
-
-    @Override
     default Tuple2<B, A> swap() {
         return FlattenableConjunctDuet.super.swap()
                                             .narrowT1();
     }
 
+    @Override
+    default Iterator<Tuple2<A, B>> iterator() {
+        return FlattenableConjunctDuet.super.iterator();
+    }
 }

@@ -15,7 +15,8 @@ import java.util.function.Predicate;
  * @created 2021-05-04
  */
 public interface FlattenableDisjunctDuet<W, A, B> extends DisjunctDuet<W, A, B>, FlattenableDuet<W, A, B>,
-                                                          FilterableDuet<W, A, B>, PeekableDisjunctDuet<W, A, B> {
+                                                          FilterableDuet<W, A, B>, PeekableDisjunctDuet<W, A, B>,
+                                                          IterableDisjunctDuet<W, A, B> {
 
     @Override
     FlattenableDisjunctDuetTemplate<W> factory();
@@ -67,5 +68,19 @@ public interface FlattenableDisjunctDuet<W, A, B> extends DisjunctDuet<W, A, B>,
                        () -> "ifNotFitsCondition");
         return fold(a -> this,
                     b -> condition.test(b) ? this : ifNotFitsCondition.apply(b)).narrowT1();
+    }
+
+    @Override
+    default <C, D> FlattenableDisjunctDuet<W, C, D> firstFromIterable(final Iterable<? extends C> iterable,
+                                                                      final D defaultSecond) {
+        return IterableDisjunctDuet.super.<C, D>firstFromIterable(iterable,
+                                                                  defaultSecond).narrowT1();
+    }
+
+    @Override
+    default <C, D> FlattenableDisjunctDuet<W, C, D> secondFromIterable(final Iterable<? extends D> iterable,
+                                                                       final C defaultFirst) {
+        return IterableDisjunctDuet.super.<C, D>secondFromIterable(iterable,
+                                                                   defaultFirst).narrowT1();
     }
 }

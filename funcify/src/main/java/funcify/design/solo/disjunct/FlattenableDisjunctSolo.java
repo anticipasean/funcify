@@ -11,7 +11,7 @@ import java.util.function.Function;
  * @created 2021-05-06
  */
 public interface FlattenableDisjunctSolo<W, A> extends DisjunctSolo<W, A>, FlattenableSolo<W, A>, FilterableSolo<W, A>,
-                                                       PeekableSolo<W, A> {
+                                                       PeekableSolo<W, A>, IterableDisjunctSolo<W, A> {
 
     @Override
     FlattenableDisjunctSoloTemplate<W> factory();
@@ -19,6 +19,12 @@ public interface FlattenableDisjunctSolo<W, A> extends DisjunctSolo<W, A>, Flatt
     @Override
     default <B> FlattenableDisjunctSolo<W, B> from(final B value) {
         return factory().from(value)
+                        .narrowT1();
+    }
+
+    @Override
+    default <B> FlattenableDisjunctSolo<W, B> fromIterable(Iterable<? extends B> iterable) {
+        return factory().fromIterable(iterable)
                         .narrowT1();
     }
 
