@@ -82,9 +82,8 @@ public interface Tuple2<A, B> extends FlattenableConjunctDuet<Tuple2W, A, B>, It
     @Override
     default <C, D> Tuple2<C, D> bimap(final Function<? super A, ? extends C> mapper1,
                                       final Function<? super B, ? extends D> mapper2) {
-        return FlattenableConjunctDuet.super.bimap(mapper1,
-                                                   mapper2)
-                                            .narrowT2();
+        return FlattenableConjunctDuet.super.<C, D>bimap(mapper1,
+                                                         mapper2).narrowT1();
     }
 
     @Override

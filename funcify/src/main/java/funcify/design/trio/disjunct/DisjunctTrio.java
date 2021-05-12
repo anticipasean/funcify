@@ -14,9 +14,34 @@ public interface DisjunctTrio<W, A, B, C> extends Trio<W, A, B, C> {
 
     DisjunctTrioTemplate<W> factory();
 
+    Trio<W, A, B, C> first(final A value);
+
+    Trio<W, A, B, C> second(final B value);
+
+    Trio<W, A, B, C> third(final C value);
+
     <D> D fold(Function<? super A, ? extends D> ifFirst,
                Function<? super B, ? extends D> ifSecond,
                Function<? super C, ? extends D> ifThird);
+
+
+    default Option<A> getFirst() {
+        return fold(Option::of,
+                    b -> Option.none(),
+                    c -> Option.none());
+    }
+
+    default Option<B> getSecond() {
+        return fold(a -> Option.none(),
+                    Option::of,
+                    c -> Option.none());
+    }
+
+    default Option<C> getThird() {
+        return fold(a -> Option.none(),
+                    b -> Option.none(),
+                    Option::of);
+    }
 
     default Tuple3<Option<A>, Option<B>, Option<C>> project() {
         return Tuple3.of(fold(Option::of,

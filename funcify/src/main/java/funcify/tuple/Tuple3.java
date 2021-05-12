@@ -1,6 +1,9 @@
 package funcify.tuple;
 
+import funcify.design.trio.FlattenableTrio;
 import funcify.design.trio.conjunct.FlattenableConjunctTrio;
+import funcify.function.Fn1;
+import funcify.function.Fn3;
 import funcify.tuple.Tuple3.Tuple3W;
 import funcify.tuple.factory.Tuple3Factory;
 
@@ -62,5 +65,42 @@ public interface Tuple3<A, B, C> extends FlattenableConjunctTrio<Tuple3W, A, B, 
                         .narrowT1();
     }
 
+    @Override
+    default <D, E, F> Tuple3<D, E, F> flatMap(final Fn3<? super A, ? super B, ? super C, ? extends FlattenableTrio<Tuple3W, D, E, F>> flatMapper) {
+        return FlattenableConjunctTrio.super.flatMap(flatMapper)
+                                            .narrowT1();
+    }
 
+    @Override
+    default <D> Tuple3<D, B, C> flatMapFirst(final Fn1<? super A, ? extends FlattenableTrio<Tuple3W, D, B, C>> flatMapper) {
+        return FlattenableConjunctTrio.super.flatMapFirst(flatMapper)
+                                            .narrowT1();
+    }
+
+    @Override
+    default <D> Tuple3<A, D, C> flatMapSecond(final Fn1<? super B, ? extends FlattenableTrio<Tuple3W, A, D, C>> flatMapper) {
+        return FlattenableConjunctTrio.super.flatMapSecond(flatMapper)
+                                            .narrowT1();
+    }
+
+    @Override
+    default <D> Tuple3<A, B, D> flatMapThird(final Fn1<? super C, ? extends FlattenableTrio<Tuple3W, A, B, D>> flatMapper) {
+        return FlattenableConjunctTrio.super.flatMapThird(flatMapper)
+                                            .narrowT1();
+    }
+
+    @Override
+    default <D> Tuple3<D, B, C> mapFirst(final Fn1<? super A, ? extends D> mapper) {
+        return FlattenableConjunctTrio.super.<D>mapFirst(mapper).narrowT1();
+    }
+
+    @Override
+    default <D> Tuple3<A, D, C> mapSecond(final Fn1<? super B, ? extends D> mapper) {
+        return FlattenableConjunctTrio.super.<D>mapSecond(mapper).narrowT1();
+    }
+
+    @Override
+    default <D> Tuple3<A, B, D> mapThird(final Fn1<? super C, ? extends D> mapper) {
+        return FlattenableConjunctTrio.super.<D>mapThird(mapper).narrowT1();
+    }
 }

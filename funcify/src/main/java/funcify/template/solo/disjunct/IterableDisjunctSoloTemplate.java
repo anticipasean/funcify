@@ -3,8 +3,8 @@ package funcify.template.solo.disjunct;
 import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Solo;
-import java.util.Collections;
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 /**
  * @author smccarron
@@ -24,9 +24,9 @@ public interface IterableDisjunctSoloTemplate<W> extends DisjunctSoloTemplate<W>
     default <A> Iterator<A> toIterator(Solo<W, A> container) {
         return fold(requireNonNull(container,
                                    () -> "container"),
-                    a -> Collections.singletonList(a)
-                                    .iterator(),
-                    Collections::emptyIterator);
+                    a -> Stream.of(a)
+                               .iterator(),
+                    Stream.<A>empty()::iterator);
     }
 
     default <A> Iterable<A> toIterable(Solo<W, A> container) {

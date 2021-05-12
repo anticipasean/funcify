@@ -1,4 +1,4 @@
-package funcify.template.trio.conjunct;
+package funcify.template.quartet.conjunct;
 
 import static java.util.Objects.requireNonNull;
 
@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  * @author smccarron
  * @created 2021-05-07
  */
-public interface IterableConjunctTrioTemplate<W> extends ConjunctTrioTemplate<W> {
+public interface IterableConjunctQuartetTemplate<W> extends ConjunctQuartetTemplate<W> {
 
     default <A, B, C> Iterator<Tuple3<A, B, C>> toIterator(Trio<W, A, B, C> container) {
         return fold(requireNonNull(container,

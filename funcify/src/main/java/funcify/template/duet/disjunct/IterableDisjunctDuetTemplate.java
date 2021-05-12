@@ -3,8 +3,8 @@ package funcify.template.duet.disjunct;
 import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Duet;
-import java.util.Collections;
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 /**
  * @author smccarron
@@ -15,17 +15,17 @@ public interface IterableDisjunctDuetTemplate<W> extends DisjunctDuetTemplate<W>
     default <A, B> Iterator<A> iteratorForFirst(Duet<W, A, B> container) {
         return fold(requireNonNull(container,
                                    () -> "container"),
-                    (A a) -> Collections.singletonList(a)
-                                        .iterator(),
-                    (B b) -> Collections.emptyIterator());
+                    (A a) -> Stream.of(a)
+                                   .iterator(),
+                    (B b) -> Stream.<A>empty().iterator());
     }
 
     default <A, B> Iterator<B> iteratorForSecond(Duet<W, A, B> container) {
         return fold(requireNonNull(container,
                                    () -> "container"),
-                    (A a) -> Collections.emptyIterator(),
-                    (B b) -> Collections.singletonList(b)
-                                        .iterator());
+                    (A a) -> Stream.<B>empty().iterator(),
+                    (B b) -> Stream.of(b)
+                                   .iterator());
     }
 
     default <A, B> Iterable<A> firstIterable(Duet<W, A, B> container) {

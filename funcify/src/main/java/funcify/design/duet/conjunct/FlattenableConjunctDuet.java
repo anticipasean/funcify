@@ -23,27 +23,24 @@ public interface FlattenableConjunctDuet<W, A, B> extends FlattenableDuet<W, A, 
     FlattenableConjunctDuetTemplate<W> factory();
 
     default <C, D> FlattenableConjunctDuet<W, C, D> flatMap(final BiFunction<? super A, ? super B, ? extends FlattenableConjunctDuet<W, C, D>> flatMapper) {
-        return factory().flatMap(this,
-                                 flatMapper)
-                        .narrowT1();
+        return factory().<A, B, C, D>flatMap(this,
+                                             flatMapper).narrowT1();
     }
 
     default <C, D> FlattenableConjunctDuet<W, C, D> bimap(final Function<? super A, ? extends C> mapper1,
                                                           final Function<? super B, ? extends D> mapper2) {
-        return factory().bimap(this,
-                               mapper1,
-                               mapper2)
-                        .narrowT2();
+        return factory().<A, B, C, D>bimap(this,
+                                           mapper1,
+                                           mapper2).narrowT1();
     }
 
     default <C, D, E, F> FlattenableConjunctDuet<W, E, F> zipBoth(final FlattenableConjunctDuet<W, C, D> container,
                                                                   final BiFunction<? super A, ? super C, ? extends E> combiner1,
                                                                   final BiFunction<? super B, ? super D, ? extends F> combiner2) {
-        return factory().zipBoth(this,
-                                 container,
-                                 combiner1,
-                                 combiner2)
-                        .narrowT2();
+        return factory().<A, B, C, D, E, F>zipBoth(this,
+                                                   container,
+                                                   combiner1,
+                                                   combiner2).narrowT1();
     }
 
     default <W3, C> ConjunctTrio<W3, A, B, C> append(C value,

@@ -4,9 +4,9 @@ import static java.util.Objects.requireNonNull;
 
 import funcify.ensemble.Duet;
 import funcify.tuple.Tuple2;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 /**
  * @author smccarron
@@ -17,9 +17,9 @@ public interface IterableConjunctDuetTemplate<W> extends ConjunctDuetTemplate<W>
     default <A, B> Iterator<Tuple2<A, B>> toIterator(Duet<W, A, B> container) {
         return fold(requireNonNull(container,
                                    () -> "container"),
-                    (A a, B b) -> Collections.singletonList(Tuple2.of(a,
-                                                                      b))
-                                             .iterator());
+                    (A a, B b) -> Stream.of(Tuple2.of(a,
+                                                      b))
+                                        .iterator());
     }
 
     default <A, B> Iterable<Tuple2<A, B>> toIterable(Duet<W, A, B> container) {
@@ -31,7 +31,8 @@ public interface IterableConjunctDuetTemplate<W> extends ConjunctDuetTemplate<W>
         if (firstIterable != null && secondIterable != null) {
             for (A currentA : firstIterable) {
                 for (B currentB : secondIterable) {
-                    return Tuple2.of(currentA, currentB);
+                    return Tuple2.of(currentA,
+                                     currentB);
                 }
             }
         }
