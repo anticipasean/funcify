@@ -6,7 +6,6 @@ import funcify.ensemble.Quintet;
 import funcify.function.Fn1;
 import funcify.function.Fn4;
 import funcify.function.Fn4.Fn4W;
-import funcify.tuple.Tuple3;
 import funcify.tuple.Tuple4;
 import lombok.AllArgsConstructor;
 
@@ -44,7 +43,7 @@ public class Fn4Factory {
     }
 
     public <A, B, C, D, E, F> Quintet<Fn4W, A, B, C, D, F> flatMap(final Quintet<Fn4W, A, B, C, D, E> container,
-                                                                   final Fn1<? super E, ? extends Quintet<Fn4W, A, B, C, D, F>> flatMapper) {
+                                                                   final Fn1<? super E, ? extends Quintet<Fn4W, ? super A, ? super B, ? super C, ? super D, ? extends F>> flatMapper) {
         return fromFunction((A paramA, B paramB, C paramC, D paramD) -> {
             return requireNonNull(flatMapper,
                                   () -> "flatMapper").convert(Fn1::narrowK)
@@ -68,32 +67,33 @@ public class Fn4Factory {
     }
 
     public <W1, X, Y, Z, A, B, C, D, E> Quintet<Fn4W, W1, X, Y, Z, E> compose(final Quintet<Fn4W, A, B, C, D, E> container,
-                                                                              final Fn4<? super W1, ? super X, ? super Y, ? super Z, ? extends Tuple4<A, B, C, D>> before) {
+                                                                              final Fn4<? super W1, ? super X, ? super Y, ? super Z, ? extends Tuple4<? extends A, ? extends B, ? extends C, ? extends D>> before) {
         return fromFunction((W1 paramW, X paramX, Y paramY, Z paramZ) -> {
             return requireNonNull(before,
                                   () -> "before").apply(paramW,
                                                         paramX,
                                                         paramY,
-                                                        paramZ)
-                                                 .fold(requireNonNull(container,
-                                                                      () -> "container").convert(Fn4::narrowK));
+                                                        paramZ).<W1, X, Y, Z,>fold(requireNonNull(container,
+                                                                                                  () -> "container").convert(Fn4::narrowK));
         });
     }
 
-    public <X, Y, Z, A, B, C, D, E> Quintet<Fn4W, X, Y, Z, E> dimap(final Quintet<Fn4W, A, B, C, D, E> container,
-                                                                    final Fn4<? super X, ? super Y, ? super Z, ? extends Tuple3<A, B, C>> mapper1,
-                                                                    final Fn1<? super D, ? extends E> mapper2) {
-        return fromFunction((X paramX, Y paramY, Z paramZ) -> {
+    public <W1, X, Y, Z, A, B, C, D, E, F> Quintet<Fn4W, W1, X, Y, Z, F> dimap(final Quintet<Fn4W, A, B, C, D, E> container,
+                                                                               final Fn4<? super W1, ? super X, ? super Y, ? super Z, ? extends Tuple4<? extends A, ? extends B, ? extends C, ? extends D>> mapper1,
+                                                                               final Fn1<? super E, ? extends F> mapper2) {
+        return fromFunction((W1 paramW, X paramX, Y paramY, Z paramZ) -> {
             return requireNonNull(mapper1,
-                                  () -> "mapper1").apply(paramX,
+                                  () -> "mapper1").apply(paramW,
+                                                         paramX,
                                                          paramY,
-                                                         paramZ).<E>fold((A paramA, B paramB, C paramC) -> {
+                                                         paramZ).<F>fold((A paramA, B paramB, C paramC, D paramD) -> {
                 return requireNonNull(mapper2,
                                       () -> "mapper2").apply(requireNonNull(container,
                                                                             () -> "container").convert(Fn4::narrowK)
                                                                                               .apply(paramA,
                                                                                                      paramB,
-                                                                                                     paramC));
+                                                                                                     paramC,
+                                                                                                     paramD));
             });
         });
     }
@@ -108,7 +108,7 @@ public class Fn4Factory {
         public E apply(final A a,
                        final B b,
                        final C c,
-                       D d) {
+                       final D d) {
             return capturedLambda.apply(a,
                                         b,
                                         c,

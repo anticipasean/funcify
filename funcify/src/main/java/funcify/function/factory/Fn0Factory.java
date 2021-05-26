@@ -52,7 +52,7 @@ public class Fn0Factory {
 
 
     public <A, B> Solo<Fn0W, B> flatMap(Solo<Fn0W, A> container,
-                                        Function<? super A, ? extends Solo<Fn0W, B>> flatMapper) {
+                                        Function<? super A, ? extends Solo<Fn0W, ? extends B>> flatMapper) {
         return fromFunction(() -> requireNonNull(flatMapper,
                                                  () -> "flatMapper").apply(requireNonNull(container,
                                                                                           () -> "container").convert(Fn0::narrowK)

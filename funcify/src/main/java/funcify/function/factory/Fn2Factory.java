@@ -57,7 +57,7 @@ public class Fn2Factory {
     }
 
     public <A, B, C, D> Trio<Fn2W, A, B, D> flatMap(Trio<Fn2W, A, B, C> container,
-                                                    Function<? super C, ? extends Trio<Fn2W, A, B, D>> flatMapper) {
+                                                    Function<? super C, ? extends Trio<Fn2W, ? super A, ? super B, ? extends D>> flatMapper) {
         return fromFunction((A paramA, B paramB) -> {
             return requireNonNull(flatMapper,
                                   () -> "flatMapper").apply(requireNonNull(container,
@@ -76,7 +76,7 @@ public class Fn2Factory {
     }
 
     public <Y, Z, A, B, C, D> Trio<Fn2W, Y, Z, D> dimap(Trio<Fn2W, A, B, C> container,
-                                                        BiFunction<? super Y, ? super Z, ? extends Tuple2<A, B>> mapper1,
+                                                        BiFunction<? super Y, ? super Z, ? extends Tuple2<? extends A, ? extends B>> mapper1,
                                                         Function<? super C, ? extends D> mapper2) {
         return fromFunction((Y paramY, Z paramZ) -> {
             return requireNonNull(mapper1,
@@ -131,7 +131,7 @@ public class Fn2Factory {
     }
 
     public <Y, Z, A, B, C> Trio<Fn2W, Y, Z, C> contraMap(Trio<Fn2W, A, B, C> container,
-                                                         BiFunction<? super Y, ? super Z, ? extends Tuple2<A, B>> mapper) {
+                                                         BiFunction<? super Y, ? super Z, ? extends Tuple2<? extends A, ? extends B>> mapper) {
         return dimap(container,
                      mapper,
                      c -> c);

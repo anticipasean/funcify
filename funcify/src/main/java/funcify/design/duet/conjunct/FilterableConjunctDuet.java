@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import funcify.design.duet.FilterableDuet;
 import funcify.design.solo.disjunct.DisjunctSolo;
-import funcify.ensemble.Duet;
 import funcify.function.Fn0;
 import funcify.function.Fn1;
 import funcify.option.Option;
@@ -73,8 +72,7 @@ public interface FilterableConjunctDuet<W, A, B> extends ConjunctDuet<W, A, B>, 
                                        condition);
     }
 
-    default Option<Tuple2<A, B>> filterOnFirst(Duet<W, A, B> container,
-                                               Predicate<? super A> condition) {
+    default Option<Tuple2<A, B>> filterOnFirst(Predicate<? super A> condition) {
         return factory().filterOnFirst(this,
                                        condition);
     }

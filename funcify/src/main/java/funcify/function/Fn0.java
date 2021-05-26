@@ -42,7 +42,7 @@ public interface Fn0<A> extends Solo<Fn0W, A>, Supplier<A> {
         return Fn0Factory.getInstance();
     }
 
-    default <B> Fn0<B> flatMap(final Fn1<? super A, ? extends Fn0<B>> flatMapper) {
+    default <B> Fn0<B> flatMap(final Fn1<? super A, ? extends Fn0<? extends B>> flatMapper) {
         return factory().flatMap(this,
                                  flatMapper)
                         .narrowT1();
@@ -61,10 +61,9 @@ public interface Fn0<A> extends Solo<Fn0W, A>, Supplier<A> {
         return apply();
     }
 
-    default <B, F extends Function<? super A, ? extends B>> Fn0<B> ap(final Fn0<F> containerWithFunction) {
-        return factory().ap(this,
-                            containerWithFunction)
-                        .narrowT1();
+    default <B> Fn0<B> ap(final Fn0<Function<? super A, ? extends B>> containerWithFunction) {
+        return factory().<A, B, Function<? super A, ? extends B>>ap(this,
+                                                                    containerWithFunction).narrowT1();
     }
 
     default <B, C> Fn0<C> zip(final Fn0<? extends B> container,

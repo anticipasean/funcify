@@ -54,10 +54,9 @@ public interface Fn3<A, B, C, D> extends Quartet<Fn3W, A, B, C, D> {
             B b,
             C c);
 
-    default <E> Fn3<A, B, C, E> flatMap(final Fn1<? super D, ? extends Fn3<A, B, C, E>> flatMapper) {
-        return factory().flatMap(this,
-                                 flatMapper)
-                        .narrowT4();
+    default <E> Fn3<A, B, C, E> flatMap(final Fn1<? super D, ? extends Fn3<? super A, ? super B, ? super C, ? extends E>> flatMapper) {
+        return factory().<A, B, C, D, E>flatMap(this,
+                                                flatMapper).narrowT1();
     }
 
     default Fn1<A, Fn1<B, Fn1<C, D>>> curry() {
@@ -102,23 +101,21 @@ public interface Fn3<A, B, C, D> extends Quartet<Fn3W, A, B, C, D> {
                                                c));
     }
 
-    default <X, Y, Z, E> Fn3<X, Y, Z, E> dimap(final Fn3<? super X, ? super Y, ? super Z, ? extends Tuple3<A, B, C>> mapper1,
+    default <X, Y, Z, E> Fn3<X, Y, Z, E> dimap(final Fn3<? super X, ? super Y, ? super Z, ? extends Tuple3<? extends A, ? extends B, ? extends C>> mapper1,
                                                final Fn1<? super D, ? extends E> mapper2) {
         return factory().<X, Y, Z, A, B, C, D, E>dimap(this,
                                                        mapper1,
                                                        mapper2).narrowT1();
     }
 
-    default <X, Y, Z> Fn3<X, Y, Z, D> compose(final Fn3<? super X, ? super Y, ? super Z, ? extends Tuple3<A, B, C>> before) {
+    default <X, Y, Z> Fn3<X, Y, Z, D> compose(final Fn3<? super X, ? super Y, ? super Z, ? extends Tuple3<? extends A, ? extends B, ? extends C>> before) {
         return factory().<X, Y, Z, A, B, C, D>compose(this,
                                                       before).narrowT1();
     }
 
     default <E> Fn3<A, B, C, E> andThen(final Fn1<? super D, ? extends E> after) {
-        return (A a, B b, C c) -> requireNonNull(after,
-                                                 () -> "after").apply(apply(a,
-                                                                            b,
-                                                                            c));
+        return factory().<A, B, C, D, E>map(this,
+                                            after).narrowT1();
     }
 
 

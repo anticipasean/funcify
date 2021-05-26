@@ -1,0 +1,44 @@
+package funcify.typedef.javatype;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Collections;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * @author smccarron
+ * @created 2021-05-22
+ */
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Setter(AccessLevel.PACKAGE)
+@Getter
+@Builder
+public class BoundedJavaTypeVariable implements JavaType {
+
+    @JsonProperty("parameterized")
+    private final boolean parameterized = true;
+
+    @Override
+    public String getName() {
+        return getBaseType().getName();
+    }
+
+    @JsonProperty("base_type")
+    private JavaType baseType;
+
+    @Default
+    @JsonProperty("lower_bound_types")
+    private List<JavaType> lowerBoundTypes = Collections.emptyList();
+
+    @Default
+    @JsonProperty("upper_bound_types")
+    private List<JavaType> upperBoundTypes = Collections.emptyList();
+
+}

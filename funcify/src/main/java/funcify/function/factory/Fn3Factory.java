@@ -43,7 +43,7 @@ public class Fn3Factory {
     }
 
     public <A, B, C, D, E> Quartet<Fn3W, A, B, C, E> flatMap(final Quartet<Fn3W, A, B, C, D> container,
-                                                             final Fn1<? super D, ? extends Quartet<Fn3W, A, B, C, E>> flatMapper) {
+                                                             final Fn1<? super D, ? extends Quartet<Fn3W, ? super A, ? super B, ? super C, ? extends E>> flatMapper) {
         return fromFunction((A paramA, B paramB, C paramC) -> {
             return requireNonNull(flatMapper,
                                   () -> "flatMapper").convert(Fn1::narrowK)
@@ -65,7 +65,7 @@ public class Fn3Factory {
     }
 
     public <X, Y, Z, A, B, C, D> Quartet<Fn3W, X, Y, Z, D> compose(final Quartet<Fn3W, A, B, C, D> container,
-                                                                   final Fn3<? super X, ? super Y, ? super Z, ? extends Tuple3<A, B, C>> before) {
+                                                                   final Fn3<? super X, ? super Y, ? super Z, ? extends Tuple3<? extends A, ? extends B, ? extends C>> before) {
         return fromFunction((X paramX, Y paramY, Z paramZ) -> {
             return requireNonNull(before,
                                   () -> "before").apply(paramX,
@@ -77,7 +77,7 @@ public class Fn3Factory {
     }
 
     public <X, Y, Z, A, B, C, D, E> Quartet<Fn3W, X, Y, Z, E> dimap(final Quartet<Fn3W, A, B, C, D> container,
-                                                                    final Fn3<? super X, ? super Y, ? super Z, ? extends Tuple3<A, B, C>> mapper1,
+                                                                    final Fn3<? super X, ? super Y, ? super Z, ? extends Tuple3<? extends A, ? extends B, ? extends C>> mapper1,
                                                                     final Fn1<? super D, ? extends E> mapper2) {
         return fromFunction((X paramX, Y paramY, Z paramZ) -> {
             return requireNonNull(mapper1,
@@ -94,6 +94,17 @@ public class Fn3Factory {
         });
     }
 
+    public <A, B, C, D, E> Quartet<Fn3W, A, B, C, E> map(final Quartet<Fn3W, A, B, C, D> container,
+                                                         final Fn1<? super D, ? extends E> mapper) {
+        return fromFunction((A a, B b, C c) -> {
+            return requireNonNull(mapper,
+                                  () -> "mapper").apply(requireNonNull(container,
+                                                                       () -> "container").convert(Fn3::narrowK)
+                                                                                         .apply(a,
+                                                                                                b,
+                                                                                                c));
+        });
+    }
 
     @AllArgsConstructor
     private static class DefaultFn3<A, B, C, D> implements Fn3<A, B, C, D> {

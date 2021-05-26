@@ -1,0 +1,82 @@
+java_type(type_definition) ::= <<
+<if(type_definition.package.name)>package <type_definition.package.name>;<endif>
+
+<type_definition.imports:{ im | import <im.package.name>.<im.simple_class_name>;}; separator="\n">
+
+<type_definition.annotations:{ an | <an:annotation_instance();separator="\n">; }>
+<type_definition.modifiers:{m | <m.keyword>}><if(type_definition.type_kind)> <type_definition.type_kind.keyword><endif> <type_definition.name><parameterize_type_declaration(type_definition)><\\>
+<if(type_definition.super_type)> extends <type_definition.super_type.name><parameterize_type_declaration(type_definition.super_type)><endif><\\>
+<if(type_definition.implemented_interface_types)> implements <type_definition.implemented_interface_types:{ iface | <type_declaration(iface)>};separator={, }><endif> {
+
+<fields(type_definition)>
+
+<methods(type_definition)>
+
+}
+>>
+
+type_declaration(java_type) ::= "<java_type.name><parameterize_type_declaration(java_type)>"
+
+annotation_declaration(annotationInstance) ::= <<
+@<annotationInstance.annotation.name><if(annotationInstance.values)>(<annotationInstance.annotation.attributes:{attr| <attr.name>=<annotationInstance.values.(attr.name)>};separator=", ">)<endif>
+>>
+
+parameterize_type_declaration(java_type) ::= "<if(java_type.type_variables)>\<<java_type.type_variables:type_variable_declaration();separator={, }>><endif>"
+
+type_variable_declaration(type_variable) ::= <<
+<if(!type_variable.lower_bound_types && !type_variable.upper_bound_types)><type_declaration(type_variable)><\\>
+<elseif(type_variable.lower_bound_types)><type_variable.base_type.name> super <type_variable.lower_bound_types:{lbt | <type_declaration(lbt)>};separator={ & }><\\>
+<elseif(type_variable.upper_bound_types)><type_variable.base_type.name> extends <type_variable.upper_bound_types:{ubt | <type_declaration(ubt)>};separator={ & }><\\>
+<endif>
+>>
+
+fields(type_definition) ::= <<
+<if(type_definition.fields)><type_definition.fields:field_declaration();separator="\n"><endif>
+>>
+
+field_declaration(field) ::= <<
+    field <field.name>;
+>>
+
+methods(type_definition) ::= <<
+<if(type_definition.methods)><type_definition.methods:method_declaration();separator="\n\n"><endif>
+>>
+
+method_declaration(method) ::= <<
+    <method.annotations:{ an | <an:annotation_declaration();separator="\n">; }>
+    <method.modifiers:{m | <m.keyword>};separator={ }><parameterize_method_declaration(method)> <method.return_type.name><parameterize_type_declaration(method.return_type)> <method.name>(<method_parameters(method)>)<if(method.code_block)><code_block(method)><else>;<endif>
+>>
+
+parameterize_method_declaration(method) ::= "<if(method.modifiers && method.type_variables)> \<<method.type_variables:{v | <v.name>};separator={,}>><endif><if(!method.modifiers && method.type_variables)>\<<method.type_variables:{v | <v.name>};separator={,}>><endif>"
+
+method_parameters(method) ::= "<method.parameters:method_parameter();separator={, }>"
+
+method_parameter(parameter) ::= "<if(parameter.modifiers)><parameter.modifiers:{m | <m.keyword> };separator={ }><endif><type_declaration(parameter.type)> <parameter.name>"
+
+code_block(method) ::= <<
+{
+        <method.code_block.statements:method_statement()>
+    }
+>>
+
+method_statement(statement) ::= <<
+<if(statement.is_return)>return <statement.expressions:expression()>;<\\>
+<elseif(statement.is_assignment && statement.local_variable_definition)><local_variable_declaration(statement)> = <statement.expression>;<\\>
+<else><expression(statement)>;<\\>
+<endif>
+>>
+
+expression(expression) ::= <<
+<if(expression.is_lambda)><lambda_expression(expr)><\\>
+<elseif(expression.template_call)><(expression.template_call)(expression.template_parameter)><\\>
+<elseif(expression.text)><expression.text><\\>
+<endif>
+>>
+
+local_variable_declaration(statement) ::= ""
+
+lambda_expression(statement) ::= <<
+<if(statement.expression.lambda_type_parameters)>(<statement.expression.lambda_type_parameters:method_parameter();separator={, }>}>) -> <\\>
+<statement.expression.lambda_body><\\>
+<endif>
+>>

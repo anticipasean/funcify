@@ -66,7 +66,7 @@ public interface Fn2<A, B, C> extends Trio<Fn2W, A, B, C>, BiFunction<A, B, C> {
 
     default Fn1<B, C> applyFirst(final A a) {
         return Fn1.of((B b) -> this.apply(a,
-                                               b));
+                                          b));
     }
 
     default Fn1<A, C> applySecond(final B b) {
@@ -79,8 +79,9 @@ public interface Fn2<A, B, C> extends Trio<Fn2W, A, B, C>, BiFunction<A, B, C> {
                                               b));
     }
 
-    default Fn2<B, A, C> swapFirstSecond(){
-        return Fn2.of((B b, A a) -> apply(a, b));
+    default Fn2<B, A, C> swapFirstSecond() {
+        return Fn2.of((B b, A a) -> apply(a,
+                                          b));
     }
 
     default <D> Fn2<A, B, D> map(final Function<? super C, ? extends D> mapper) {
@@ -89,10 +90,9 @@ public interface Fn2<A, B, C> extends Trio<Fn2W, A, B, C>, BiFunction<A, B, C> {
                         .narrowT3();
     }
 
-    default <D> Fn2<A, B, D> flatMap(final Function<? super C, ? extends Fn2<A, B, D>> flatMapper) {
-        return factory().flatMap(this,
-                                 flatMapper)
-                        .narrowT3();
+    default <D> Fn2<A, B, D> flatMap(final Function<? super C, ? extends Fn2<? super A, ? super B, ? extends D>> flatMapper) {
+        return factory().<A, B, C, D>flatMap(this,
+                                             flatMapper).narrowT1();
     }
 
     @Override
@@ -101,34 +101,30 @@ public interface Fn2<A, B, C> extends Trio<Fn2W, A, B, C>, BiFunction<A, B, C> {
     }
 
     default <Z> Fn2<Z, B, C> composeFirst(final Function<? super Z, ? extends A> mapper) {
-        return factory().contraMapFirst(this,
-                                        mapper)
-                        .narrowT3();
+        return factory().<Z, A, B, C>contraMapFirst(this,
+                                                    mapper).narrowT1();
     }
 
     default <Z> Fn2<A, Z, C> composeSecond(final Function<? super Z, ? extends B> mapper) {
-        return factory().contraMapSecond(this,
-                                         mapper)
-                        .narrowT3();
+        return factory().<Z, A, B, C>contraMapSecond(this,
+                                                     mapper).narrowT1();
     }
 
-    default <Y, Z> Fn2<Y, Z, C> compose(final BiFunction<? super Y, ? super Z, ? extends Tuple2<A, B>> before) {
-        return factory().contraMap(this,
-                                   before)
-                        .narrowT3();
+    default <Y, Z> Fn2<Y, Z, C> compose(final BiFunction<? super Y, ? super Z, ? extends Tuple2<? extends A, ? extends B>> before) {
+        return factory().<Y, Z, A, B, C>contraMap(this,
+                                                  before).narrowT1();
     }
 
-    default <Y, Z, D> Fn2<Y, Z, D> dimap(BiFunction<? super Y, ? super Z, ? extends Tuple2<A, B>> mapper1,
-                                         Function<? super C, ? extends D> mapper2) {
+    default <Y, Z, D> Fn2<Y, Z, D> dimap(final BiFunction<? super Y, ? super Z, ? extends Tuple2<? extends A, ? extends B>> mapper1,
+                                         final Function<? super C, ? extends D> mapper2) {
         return factory().<Y, Z, A, B, C, D>dimap(this,
                                                  mapper1,
                                                  mapper2).narrowT1();
     }
 
     default <D> Fn2<A, B, D> ap(final Fn2<? super A, ? super C, ? extends Fn2<? super A, ? super B, ? extends D>> applicative) {
-        return factory().ap(this,
-                            applicative)
-                        .narrowT1();
+        return factory().<A, B, C, D, Fn2<? super A, ? super B, ? extends D>>ap(this,
+                                                                                applicative).narrowT1();
     }
 
 

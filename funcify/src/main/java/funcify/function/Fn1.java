@@ -1,12 +1,9 @@
 package funcify.function;
 
-import static java.util.Objects.requireNonNull;
-
 import funcify.ensemble.Duet;
 import funcify.ensemble.Solo;
 import funcify.function.Fn1.Fn1W;
 import funcify.function.factory.Fn1Factory;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -37,6 +34,10 @@ public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
                          .narrowT1();
     }
 
+    static <A> Fn1<A, A> identity() {
+        return of((A a) -> a);
+    }
+
     static <A, B, F extends Fn1<A, Fn1<A, B>>> Fn1<A, B> flatten(final F nestedFunc) {
         return Fn1Factory.getInstance()
                          .flatten(Duet.widenP(nestedFunc))
@@ -52,22 +53,19 @@ public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
 
     @Override
     default <Z> Fn1<Z, B> compose(final Function<? super Z, ? extends A> before) {
-        return factory().fromFunction((Z param) -> apply(requireNonNull(before,
-                                                                        () -> "before").apply(param)))
-                        .narrowT1();
+        return this.<Z, B>dimap(Fn1.of(before),
+                                Fn1.<B>identity()).narrowT1();
     }
 
     @Override
     default <V> Fn1<A, V> andThen(final Function<? super B, ? extends V> after) {
-        return factory().fromFunction((A param) -> requireNonNull(after,
-                                                                  () -> "after").apply(apply(param)))
-                        .narrowT1();
+        return factory().<A, B, V>map(this,
+                                      after).narrowT1();
     }
 
     default <C> Fn1<A, C> map(final Fn1<? super B, ? extends C> mapper) {
-        return factory().map(this,
-                             mapper)
-                        .narrowT1();
+        return factory().<A, B, C>map(this,
+                                      mapper).narrowT1();
     }
 
     default <C> Fn1<A, C> zip(final Fn1<A, B> container2,
@@ -78,10 +76,9 @@ public interface Fn1<A, B> extends Duet<Fn1W, A, B>, Function<A, B> {
                         .narrowT1();
     }
 
-    default <C> Fn1<A, C> flatMap(final Fn1<? super B, ? extends Fn1<A, C>> flatMapper) {
-        return factory().flatMap(this,
-                                 flatMapper)
-                        .narrowT1();
+    default <C> Fn1<A, C> flatMap(final Fn1<? super B, ? extends Fn1<? super A, ? extends C>> flatMapper) {
+        return factory().<A, B, C>flatMap(this,
+                                          flatMapper).narrowT1();
     }
 
     default <Z, C> Fn1<Z, C> dimap(final Fn1<? super Z, ? extends A> mapper1,

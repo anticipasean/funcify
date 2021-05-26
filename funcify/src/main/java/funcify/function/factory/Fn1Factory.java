@@ -45,7 +45,7 @@ public class Fn1Factory {
     }
 
     public <A, B, C> Duet<Fn1W, A, C> flatMap(final Duet<Fn1W, A, B> container,
-                                              final Function<? super B, ? extends Duet<Fn1W, A, C>> flatMapper) {
+                                              final Function<? super B, ? extends Duet<Fn1W, ? super A, ? extends C>> flatMapper) {
         return fromFunction((A paramA) -> requireNonNull(flatMapper,
                                                          () -> "flatMapper").apply(requireNonNull(container,
                                                                                                   () -> "container").convert(Fn1::narrowK)

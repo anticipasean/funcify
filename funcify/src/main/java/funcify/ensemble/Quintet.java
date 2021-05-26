@@ -15,7 +15,7 @@ import java.util.function.Function;
  * @param <B> - Second value type parameter
  * @param <C> - Third value type parameter
  * @param <D> - Fourth value type parameter
- * @param <E> - Fourth value type parameter
+ * @param <E> - Fifth value type parameter
  * @author smccarron
  * @created 2021-04-28
  */

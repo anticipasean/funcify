@@ -21,10 +21,24 @@ public interface FilterableSolo<W, A> extends Solo<W, A> {
                                 condition);
     }
 
+    default Option<A> filterNot(final Predicate<? super A> condition) {
+        return factory().filterNot(this,
+                                   condition);
+    }
+
     default <WDS> DisjunctSolo<WDS, A> filter(final Predicate<? super A> condition,
                                               final Fn1<? super A, ? extends DisjunctSolo<WDS, A>> ifFitsCondition,
                                               final Fn0<? extends DisjunctSolo<WDS, A>> ifNotFitsCondition) {
         return factory().<A, WDS, DisjunctSolo<WDS, A>>filter(this,
+                                                              ifFitsCondition,
+                                                              ifNotFitsCondition,
+                                                              condition).narrowT1();
+    }
+
+    default <WDS> DisjunctSolo<WDS, A> filterNot(final Predicate<? super A> condition,
+                                                 final Fn1<? super A, ? extends DisjunctSolo<WDS, A>> ifFitsCondition,
+                                                 final Fn0<? extends DisjunctSolo<WDS, A>> ifNotFitsCondition) {
+        return factory().<A, WDS, DisjunctSolo<WDS, A>>filterNot(this,
                                                               ifFitsCondition,
                                                               ifNotFitsCondition,
                                                               condition).narrowT1();
