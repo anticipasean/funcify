@@ -22,7 +22,7 @@ import java.util.Objects;
  * @author smccarron
  * @created 2021-05-22
  */
-public interface JavaDefinitionFactory<D> extends JavaTypeFactory {
+public interface JavaDefinitionFactory<D extends Definition<D>> extends JavaTypeFactory {
 
     D name(final String name);
 
@@ -149,6 +149,7 @@ public interface JavaDefinitionFactory<D> extends JavaTypeFactory {
         return definition;
     }
 
+    @SuppressWarnings("unchecked")
     default D subTypeDefinition(final D definition,
                                 final D... subTypeDefinitions) {
         return subTypeDefinitions(definition,
@@ -204,7 +205,13 @@ public interface JavaDefinitionFactory<D> extends JavaTypeFactory {
     }
 
     default D expression(final D definition,
-                         final JavaExpression expression) {
+                         final JavaExpression... expression) {
+        return expressions(definition,
+                           asList(expression));
+    }
+
+    default D expressions(final D definition,
+                          final List<JavaExpression> expressions) {
         return definition;
     }
 

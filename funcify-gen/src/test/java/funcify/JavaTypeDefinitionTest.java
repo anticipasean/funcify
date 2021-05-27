@@ -92,10 +92,10 @@ public class JavaTypeDefinitionTest {
     @Test
     public void sttest() {
 
-        final URI uri = URI.create("file:///" + Paths.get("src/main/antlr/funcify/java_type.stg")
+        final URI uri = URI.create("file:///" + Paths.get("src/main/antlr/funcify/java_type_definition.stg")
                                                      .toAbsolutePath());
 
-        final Path path = Paths.get("src/main/antlr/funcify/java_type.stg")
+        final Path path = Paths.get("src/main/antlr/funcify/java_type_definition.stg")
                                .toAbsolutePath();
         System.out.println("path: " + path);
         System.out.println("exists: " + new File(path.toString()).exists());

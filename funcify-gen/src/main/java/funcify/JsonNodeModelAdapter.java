@@ -27,6 +27,10 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
                               final String propertyName) throws STNoSuchPropertyException {
         requireNonNull(model,
                        "model");
+        //        System.out.println(String.format("model_adapter: [ node_type: %s, property: %s, property_name: %s ]",
+        //                                         model.getNodeType(),
+        //                                         property,
+        //                                         propertyName));
         if (property == null) {
             return throwNoSuchProperty(JsonNode.class,
                                        propertyName,
@@ -34,10 +38,6 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
         }
         requireNonNull(propertyName,
                        "propertyName");
-        //        System.out.println(String.format("model_adapter: [ node_type: %s, property: %s, property_name: %s ]",
-        //                                         model.getNodeType(),
-        //                                         property,
-        //                                         propertyName));
         try {
             return mapJsonNode(model,
                                propertyName);
@@ -98,11 +98,11 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
     private static <T> BiPredicate<JsonNode, T> propertyFoundAndNotContainerPropertyValue(Class<T> propertyNameType) {
         return (jsonNode, propName) -> {
             if (String.class.isAssignableFrom(propertyNameType)) {
-                return jsonNode.has(((String) propName)) && !jsonNode.get(((String) propName))
-                                                                     .isContainerNode();
+                return jsonNode.hasNonNull(((String) propName)) && !jsonNode.get(((String) propName))
+                                                                            .isContainerNode();
             } else if (Integer.class.isAssignableFrom(propertyNameType)) {
-                return jsonNode.has(((Integer) propName)) && !jsonNode.get(((Integer) propName))
-                                                                      .isContainerNode();
+                return jsonNode.hasNonNull(((Integer) propName)) && !jsonNode.get(((Integer) propName))
+                                                                             .isContainerNode();
             } else {
                 return false;
             }
@@ -112,11 +112,11 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
     private static <T> BiPredicate<JsonNode, T> propertyFoundAndContainerPropertyValue(Class<T> propertyNameType) {
         return (jsonNode, propName) -> {
             if (String.class.isAssignableFrom(propertyNameType)) {
-                return jsonNode.has(((String) propName)) && jsonNode.get(((String) propName))
-                                                                    .isContainerNode();
+                return jsonNode.hasNonNull(((String) propName)) && jsonNode.get(((String) propName))
+                                                                           .isContainerNode();
             } else if (Integer.class.isAssignableFrom(propertyNameType)) {
-                return jsonNode.has(((Integer) propName)) && jsonNode.get(((Integer) propName))
-                                                                     .isContainerNode();
+                return jsonNode.hasNonNull(((Integer) propName)) && jsonNode.get(((Integer) propName))
+                                                                            .isContainerNode();
             } else {
                 return false;
             }

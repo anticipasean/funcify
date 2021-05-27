@@ -1,6 +1,7 @@
 package funcify;
 
 import funcify.typedef.JavaCodeBlock;
+import funcify.typedef.javastatement.JavaExpression;
 import funcify.typedef.javastatement.JavaStatement;
 import java.util.List;
 
@@ -28,4 +29,5 @@ public interface JavaCodeBlockFactory extends JavaDefinitionFactory<JavaCodeBloc
                                         .addAll(statements);
         return definition.withStatements(definition.getStatements());
     }
+    
 }

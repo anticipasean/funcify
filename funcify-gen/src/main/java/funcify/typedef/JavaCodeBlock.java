@@ -1,6 +1,7 @@
 package funcify.typedef;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import funcify.Definition;
 import funcify.typedef.javastatement.JavaStatement;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import lombok.With;
 @Builder
 @Getter
 @With
-public class JavaCodeBlock {
+public class JavaCodeBlock implements Definition<JavaCodeBlock> {
 
     @JsonProperty("statements")
     @Default

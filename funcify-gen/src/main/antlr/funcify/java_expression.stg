@@ -1,0 +1,16 @@
+import "java_type_definition.stg"
+
+null_check(name) ::= "Objects.requireNonNull(<name>, () -> \"<name>\")"
+
+function_call(function) ::= <<
+<if(rest(function))><null_check(first(function))>.apply(<rest(function):{p | <p>};separator=", ">)<\\>
+<elseif(first(function))><null_check(first(function))>.apply()<\\>
+<else><null_check(first(function))>.apply()<\\>
+<endif>
+>>
+
+parens(expression) ::= "(<expression>)"
+
+cast_as(parameters) ::= <<
+<if(first(rest(parameters)))><first(rest(parameters)):parens()> <first(parameters)><endif>
+>>

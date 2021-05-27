@@ -3,7 +3,7 @@ java_type(type_definition) ::= <<
 
 <type_definition.imports:{ im | import <im.package.name>.<im.simple_class_name>;}; separator="\n">
 
-<type_definition.annotations:{ an | <an:annotation_instance();separator="\n">; }>
+<type_definition.annotations:annotation_declaration()>
 <type_definition.modifiers:{m | <m.keyword>}><if(type_definition.type_kind)> <type_definition.type_kind.keyword><endif> <type_definition.name><parameterize_type_declaration(type_definition)><\\>
 <if(type_definition.super_type)> extends <type_definition.super_type.name><parameterize_type_declaration(type_definition.super_type)><endif><\\>
 <if(type_definition.implemented_interface_types)> implements <type_definition.implemented_interface_types:{ iface | <type_declaration(iface)>};separator={, }><endif> {
@@ -17,8 +17,8 @@ java_type(type_definition) ::= <<
 
 type_declaration(java_type) ::= "<java_type.name><parameterize_type_declaration(java_type)>"
 
-annotation_declaration(annotationInstance) ::= <<
-@<annotationInstance.annotation.name><if(annotationInstance.values)>(<annotationInstance.annotation.attributes:{attr| <attr.name>=<annotationInstance.values.(attr.name)>};separator=", ">)<endif>
+annotation_declaration(annotation) ::= <<
+<if(annotation.name)>@<annotation.name><if(annotation.parameters)>("<first(annotation.parameters).value>")<endif><endif>
 >>
 
 parameterize_type_declaration(java_type) ::= "<if(java_type.type_variables)>\<<java_type.type_variables:type_variable_declaration();separator={, }>><endif>"
@@ -43,11 +43,11 @@ methods(type_definition) ::= <<
 >>
 
 method_declaration(method) ::= <<
-    <method.annotations:{ an | <an:annotation_declaration();separator="\n">; }>
+    <method.annotations:annotation_declaration()>
     <method.modifiers:{m | <m.keyword>};separator={ }><parameterize_method_declaration(method)> <method.return_type.name><parameterize_type_declaration(method.return_type)> <method.name>(<method_parameters(method)>)<if(method.code_block)><code_block(method)><else>;<endif>
 >>
 
-parameterize_method_declaration(method) ::= "<if(method.modifiers && method.type_variables)> \<<method.type_variables:{v | <v.name>};separator={,}>><endif><if(!method.modifiers && method.type_variables)>\<<method.type_variables:{v | <v.name>};separator={,}>><endif>"
+parameterize_method_declaration(method) ::= "<if(method.modifiers && method.type_variables)> \<<method.type_variables:type_variable_declaration();separator={,}>><endif><if(!method.modifiers && method.type_variables)>\<<method.type_variables:type_variable_declaration();separator={,}>><endif>"
 
 method_parameters(method) ::= "<method.parameters:method_parameter();separator={, }>"
 
@@ -68,7 +68,7 @@ method_statement(statement) ::= <<
 
 expression(expression) ::= <<
 <if(expression.is_lambda)><lambda_expression(expr)><\\>
-<elseif(expression.template_call)><(expression.template_call)(expression.template_parameter)><\\>
+<elseif(expression.template_call)><(expression.template_call)(expression.template_parameters:{p | <p.(i0)>})><\\>
 <elseif(expression.text)><expression.text><\\>
 <endif>
 >>

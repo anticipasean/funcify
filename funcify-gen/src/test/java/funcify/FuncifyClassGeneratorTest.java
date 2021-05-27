@@ -2,8 +2,6 @@ package funcify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -29,13 +27,13 @@ public class FuncifyClassGeneratorTest {
     public void generateEnsembleInterfaceTypesTest() {
         final GenerationSession updatedSession = new EnsembleInterfaceTypeAssembler().assembleEnsembleInterfaceTypes(buildInitialGenerationSession());
 
-        final URI uri = URI.create("file:///" + Paths.get("src/main/antlr/funcify/java_type.stg")
-                                                     .toAbsolutePath());
+        //        final URI uri = URI.create("file:///" + Paths.get("src/main/antlr/funcify/java_type_definition.stg")
+        //                                                     .toAbsolutePath());
 
         final Path path = Paths.get("src/main/antlr/funcify/funcify.stg")
                                .toAbsolutePath();
-        System.out.println("path: " + path);
-        System.out.println("exists: " + new File(path.toString()).exists());
+        //        System.out.println("path: " + path);
+        //        System.out.println("exists: " + new File(path.toString()).exists());
         final STGroupFile stGroupFile = new STGroupFile(path.toString(),
                                                         "UTF-8");
         stGroupFile.registerModelAdaptor(JsonNode.class,
@@ -48,7 +46,7 @@ public class FuncifyClassGeneratorTest {
                                                     .add("type_definition",
                                                          eNode);
         System.out.println(ensembleBaseTypeStrTemplate.render());
-//        System.out.println("ensemble_base_type.json: " + eNode.toPrettyString());
+        //        System.out.println("ensemble_base_type.json: " + eNode.toPrettyString());
 
         updatedSession.getEnsembleInterfaceTypeDefinitionsByEnsembleKind()
                       .entrySet()
@@ -63,7 +61,7 @@ public class FuncifyClassGeneratorTest {
                                                                   jsonNode);
                               System.out.println("ensemble: " + entry.getKey()
                                                                      .name());
-//                              System.out.println("ensemble.json: " + jsonNode.toPrettyString());
+                              //                              System.out.println("ensemble.json: " + jsonNode.toPrettyString());
                               System.out.println(stringTemplate.render());
                           } catch (Exception e) {
                               e.printStackTrace();

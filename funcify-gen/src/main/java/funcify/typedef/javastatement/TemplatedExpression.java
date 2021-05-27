@@ -2,7 +2,6 @@ package funcify.typedef.javastatement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import java.util.Map;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +26,7 @@ public class TemplatedExpression implements JavaExpression {
     @JsonProperty("template_call")
     private String templateCall;
 
-    @JsonProperty("template_parameter")
-    private Object templateParameter;
+    @JsonProperty("template_parameters")
+    private List<String> templateParameters;
 
 }

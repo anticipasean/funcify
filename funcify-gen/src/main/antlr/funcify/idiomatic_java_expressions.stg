@@ -1,1 +1,0 @@
-null_object_check(name) ::= "Objects.requireNonNull(<name>, () -> \"<name>\")"

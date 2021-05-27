@@ -1,6 +1,7 @@
 package funcify.typedef;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import funcify.Definition;
 import funcify.typedef.javatype.JavaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import lombok.With;
 @Getter
 @With
 @Builder
-public class JavaMethod {
+public class JavaMethod implements Definition<JavaMethod> {
 
     @JsonProperty("annotations")
     @Default

@@ -1,6 +1,7 @@
 package funcify.typedef;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import funcify.Definition;
 import funcify.typedef.javatype.JavaType;
 import funcify.typedef.javatype.VariableParameterJavaType;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import lombok.With;
 @Builder
 @Getter
 @With
-public class JavaTypeDefinition {
+public class JavaTypeDefinition implements Definition<JavaTypeDefinition> {
 
     @JsonProperty("package")
     private JavaPackage javaPackage;
