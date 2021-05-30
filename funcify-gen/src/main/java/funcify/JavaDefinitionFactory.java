@@ -12,7 +12,7 @@ import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaPackage;
 import funcify.typedef.JavaParameter;
 import funcify.typedef.JavaTypeKind;
-import funcify.typedef.javastatement.JavaExpression;
+import funcify.typedef.javaexpr.JavaExpression;
 import funcify.typedef.javastatement.JavaStatement;
 import funcify.typedef.javatype.JavaType;
 import java.util.List;
@@ -24,7 +24,10 @@ import java.util.Objects;
  */
 public interface JavaDefinitionFactory<D extends Definition<D>> extends JavaTypeFactory {
 
-    D name(final String name);
+    default D name(final D definition,
+                   final String name) {
+        return definition;
+    }
 
     default D javaPackage(final D definition,
                           final String javaPackage) {

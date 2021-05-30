@@ -23,10 +23,9 @@ public interface JavaTypeDefinitionFactory extends JavaDefinitionFactory<JavaTyp
     }
 
     @Override
-    default JavaTypeDefinition name(final String name) {
-        return JavaTypeDefinition.builder()
-                                 .name(name)
-                                 .build();
+    default JavaTypeDefinition name(final JavaTypeDefinition definition,
+                                    final String name) {
+        return definition.withName(name);
     }
 
     @Override

@@ -7,6 +7,7 @@ import funcify.typedef.javatype.SimpleJavaType;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
 import funcify.typedef.javatype.VariableParameterJavaType;
 import funcify.typedef.javatype.WildcardJavaTypeBound;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -179,25 +180,24 @@ public interface JavaTypeFactory {
                                                             final String name,
                                                             final JavaType... typeVariable) {
         final int size = typeVariable.length;
-        final Stream.Builder<JavaType> javaTypeStreamBuilder = Stream.builder();
+        final List<JavaType> javaTypeVariablesList = new ArrayList<>();
         if (size == 0) {
             return javaType(javaPackage,
                             name);
         } else if (size == 1) {
-            javaTypeStreamBuilder.add(javaTypeVariableWithLowerBounds(typeVariable[0]));
+            javaTypeVariablesList.add(javaTypeVariableWithLowerBounds(typeVariable[0]));
         } else {
             for (int i = 0; i < size; i++) {
                 if (i != (size - 1)) {
-                    javaTypeStreamBuilder.add(javaTypeVariableWithWildcardLowerBounds(typeVariable[i]));
+                    javaTypeVariablesList.add(javaTypeVariableWithWildcardLowerBounds(typeVariable[i]));
                 } else {
-                    javaTypeStreamBuilder.add(javaTypeVariableWithWildcardUpperBounds(typeVariable[i]));
+                    javaTypeVariablesList.add(javaTypeVariableWithWildcardUpperBounds(typeVariable[i]));
                 }
             }
         }
         return parameterizedJavaType(javaPackage,
                                      name,
-                                     javaTypeStreamBuilder.build()
-                                                          .collect(Collectors.toList()));
+                                     javaTypeVariablesList);
     }
 
 }

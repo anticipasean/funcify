@@ -1,6 +1,7 @@
-package funcify.typedef.javastatement;
+package funcify.typedef.javaexpr;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import funcify.typedef.JavaParameter;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,22 +12,22 @@ import lombok.Setter;
 
 /**
  * @author smccarron
- * @created 2021-05-25
+ * @created 2021-05-22
  */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(AccessLevel.PACKAGE)
 @Builder
 @Getter
-public class TemplatedExpression implements JavaExpression {
+public class LambdaExpression implements JavaExpression {
 
     @JsonProperty("is_lambda")
-    private final boolean lambda = false;
+    private final boolean lambda = true;
 
-    @JsonProperty("template_call")
-    private String templateCall;
+    @JsonProperty("parameters")
+    private List<JavaParameter> parameters;
 
-    @JsonProperty("template_parameters")
-    private List<String> templateParameters;
+    @JsonProperty("lambda_body")
+    private String lambdaBody;
 
 }

@@ -17,15 +17,15 @@ import org.stringtemplate.v4.STGroupFile;
  */
 public class FuncifyClassGeneratorTest {
 
-    private GenerationSession buildInitialGenerationSession() {
-        return GenerationSession.builder()
-                                .ensembleKinds(Arrays.asList(EnsembleKind.values()))
-                                .build();
+    private DefaultGenerationSession buildInitialGenerationSession() {
+        return DefaultGenerationSession.builder()
+                                       .ensembleKinds(Arrays.asList(EnsembleKind.values()))
+                                       .build();
     }
 
     @Test
     public void generateEnsembleInterfaceTypesTest() {
-        final GenerationSession updatedSession = new EnsembleInterfaceTypeAssembler().assembleEnsembleInterfaceTypes(buildInitialGenerationSession());
+        final DefaultGenerationSession updatedSession = new EnsembleInterfaceTypeAssembler().assembleEnsembleInterfaceTypes(buildInitialGenerationSession());
 
         //        final URI uri = URI.create("file:///" + Paths.get("src/main/antlr/funcify/java_type_definition.stg")
         //                                                     .toAbsolutePath());

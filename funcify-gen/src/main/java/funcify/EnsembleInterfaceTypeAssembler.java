@@ -1,5 +1,6 @@
 package funcify;
 
+import static funcify.JavaMapTool.fromPair;
 import static java.util.Arrays.asList;
 
 import funcify.typedef.JavaAnnotation;
@@ -10,14 +11,12 @@ import funcify.typedef.JavaParameter;
 import funcify.typedef.JavaTypeDefinition;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javastatement.ReturnStatement;
-import funcify.typedef.javastatement.TemplatedExpression;
+import funcify.typedef.javaexpr.TemplatedExpression;
 import funcify.typedef.javatype.JavaType;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -36,7 +35,7 @@ public class EnsembleInterfaceTypeAssembler {
 
     }
 
-    public GenerationSession assembleEnsembleInterfaceTypes(final GenerationSession generationSession) {
+    public DefaultGenerationSession assembleEnsembleInterfaceTypes(final DefaultGenerationSession generationSession) {
         final JavaTypeDefinition baseEnsembleInterfaceTypeDefinition = baseEnsembleInterfaceTypeCreator(JavaTypeDefinitionFactory.getInstance());
         return generationSession.withBaseEnsembleInterfaceTypeDefinition(baseEnsembleInterfaceTypeDefinition)
                                 .withEnsembleInterfaceTypeDefinitionsByEnsembleKind(generationSession.getEnsembleKinds()
@@ -50,30 +49,33 @@ public class EnsembleInterfaceTypeAssembler {
 
     }
 
-    private static <D extends Definition<D>> D buildEnsembleInterfaceTypeDefinitionForEnsembleKind(final JavaDefinitionFactory<D> javaDefinitionFactory,
-                                                                                                   final JavaTypeDefinition baseEnsembleInterfaceTypeDefinition,
-                                                                                                   final EnsembleKind ensembleKind) {
+    private static JavaTypeDefinition buildEnsembleInterfaceTypeDefinitionForEnsembleKind(final JavaDefinitionFactory<JavaTypeDefinition> javaDefinitionFactory,
+                                                                                          final JavaTypeDefinition baseEnsembleInterfaceTypeDefinition,
+                                                                                          final EnsembleKind ensembleKind) {
         final JavaType ensembleInterfaceSuperType = ensembleKindInterfaceTypeSuperTypeCreator(javaDefinitionFactory,
                                                                                               baseEnsembleInterfaceTypeDefinition,
                                                                                               ensembleKind);
-        return javaDefinitionFactory.name(ensembleKind.getSimpleClassName())
-                                    .foldUpdate(javaDefinitionFactory::javaPackage,
-                                                FUNCIFY_ENSEMBLE_PACKAGE_NAME)
-                                    .foldUpdate(javaDefinitionFactory::typeVariables,
-                                                Stream.concat(Stream.of(WITNESS_TYPE_VARIABLE),
-                                                              firstNSimpleJavaTypeVariables(ensembleKind.getNumberOfValueParameters()))
-                                                      .collect(Collectors.toList()))
-                                    .foldUpdate(javaDefinitionFactory::modifier,
-                                                JavaModifier.PUBLIC)
-                                    .foldUpdate(javaDefinitionFactory::typeKind,
-                                                JavaTypeKind.INTERFACE)
-                                    .foldUpdate(javaDefinitionFactory::superType,
-                                                ensembleInterfaceSuperType)
-                                    .update(createAndUpdateWithConvertMethod(javaDefinitionFactory,
-                                                                             ensembleKind,
-                                                                             ensembleInterfaceSuperType))
-                                    .update(createAndUpdateWithNarrowMethodIfSolo(javaDefinitionFactory,
-                                                                                  ensembleKind));
+        return JavaTypeDefinition.builder()
+                                 .build()
+                                 .foldUpdate(javaDefinitionFactory::name,
+                                             ensembleKind.getSimpleClassName())
+                                 .foldUpdate(javaDefinitionFactory::javaPackage,
+                                             FUNCIFY_ENSEMBLE_PACKAGE_NAME)
+                                 .foldUpdate(javaDefinitionFactory::typeVariables,
+                                             Stream.concat(Stream.of(WITNESS_TYPE_VARIABLE),
+                                                           firstNSimpleJavaTypeVariables(ensembleKind.getNumberOfValueParameters()))
+                                                   .collect(Collectors.toList()))
+                                 .foldUpdate(javaDefinitionFactory::modifier,
+                                             JavaModifier.PUBLIC)
+                                 .foldUpdate(javaDefinitionFactory::typeKind,
+                                             JavaTypeKind.INTERFACE)
+                                 .foldUpdate(javaDefinitionFactory::superType,
+                                             ensembleInterfaceSuperType)
+                                 .update(createAndUpdateWithConvertMethod(javaDefinitionFactory,
+                                                                          ensembleKind,
+                                                                          ensembleInterfaceSuperType))
+                                 .update(createAndUpdateWithNarrowMethodIfSolo(javaDefinitionFactory,
+                                                                               ensembleKind));
 
     }
 
@@ -95,30 +97,33 @@ public class EnsembleInterfaceTypeAssembler {
 
             final JavaDefinitionFactory<JavaMethod> javaMethodDefinitionFactory = JavaMethodFactory.getInstance();
             return javaDefinitionFactory.method(definition,
-                                                javaMethodDefinitionFactory.name("narrow")
-                                                                           .foldUpdate(javaMethodDefinitionFactory::javaAnnotation,
-                                                                                       JavaAnnotation.builder()
-                                                                                                     .name("SuppressWarnings")
-                                                                                                     .parameters(fromPairs("value",
-                                                                                                                           "unchecked"))
-                                                                                                     .build())
-                                                                           .foldUpdate(javaMethodDefinitionFactory::modifier,
-                                                                                       JavaModifier.DEFAULT)
-                                                                           .foldUpdate(javaMethodDefinitionFactory::typeVariable,
-                                                                                       returnTypeVariable)
-                                                                           .foldUpdate(javaMethodDefinitionFactory::returnType,
-                                                                                       returnTypeBaseVariable)
-                                                                           .foldUpdate(javaMethodDefinitionFactory::codeBlock,
-                                                                                       JavaCodeBlockFactory.getInstance()
-                                                                                                           .statement(JavaCodeBlockFactory.getInstance()
-                                                                                                                                          .name(""),
-                                                                                                                      ReturnStatement.builder()
-                                                                                                                                     .expressions(asList(TemplatedExpression.builder()
-                                                                                                                                                                            .templateCall("cast_as")
-                                                                                                                                                                            .templateParameters(asList("this",
-                                                                                                                                                                                                       "S"))
-                                                                                                                                                                            .build()))
-                                                                                                                                     .build())));
+                                                JavaMethod.builder()
+                                                          .build()
+                                                          .foldUpdate(javaMethodDefinitionFactory::name,
+                                                                      "narrow")
+                                                          .foldUpdate(javaMethodDefinitionFactory::javaAnnotation,
+                                                                      JavaAnnotation.builder()
+                                                                                    .name("SuppressWarnings")
+                                                                                    .parameters(fromPair("value",
+                                                                                                         "unchecked"))
+                                                                                    .build())
+                                                          .foldUpdate(javaMethodDefinitionFactory::modifier,
+                                                                      JavaModifier.DEFAULT)
+                                                          .foldUpdate(javaMethodDefinitionFactory::typeVariable,
+                                                                      returnTypeVariable)
+                                                          .foldUpdate(javaMethodDefinitionFactory::returnType,
+                                                                      returnTypeBaseVariable)
+                                                          .foldUpdate(javaMethodDefinitionFactory::codeBlock,
+                                                                      JavaCodeBlockFactory.getInstance()
+                                                                                          .statement(JavaCodeBlock.builder()
+                                                                                                                  .build(),
+                                                                                                     ReturnStatement.builder()
+                                                                                                                    .expressions(asList(TemplatedExpression.builder()
+                                                                                                                                                           .templateCall("cast_as")
+                                                                                                                                                           .templateParameters(asList("this",
+                                                                                                                                                                                      "S"))
+                                                                                                                                                           .build()))
+                                                                                                                    .build())));
         };
     }
 
@@ -144,20 +149,23 @@ public class EnsembleInterfaceTypeAssembler {
         return javaDefinitionFactory.method(javaDefinitionFactory.javaImport(definition,
                                                                              Function.class,
                                                                              Objects.class),
-                                            javaMethodDefinitionFactory.name("convert")
-                                                                       .foldUpdate(javaMethodDefinitionFactory::modifier,
-                                                                                   JavaModifier.DEFAULT)
-                                                                       .foldUpdate(javaMethodDefinitionFactory::typeVariable,
-                                                                                   returnTypeVariable)
-                                                                       .foldUpdate(javaMethodDefinitionFactory::returnType,
-                                                                                   returnTypeVariable)
-                                                                       .foldUpdate(javaMethodDefinitionFactory::parameter,
-                                                                                   converterFunctionParameter(javaMethodDefinitionFactory,
-                                                                                                              ensembleKind,
-                                                                                                              ensembleInterfaceSuperType,
-                                                                                                              returnTypeVariable))
-                                                                       .foldUpdate(javaMethodDefinitionFactory::codeBlock,
-                                                                                   converterMethodCodeBlock(JavaCodeBlockFactory.getInstance())));
+                                            JavaMethod.builder()
+                                                      .build()
+                                                      .foldUpdate(javaMethodDefinitionFactory::name,
+                                                                  "convert")
+                                                      .foldUpdate(javaMethodDefinitionFactory::modifier,
+                                                                  JavaModifier.DEFAULT)
+                                                      .foldUpdate(javaMethodDefinitionFactory::typeVariable,
+                                                                  returnTypeVariable)
+                                                      .foldUpdate(javaMethodDefinitionFactory::returnType,
+                                                                  returnTypeVariable)
+                                                      .foldUpdate(javaMethodDefinitionFactory::parameter,
+                                                                  converterFunctionParameter(javaMethodDefinitionFactory,
+                                                                                             ensembleKind,
+                                                                                             ensembleInterfaceSuperType,
+                                                                                             returnTypeVariable))
+                                                      .foldUpdate(javaMethodDefinitionFactory::codeBlock,
+                                                                  converterMethodCodeBlock(JavaCodeBlockFactory.getInstance())));
     }
 
     private static <D extends Definition<D>> JavaType ensembleKindInterfaceTypeSuperTypeCreator(final JavaDefinitionFactory<D> javaDefinitionFactory,
@@ -172,38 +180,35 @@ public class EnsembleInterfaceTypeAssembler {
         }
     }
 
-    private static <D extends Definition<D>> D baseEnsembleInterfaceTypeCreator(final JavaDefinitionFactory<D> javaDefinitionFactory) {
-        return javaDefinitionFactory.name("Ensemble")
-                                    .foldUpdate(javaDefinitionFactory::javaPackage,
-                                                FUNCIFY_ENSEMBLE_PACKAGE_NAME)
-                                    .foldUpdate(javaDefinitionFactory::modifier,
-                                                JavaModifier.PUBLIC)
-                                    .foldUpdate(javaDefinitionFactory::typeKind,
-                                                JavaTypeKind.INTERFACE)
-                                    .foldUpdate(javaDefinitionFactory::typeVariable,
-                                                WITNESS_TYPE_VARIABLE);
+    private static JavaTypeDefinition baseEnsembleInterfaceTypeCreator(final JavaDefinitionFactory<JavaTypeDefinition> javaDefinitionFactory) {
+        return JavaTypeDefinition.builder()
+                                 .build()
+                                 .foldUpdate(javaDefinitionFactory::name,
+                                             "Ensemble")
+                                 .foldUpdate(javaDefinitionFactory::javaPackage,
+                                             FUNCIFY_ENSEMBLE_PACKAGE_NAME)
+                                 .foldUpdate(javaDefinitionFactory::modifier,
+                                             JavaModifier.PUBLIC)
+                                 .foldUpdate(javaDefinitionFactory::typeKind,
+                                             JavaTypeKind.INTERFACE)
+                                 .foldUpdate(javaDefinitionFactory::typeVariable,
+                                             WITNESS_TYPE_VARIABLE);
     }
 
     //TODO: Expand methods within code block def factory to streamline the creation of these expressions
     private static JavaCodeBlock converterMethodCodeBlock(JavaDefinitionFactory<JavaCodeBlock> javaCodeBlockDefinitionFactory) {
-        return javaCodeBlockDefinitionFactory.name("")
-                                             .foldUpdate(javaCodeBlockDefinitionFactory::statement,
-                                                         ReturnStatement.builder()
-                                                                        .expressions(asList(TemplatedExpression.builder()
-                                                                                                               .templateCall("function_call")
-                                                                                                               .templateParameters(asList("converter",
-                                                                                                                                          "this"))
-                                                                                                               .build()))
-                                                                        .build());
+        return JavaCodeBlock.builder()
+                            .build()
+                            .foldUpdate(javaCodeBlockDefinitionFactory::statement,
+                                        ReturnStatement.builder()
+                                                       .expressions(asList(TemplatedExpression.builder()
+                                                                                              .templateCall("function_call")
+                                                                                              .templateParameters(asList("converter",
+                                                                                                                         "this"))
+                                                                                              .build()))
+                                                       .build());
     }
 
-    private static <K, V> Map<K, V> fromPairs(final K k,
-                                              final V v) {
-        return Stream.of(new SimpleImmutableEntry<>(k,
-                                                    v))
-                     .collect(Collectors.toMap(Entry::getKey,
-                                               Entry::getValue));
-    }
 
     private static <D extends Definition<D>> JavaParameter converterFunctionParameter(final JavaDefinitionFactory<D> javaDefinitionFactory,
                                                                                       final EnsembleKind ensembleKind,

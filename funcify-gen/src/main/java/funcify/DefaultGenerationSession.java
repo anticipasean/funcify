@@ -1,6 +1,5 @@
 package funcify;
 
-import funcify.template.Trait;
 import funcify.typedef.JavaTypeDefinition;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -23,7 +22,7 @@ import lombok.With;
 @With
 @Getter
 @ToString
-public class GenerationSession {
+public class DefaultGenerationSession {
 
     private final Path destinationDirectoryPath;
 
@@ -35,7 +34,5 @@ public class GenerationSession {
     @Default
     private final Map<EnsembleKind, JavaTypeDefinition> ensembleInterfaceTypeDefinitionsByEnsembleKind = new HashMap<>();
 
-    @Default
-    private final List<Trait> traits = Collections.emptyList();
 
 }

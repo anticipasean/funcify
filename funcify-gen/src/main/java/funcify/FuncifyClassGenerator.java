@@ -22,7 +22,7 @@ public class FuncifyClassGenerator implements Callable<File> {
 
     @Option(names = {"-l", "--limit"},
             description = "limit for number of value parameters to consider in funcify ensembles and subtypes generated",
-            fallbackValue = "22")
+            defaultValue = "22")
     private int valueParameterLimit;
 
     public static void main(String[] args) {
@@ -32,18 +32,18 @@ public class FuncifyClassGenerator implements Callable<File> {
 
     @Override
     public File call() throws Exception {
-        final GenerationSession generationSession = buildInitialGenerationSession();
+        final DefaultGenerationSession generationSession = buildInitialGenerationSession();
         return null;
     }
 
-    private GenerationSession buildInitialGenerationSession() {
-        return GenerationSession.builder()
-                                .destinationDirectoryPath(destinationDirectory)
-                                .ensembleKinds(Stream.of(EnsembleKind.values())
+    private DefaultGenerationSession buildInitialGenerationSession() {
+        return DefaultGenerationSession.builder()
+                                       .destinationDirectoryPath(destinationDirectory)
+                                       .ensembleKinds(Stream.of(EnsembleKind.values())
                                                      .filter(ek -> (valueParameterLimit >= 1
                                                          && ek.getNumberOfValueParameters() <= valueParameterLimit)
                                                          || valueParameterLimit <= 0)
                                                      .collect(Collectors.toList()))
-                                .build();
+                                       .build();
     }
 }

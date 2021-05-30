@@ -1,4 +1,4 @@
-package funcify.typedef.javastatement;
+package funcify.typedef.javaexpr;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;

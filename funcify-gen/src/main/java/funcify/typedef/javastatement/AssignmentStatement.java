@@ -1,10 +1,14 @@
 package funcify.typedef.javastatement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import funcify.typedef.javaexpr.JavaExpression;
 import funcify.typedef.javatype.JavaType;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,7 +30,8 @@ public class AssignmentStatement implements JavaStatement {
     @JsonProperty("assignee_name")
     private String assigneeName;
 
-    @JsonProperty("expression")
-    private JavaExpression expression;
+    @Default
+    @JsonProperty("expressions")
+    private List<JavaExpression> expressions = new ArrayList<>();
 
 }
