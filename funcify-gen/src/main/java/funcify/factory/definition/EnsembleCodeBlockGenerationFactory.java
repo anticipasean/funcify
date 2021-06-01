@@ -1,7 +1,7 @@
 package funcify.factory.definition;
 
 import funcify.factory.session.EnsembleTypeGenerationSession.EnsembleTypeGenerationSessionWT;
-import funcify.template.definition.CodeBlockGenerationTemplate;
+import funcify.template.generation.CodeBlockGenerationTemplate;
 
 /**
  * @author smccarron

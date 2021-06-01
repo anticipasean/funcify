@@ -37,9 +37,9 @@ public interface JavaTypeDefinitionFactory extends JavaDefinitionFactory<JavaTyp
     @Override
     default JavaTypeDefinition javaImports(final JavaTypeDefinition definition,
                                            final List<JavaImport> javaImport) {
-        final boolean added = definition.getImports()
+        final boolean added = definition.getJavaImports()
                                         .addAll(javaImport);
-        return definition.withImports(definition.getImports());
+        return definition.withJavaImports(definition.getJavaImports());
     }
 
     @Override

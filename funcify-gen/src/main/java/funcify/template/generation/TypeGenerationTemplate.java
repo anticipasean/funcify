@@ -1,4 +1,4 @@
-package funcify.template.definition;
+package funcify.template.generation;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -15,17 +15,25 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * The template provides the framework for the updates that can be made to the session and what the session can and should provide
+ * to those using the framework
+ *
  * @param <SWT> - Session Witness Type
  * @author smccarron
  * @created 2021-05-28
  */
 public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SWT> {
 
-    <TD, MD, CD, SD, ED> TD emptyTypeDefinition(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session);
+    default <TD, MD, CD, SD, ED> TD emptyTypeDefinition(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session) {
+        return session.emptyTypeDefinition();
+    }
 
-    <TD, MD, CD, SD, ED> TD typeName(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                     final TD typeDef,
-                                     final String name);
+    default <TD, MD, CD, SD, ED> TD typeName(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                             final TD typeDef,
+                                             final String name) {
+        return session.typeName(typeDef,
+                                name);
+    }
 
     default <TD, MD, CD, SD, ED> TD javaPackage(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                 final TD typeDef,
@@ -37,9 +45,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                       .build());
     }
 
-    <TD, MD, CD, SD, ED> TD javaPackage(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                        final TD typeDef,
-                                        final JavaPackage javaPackage);
+    default <TD, MD, CD, SD, ED> TD javaPackage(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                                final TD typeDef,
+                                                final JavaPackage javaPackage) {
+        return session.javaPackage(typeDef,
+                                   javaPackage);
+    }
 
     default <TD, MD, CD, SD, ED> TD javaImport(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                final TD typeDef,
@@ -89,13 +100,19 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                            asList(javaImport));
     }
 
-    <TD, MD, CD, SD, ED> TD javaImports(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                        final TD typeDef,
-                                        final List<JavaImport> javaImport);
+    default <TD, MD, CD, SD, ED> TD javaImports(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                                final TD typeDef,
+                                                final List<JavaImport> javaImports) {
+        return session.javaImports(typeDef,
+                                   javaImports);
+    }
 
-    <TD, MD, CD, SD, ED> TD javaAnnotations(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                            final TD typeDef,
-                                            final List<JavaAnnotation> javaAnnotations);
+    default <TD, MD, CD, SD, ED> TD javaAnnotations(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                                    final TD typeDef,
+                                                    final List<JavaAnnotation> javaAnnotations) {
+        return session.javaAnnotations(typeDef,
+                                       javaAnnotations);
+    }
 
     default <TD, MD, CD, SD, ED> TD javaAnnotation(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                    final TD typeDef,
@@ -105,9 +122,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                asList(annotation));
     }
 
-    <TD, MD, CD, SD, ED> TD typeModifiers(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                          final TD typeDef,
-                                          final List<JavaModifier> modifiers);
+    default <TD, MD, CD, SD, ED> TD typeModifiers(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                                  final TD typeDef,
+                                                  final List<JavaModifier> modifiers) {
+        return session.typeModifiers(typeDef,
+                                     modifiers);
+    }
 
     default <TD, MD, CD, SD, ED> TD typeModifiers(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                   final TD typeDef,
@@ -117,13 +137,19 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                              asList(modifier));
     }
 
-    <TD, MD, CD, SD, ED> TD typeKind(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                     final TD typeDef,
-                                     final JavaTypeKind typeKind);
+    default <TD, MD, CD, SD, ED> TD typeKind(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                             final TD typeDef,
+                                             final JavaTypeKind typeKind) {
+        return session.typeKind(typeDef,
+                                typeKind);
+    }
 
-    <TD, MD, CD, SD, ED> TD superType(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                      final TD typeDef,
-                                      final JavaType superType);
+    default <TD, MD, CD, SD, ED> TD superType(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                              final TD typeDef,
+                                              final JavaType superType) {
+        return session.superType(typeDef,
+                                 superType);
+    }
 
     default <TD, MD, CD, SD, ED> TD implementedInterfaceType(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                              final TD typeDef,
@@ -133,9 +159,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                          asList(implementedInterfaceType));
     }
 
-    <TD, MD, CD, SD, ED> TD implementedInterfaceTypes(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                                      final TD typeDef,
-                                                      final List<JavaType> implementedInterfaceTypes);
+    default <TD, MD, CD, SD, ED> TD implementedInterfaceTypes(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                                              final TD typeDef,
+                                                              final List<JavaType> implementedInterfaceTypes) {
+        return session.implementedInterfaceTypes(typeDef,
+                                                 implementedInterfaceTypes);
+    }
 
     default <TD, MD, CD, SD, ED> TD field(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                           final TD typeDef,
@@ -145,9 +174,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                       asList(field));
     }
 
-    <TD, MD, CD, SD, ED> TD fields(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                   final TD typeDef,
-                                   final List<JavaField> fields);
+    default <TD, MD, CD, SD, ED> TD fields(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                           final TD typeDef,
+                                           final List<JavaField> fields) {
+        return session.fields(typeDef,
+                              fields);
+    }
 
     @SuppressWarnings("unchecked")
     default <TD, MD, CD, SD, ED> TD method(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
@@ -158,9 +190,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                        asList(method));
     }
 
-    <TD, MD, CD, SD, ED> TD methods(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                    final TD typeDef,
-                                    final List<MD> methods);
+    default <TD, MD, CD, SD, ED> TD methods(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                            final TD typeDef,
+                                            final List<MD> methods) {
+        return session.methods(typeDef,
+                               methods);
+    }
 
     @SuppressWarnings("unchecked")
     default <TD, MD, CD, SD, ED> TD subTypeDefinition(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
@@ -171,9 +206,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                   asList(subTypeDefinitions));
     }
 
-    <TD, MD, CD, SD, ED> TD subTypeDefinitions(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                               final TD typeDef,
-                                               final List<TD> subTypeDefinitions);
+    default <TD, MD, CD, SD, ED> TD subTypeDefinitions(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                                       final TD typeDef,
+                                                       final List<TD> subTypeDefinitions) {
+        return session.subTypeDefinitions(typeDef,
+                                          subTypeDefinitions);
+    }
 
 
 }

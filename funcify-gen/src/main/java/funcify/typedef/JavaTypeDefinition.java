@@ -32,7 +32,7 @@ public class JavaTypeDefinition implements Definition<JavaTypeDefinition> {
 
     @JsonProperty("imports")
     @Default
-    private List<JavaImport> imports = new ArrayList<>();
+    private List<JavaImport> javaImports = new ArrayList<>();
 
     @JsonProperty("annotations")
     @Default

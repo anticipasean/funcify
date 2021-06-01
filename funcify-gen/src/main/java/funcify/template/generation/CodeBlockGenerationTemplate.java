@@ -1,4 +1,4 @@
-package funcify.template.definition;
+package funcify.template.generation;
 
 import static java.util.Arrays.asList;
 
@@ -11,7 +11,9 @@ import java.util.List;
  */
 public interface CodeBlockGenerationTemplate<SWT> extends StatementGenerationTemplate<SWT> {
 
-    <TD, MD, CD, SD, ED> CD emptyCodeBlockDefinition(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session);
+    default <TD, MD, CD, SD, ED> CD emptyCodeBlockDefinition(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session) {
+        return session.emptyCodeBlockDefinition();
+    }
 
 
     @SuppressWarnings("unchecked")
@@ -23,8 +25,10 @@ public interface CodeBlockGenerationTemplate<SWT> extends StatementGenerationTem
                           asList(statement));
     }
 
-    <TD, MD, CD, SD, ED> CD statements(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                       final CD codeBlockDef,
-                                       final List<SD> statements);
+    default <TD, MD, CD, SD, ED> CD statements(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                               final CD codeBlockDef,
+                                               final List<SD> statements) {
+        return session.statements(codeBlockDef, statements);
+    }
 
 }
