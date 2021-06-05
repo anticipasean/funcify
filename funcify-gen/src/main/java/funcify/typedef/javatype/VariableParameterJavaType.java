@@ -3,7 +3,7 @@ package funcify.typedef.javatype;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import funcify.typedef.JavaPackage;
 import java.util.Collections;
-import java.util.List;
+import funcify.tool.SyncList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +11,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author smccarron
@@ -21,6 +22,7 @@ import lombok.Setter;
 @Setter(AccessLevel.PACKAGE)
 @Getter
 @Builder
+@ToString
 public class VariableParameterJavaType implements JavaType {
 
     @JsonProperty("parameterized")
@@ -34,6 +36,6 @@ public class VariableParameterJavaType implements JavaType {
 
     @Default
     @JsonProperty("type_variables")
-    private List<JavaType> typeVariables = Collections.emptyList();
+    private SyncList<JavaType> typeVariables = SyncList.empty();
 
 }

@@ -2,9 +2,8 @@ package funcify.typedef;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import funcify.Definition;
+import funcify.tool.SyncList;
 import funcify.typedef.javastatement.JavaStatement;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +11,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.With;
 
 /**
@@ -24,10 +24,11 @@ import lombok.With;
 @Builder
 @Getter
 @With
+@ToString
 public class JavaCodeBlock implements Definition<JavaCodeBlock> {
 
     @JsonProperty("statements")
     @Default
-    List<JavaStatement> statements = new ArrayList<>();
+    SyncList<JavaStatement> statements = SyncList.empty();
 
 }

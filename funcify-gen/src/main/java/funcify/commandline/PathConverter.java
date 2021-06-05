@@ -1,5 +1,6 @@
 package funcify.commandline;
 
+import funcify.tool.LiftOps;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -16,13 +17,7 @@ public class PathConverter implements ITypeConverter<Path> {
     @Override
     public Path convert(final String value) throws Exception {
         return Optional.ofNullable(value)
-                       .flatMap(s -> {
-                           try {
-                               return Optional.<Path>of(Paths.get(s));
-                           } catch (final Throwable t) {
-                               return Optional.<Path>empty();
-                           }
-                       })
+                       .flatMap(LiftOps.<String, Path>tryCatchLift(Paths::get))
                        .orElseGet(() -> Paths.get(System.getProperty("user.dir")));
     }
 }

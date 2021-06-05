@@ -1,8 +1,8 @@
 package funcify;
 
+import funcify.tool.SyncList;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.javastatement.JavaStatement;
-import java.util.List;
 
 /**
  * @author smccarron
@@ -10,17 +10,17 @@ import java.util.List;
  */
 public interface JavaCodeBlockFactory extends JavaDefinitionFactory<JavaCodeBlock> {
 
-    public static JavaCodeBlockFactory getInstance() {
+    static JavaCodeBlockFactory getInstance() {
         return new JavaCodeBlockFactory() {
         };
     }
 
     @Override
     default JavaCodeBlock statements(final JavaCodeBlock definition,
-                                     final List<JavaStatement> statements) {
-        final boolean added = definition.getStatements()
-                                        .addAll(statements);
-        return definition.withStatements(definition.getStatements());
+                                     final SyncList<JavaStatement> statements) {
+
+        return definition.withStatements(definition.getStatements()
+                                                   .appendAll(statements));
     }
 
 }

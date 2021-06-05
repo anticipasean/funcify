@@ -1,7 +1,7 @@
 package funcify.template.session;
 
+import funcify.tool.SyncList;
 import funcify.typedef.JavaParameter;
-import java.util.List;
 
 /**
  * @author smccarron
@@ -9,16 +9,16 @@ import java.util.List;
  */
 public interface ExpressionGenerationSession<SWT, TD, MD, CD, SD, ED> {
 
-    List<ED> getExpressionsInStatement(final SD statementDef);
+    SyncList<ED> getExpressionsInStatement(final SD statementDef);
 
-    ED simpleExpression(final List<String> text);
+    ED simpleExpression(final SyncList<String> text);
 
 
     ED templateExpression(final String templateName,
-                          final List<String> templateParameters);
+                          final SyncList<String> templateParameters);
 
 
     @SuppressWarnings("unchecked")
-    ED lambdaExpression(final List<JavaParameter> parameters,
+    ED lambdaExpression(final SyncList<JavaParameter> parameters,
                         final ED... lambdaBodyExpression);
 }

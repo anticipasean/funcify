@@ -1,5 +1,6 @@
 package funcify;
 
+import funcify.tool.SyncList;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaField;
 import funcify.typedef.JavaImport;
@@ -9,7 +10,6 @@ import funcify.typedef.JavaPackage;
 import funcify.typedef.JavaTypeDefinition;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javatype.JavaType;
-import java.util.List;
 
 /**
  * @author smccarron
@@ -17,7 +17,7 @@ import java.util.List;
  */
 public interface JavaTypeDefinitionFactory extends JavaDefinitionFactory<JavaTypeDefinition> {
 
-    public static JavaDefinitionFactory<JavaTypeDefinition> getInstance() {
+    static JavaDefinitionFactory<JavaTypeDefinition> getInstance() {
         return new JavaTypeDefinitionFactory() {
         };
     }
@@ -36,26 +36,23 @@ public interface JavaTypeDefinitionFactory extends JavaDefinitionFactory<JavaTyp
 
     @Override
     default JavaTypeDefinition javaImports(final JavaTypeDefinition definition,
-                                           final List<JavaImport> javaImport) {
-        final boolean added = definition.getJavaImports()
-                                        .addAll(javaImport);
-        return definition.withJavaImports(definition.getJavaImports());
+                                           final SyncList<JavaImport> javaImport) {
+        return definition.withJavaImports(definition.getJavaImports()
+                                                    .appendAll(javaImport));
     }
 
     @Override
     default JavaTypeDefinition javaAnnotations(final JavaTypeDefinition definition,
-                                               final List<JavaAnnotation> javaAnnotations) {
-        final boolean added = definition.getAnnotations()
-                                        .addAll(javaAnnotations);
-        return definition.withAnnotations(definition.getAnnotations());
+                                               final SyncList<JavaAnnotation> javaAnnotations) {
+        return definition.withAnnotations(definition.getAnnotations()
+                                                    .appendAll(javaAnnotations));
     }
 
     @Override
     default JavaTypeDefinition modifiers(final JavaTypeDefinition definition,
-                                         final List<JavaModifier> modifiers) {
-        final boolean added = definition.getModifiers()
-                                        .addAll(modifiers);
-        return definition.withModifiers(definition.getModifiers());
+                                         final SyncList<JavaModifier> modifiers) {
+        return definition.withModifiers(definition.getModifiers()
+                                                  .appendAll(modifiers));
     }
 
     @Override
@@ -72,41 +69,36 @@ public interface JavaTypeDefinitionFactory extends JavaDefinitionFactory<JavaTyp
 
     @Override
     default JavaTypeDefinition implementedInterfaceTypes(final JavaTypeDefinition definition,
-                                                         final List<JavaType> implementedInterfaceType) {
-        final boolean added = definition.getImplementedInterfaceTypes()
-                                        .addAll(implementedInterfaceType);
-        return definition.withImplementedInterfaceTypes(definition.getImplementedInterfaceTypes());
+                                                         final SyncList<JavaType> implementedInterfaceType) {
+        return definition.withImplementedInterfaceTypes(definition.getImplementedInterfaceTypes()
+                                                                  .appendAll(implementedInterfaceType));
     }
 
     @Override
     default JavaTypeDefinition fields(final JavaTypeDefinition definition,
-                                      final List<JavaField> field) {
-        final boolean added = definition.getFields()
-                                        .addAll(field);
-        return definition.withFields(definition.getFields());
+                                      final SyncList<JavaField> field) {
+        return definition.withFields(definition.getFields()
+                                               .appendAll(field));
     }
 
     @Override
     default JavaTypeDefinition methods(final JavaTypeDefinition definition,
-                                       final List<JavaMethod> methods) {
-        final boolean added = definition.getMethods()
-                                        .addAll(methods);
-        return definition.withMethods(definition.getMethods());
+                                       final SyncList<JavaMethod> methods) {
+        return definition.withMethods(definition.getMethods()
+                                                .appendAll(methods));
     }
 
     @Override
     default JavaTypeDefinition subTypeDefinitions(final JavaTypeDefinition definition,
-                                                  final List<JavaTypeDefinition> subTypeDefinition) {
-        final boolean added = definition.getSubTypeDefinitions()
-                                        .addAll(subTypeDefinition);
-        return definition.withSubTypeDefinitions(definition.getSubTypeDefinitions());
+                                                  final SyncList<JavaTypeDefinition> subTypeDefinition) {
+        return definition.withSubTypeDefinitions(definition.getSubTypeDefinitions()
+                                                           .appendAll(subTypeDefinition));
     }
 
     @Override
     default JavaTypeDefinition typeVariables(final JavaTypeDefinition definition,
-                                             final List<JavaType> typeVariables) {
-        final boolean added = definition.getTypeVariables()
-                                        .addAll(typeVariables);
-        return definition.withTypeVariables(definition.getTypeVariables());
+                                             final SyncList<JavaType> typeVariables) {
+        return definition.withTypeVariables(definition.getTypeVariables()
+                                                      .appendAll(typeVariables));
     }
 }

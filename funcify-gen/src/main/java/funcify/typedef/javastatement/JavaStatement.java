@@ -2,7 +2,7 @@ package funcify.typedef.javastatement;
 
 import funcify.Definition;
 import funcify.typedef.javaexpr.JavaExpression;
-import java.util.List;
+import funcify.tool.SyncList;
 
 /**
  * @author smccarron
@@ -18,5 +18,5 @@ public interface JavaStatement extends Definition<JavaStatement> {
         return false;
     }
 
-    List<JavaExpression> getExpressions();
+    SyncList<JavaExpression> getExpressions();
 }

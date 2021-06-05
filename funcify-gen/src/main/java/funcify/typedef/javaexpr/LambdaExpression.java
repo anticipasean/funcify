@@ -2,7 +2,7 @@ package funcify.typedef.javaexpr;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import funcify.typedef.JavaParameter;
-import java.util.List;
+import funcify.tool.SyncList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +25,7 @@ public class LambdaExpression implements JavaExpression {
     private final boolean lambda = true;
 
     @JsonProperty("parameters")
-    private List<JavaParameter> parameters;
+    private SyncList<JavaParameter> parameters;
 
     @JsonProperty("lambda_body")
     private String lambdaBody;

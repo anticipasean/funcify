@@ -1,8 +1,7 @@
 package funcify.typedef;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.HashMap;
-import java.util.Map;
+import funcify.tool.SyncMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +9,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author smccarron
@@ -20,6 +20,7 @@ import lombok.Setter;
 @Setter(AccessLevel.PACKAGE)
 @Builder
 @Getter
+@ToString
 public class JavaAnnotation {
 
     @JsonProperty("name")
@@ -27,6 +28,6 @@ public class JavaAnnotation {
 
     @JsonProperty("parameters")
     @Default
-    private Map<String, String> parameters = new HashMap<>();
+    private SyncMap<String, String> parameters = SyncMap.empty();
 
 }

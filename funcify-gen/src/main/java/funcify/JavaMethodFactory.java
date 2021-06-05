@@ -1,12 +1,12 @@
 package funcify;
 
+import funcify.tool.SyncList;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaMethod;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
 import funcify.typedef.javatype.JavaType;
-import java.util.List;
 
 /**
  * @author smccarron
@@ -14,40 +14,36 @@ import java.util.List;
  */
 public interface JavaMethodFactory extends JavaDefinitionFactory<JavaMethod> {
 
-    public static JavaDefinitionFactory<JavaMethod> getInstance() {
+    static JavaDefinitionFactory<JavaMethod> getInstance() {
         return new JavaMethodFactory() {
         };
     }
 
     @Override
-    default JavaMethod name(final String name) {
-        return JavaMethod.builder()
-                         .name(name)
-                         .build();
+    default JavaMethod name(final JavaMethod definition,
+                            final String name) {
+        return definition.withName(name);
     }
 
     @Override
     default JavaMethod javaAnnotations(final JavaMethod definition,
-                                       final List<JavaAnnotation> javaAnnotations) {
-        final boolean added = definition.getAnnotations()
-                                        .addAll(javaAnnotations);
-        return definition.withAnnotations(definition.getAnnotations());
+                                       final SyncList<JavaAnnotation> javaAnnotations) {
+        return definition.withAnnotations(definition.getAnnotations()
+                                                    .appendAll(javaAnnotations));
     }
 
     @Override
     default JavaMethod modifiers(final JavaMethod javaMethod,
-                                 final List<JavaModifier> modifiers) {
-        final boolean added = javaMethod.getModifiers()
-                                        .addAll(modifiers);
-        return javaMethod.withModifiers(javaMethod.getModifiers());
+                                 final SyncList<JavaModifier> modifiers) {
+        return javaMethod.withModifiers(javaMethod.getModifiers()
+                                                  .appendAll(modifiers));
     }
 
     @Override
     default JavaMethod typeVariables(final JavaMethod javaMethod,
-                                     final List<JavaType> typeVariables) {
-        final boolean added = javaMethod.getTypeVariables()
-                                        .addAll(typeVariables);
-        return javaMethod.withTypeVariables(javaMethod.getTypeVariables());
+                                     final SyncList<JavaType> typeVariables) {
+        return javaMethod.withTypeVariables(javaMethod.getTypeVariables()
+                                                      .appendAll(typeVariables));
     }
 
     @Override
@@ -58,10 +54,9 @@ public interface JavaMethodFactory extends JavaDefinitionFactory<JavaMethod> {
 
     @Override
     default JavaMethod parameters(final JavaMethod javaMethod,
-                                  final List<JavaParameter> parameters) {
-        final boolean added = javaMethod.getParameters()
-                                        .addAll(parameters);
-        return javaMethod.withParameters(javaMethod.getParameters());
+                                  final SyncList<JavaParameter> parameters) {
+        return javaMethod.withParameters(javaMethod.getParameters()
+                                                   .appendAll(parameters));
     }
 
     @Override

@@ -2,7 +2,7 @@ package funcify.typedef.javatype;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
-import java.util.List;
+import funcify.tool.SyncList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +10,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author smccarron
@@ -20,6 +21,7 @@ import lombok.Setter;
 @Setter(AccessLevel.PACKAGE)
 @Getter
 @Builder
+@ToString
 public class BoundedJavaTypeVariable implements JavaType {
 
     @JsonProperty("parameterized")
@@ -35,10 +37,10 @@ public class BoundedJavaTypeVariable implements JavaType {
 
     @Default
     @JsonProperty("lower_bound_types")
-    private List<JavaType> lowerBoundTypes = Collections.emptyList();
+    private SyncList<JavaType> lowerBoundTypes = SyncList.empty();
 
     @Default
     @JsonProperty("upper_bound_types")
-    private List<JavaType> upperBoundTypes = Collections.emptyList();
+    private SyncList<JavaType> upperBoundTypes = SyncList.empty();
 
 }

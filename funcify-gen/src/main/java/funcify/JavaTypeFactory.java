@@ -1,5 +1,6 @@
 package funcify;
 
+import funcify.tool.SyncList;
 import funcify.typedef.JavaPackage;
 import funcify.typedef.javatype.BoundedJavaTypeVariable;
 import funcify.typedef.javatype.JavaType;
@@ -7,10 +8,6 @@ import funcify.typedef.javatype.SimpleJavaType;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
 import funcify.typedef.javatype.VariableParameterJavaType;
 import funcify.typedef.javatype.WildcardJavaTypeBound;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author smccarron
@@ -53,9 +50,8 @@ public interface JavaTypeFactory {
                                                 .name(javaPackage)
                                                 .build(),
                                      name,
-                                     Stream.of(typeVariable)
-                                           .map(SimpleJavaTypeVariable::of)
-                                           .collect(Collectors.<JavaType>toList()));
+                                     SyncList.of(typeVariable)
+                                             .map(SimpleJavaTypeVariable::of));
     }
 
 
@@ -64,9 +60,8 @@ public interface JavaTypeFactory {
                                                  final String... typeVariable) {
         return parameterizedJavaType(javaPackage,
                                      name,
-                                     Stream.of(typeVariable)
-                                           .map(SimpleJavaTypeVariable::of)
-                                           .collect(Collectors.toList()));
+                                     SyncList.of(typeVariable)
+                                             .map(SimpleJavaTypeVariable::of));
     }
 
     default JavaType parameterizedJavaType(final String javaPackage,
@@ -84,13 +79,12 @@ public interface JavaTypeFactory {
                                            final JavaType... typeVariable) {
         return parameterizedJavaType(javaPackage,
                                      name,
-                                     Stream.of(typeVariable)
-                                           .collect(Collectors.toList()));
+                                     SyncList.of(typeVariable));
     }
 
     default JavaType parameterizedJavaType(final String javaPackage,
                                            final String name,
-                                           final List<JavaType> typeVariableList) {
+                                           final SyncList<JavaType> typeVariableList) {
         return VariableParameterJavaType.builder()
                                         .javaPackage(JavaPackage.builder()
                                                                 .name(javaPackage)
@@ -102,7 +96,7 @@ public interface JavaTypeFactory {
 
     default JavaType parameterizedJavaType(final JavaPackage javaPackage,
                                            final String name,
-                                           final List<JavaType> typeVariableList) {
+                                           final SyncList<JavaType> typeVariableList) {
         return VariableParameterJavaType.builder()
                                         .javaPackage(javaPackage)
                                         .name(name)
@@ -114,16 +108,14 @@ public interface JavaTypeFactory {
                                                    final String name) {
         return parameterizedJavaType(javaPackage,
                                      name,
-                                     Stream.of(WildcardJavaTypeBound.getInstance())
-                                           .collect(Collectors.toList()));
+                                     SyncList.of(WildcardJavaTypeBound.getInstance()));
     }
 
     default JavaType javaTypeVariableWithLowerBounds(final JavaType baseTypeVariable,
                                                      final JavaType... lowerBound) {
         return BoundedJavaTypeVariable.builder()
                                       .baseType(baseTypeVariable)
-                                      .lowerBoundTypes(Stream.of(lowerBound)
-                                                             .collect(Collectors.toList()))
+                                      .lowerBoundTypes(SyncList.of(lowerBound))
                                       .build();
     }
 
@@ -131,14 +123,13 @@ public interface JavaTypeFactory {
                                                      final JavaType... upperBound) {
         return BoundedJavaTypeVariable.builder()
                                       .baseType(baseTypeVariable)
-                                      .upperBoundTypes(Stream.of(upperBound)
-                                                             .collect(Collectors.toList()))
+                                      .upperBoundTypes(SyncList.of(upperBound))
                                       .build();
     }
 
     default JavaType javaTypeVariableWithLowerAndUpperBounds(final JavaType baseTypeVariable,
-                                                             final List<JavaType> lowerBounds,
-                                                             final List<JavaType> upperBounds) {
+                                                             final SyncList<JavaType> lowerBounds,
+                                                             final SyncList<JavaType> upperBounds) {
         return BoundedJavaTypeVariable.builder()
                                       .baseType(baseTypeVariable)
                                       .lowerBoundTypes(lowerBounds)
@@ -180,18 +171,18 @@ public interface JavaTypeFactory {
                                                             final String name,
                                                             final JavaType... typeVariable) {
         final int size = typeVariable.length;
-        final List<JavaType> javaTypeVariablesList = new ArrayList<>();
+        final SyncList<JavaType> javaTypeVariablesList = SyncList.empty();
         if (size == 0) {
             return javaType(javaPackage,
                             name);
         } else if (size == 1) {
-            javaTypeVariablesList.add(javaTypeVariableWithLowerBounds(typeVariable[0]));
+            javaTypeVariablesList.append(javaTypeVariableWithLowerBounds(typeVariable[0]));
         } else {
             for (int i = 0; i < size; i++) {
                 if (i != (size - 1)) {
-                    javaTypeVariablesList.add(javaTypeVariableWithWildcardLowerBounds(typeVariable[i]));
+                    javaTypeVariablesList.append(javaTypeVariableWithWildcardLowerBounds(typeVariable[i]));
                 } else {
-                    javaTypeVariablesList.add(javaTypeVariableWithWildcardUpperBounds(typeVariable[i]));
+                    javaTypeVariablesList.append(javaTypeVariableWithWildcardUpperBounds(typeVariable[i]));
                 }
             }
         }

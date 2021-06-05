@@ -1,5 +1,6 @@
 package funcify.factory.session;
 
+import funcify.tool.SyncList;
 import funcify.tool.SyncMap;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
@@ -14,7 +15,6 @@ import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javaexpr.JavaExpression;
 import funcify.typedef.javastatement.JavaStatement;
 import funcify.typedef.javatype.JavaType;
-import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,19 +50,19 @@ public class DefaultEnsembleTypeGenerationSession implements
 
     @Override
     public JavaTypeDefinition javaImports(final JavaTypeDefinition typeDef,
-                                          final List<JavaImport> javaImports) {
+                                          final SyncList<JavaImport> javaImports) {
         return typeDef.withJavaImports(javaImports);
     }
 
     @Override
     public JavaTypeDefinition javaAnnotations(final JavaTypeDefinition typeDef,
-                                              final List<JavaAnnotation> javaAnnotations) {
+                                              final SyncList<JavaAnnotation> javaAnnotations) {
         return typeDef.withAnnotations(javaAnnotations);
     }
 
     @Override
     public JavaTypeDefinition typeModifiers(final JavaTypeDefinition typeDef,
-                                            final List<JavaModifier> modifiers) {
+                                            final SyncList<JavaModifier> modifiers) {
         return typeDef.withModifiers(modifiers);
     }
 
@@ -80,25 +80,25 @@ public class DefaultEnsembleTypeGenerationSession implements
 
     @Override
     public JavaTypeDefinition implementedInterfaceTypes(final JavaTypeDefinition typeDef,
-                                                        final List<JavaType> implementedInterfaceTypes) {
+                                                        final SyncList<JavaType> implementedInterfaceTypes) {
         return typeDef.withImplementedInterfaceTypes(implementedInterfaceTypes);
     }
 
     @Override
     public JavaTypeDefinition fields(final JavaTypeDefinition typeDef,
-                                     final List<JavaField> fields) {
+                                     final SyncList<JavaField> fields) {
         return typeDef.withFields(fields);
     }
 
     @Override
     public JavaTypeDefinition methods(final JavaTypeDefinition typeDef,
-                                      final List<JavaMethod> methods) {
+                                      final SyncList<JavaMethod> methods) {
         return typeDef.withMethods(methods);
     }
 
     @Override
     public JavaTypeDefinition subTypeDefinitions(final JavaTypeDefinition typeDef,
-                                                 final List<JavaTypeDefinition> subTypeDefinitions) {
+                                                 final SyncList<JavaTypeDefinition> subTypeDefinitions) {
         return typeDef.withSubTypeDefinitions(subTypeDefinitions);
     }
 
@@ -115,13 +115,13 @@ public class DefaultEnsembleTypeGenerationSession implements
 
     @Override
     public JavaTypeDefinition methodModifiers(final JavaMethod methodDef,
-                                              final List<JavaModifier> modifiers) {
+                                              final SyncList<JavaModifier> modifiers) {
         return null;
     }
 
     @Override
     public JavaMethod methodTypeVariables(final JavaMethod methodDef,
-                                          final List<JavaType> typeVariables) {
+                                          final SyncList<JavaType> typeVariables) {
         return null;
     }
 
@@ -139,7 +139,7 @@ public class DefaultEnsembleTypeGenerationSession implements
 
     @Override
     public JavaMethod parameters(final JavaMethod methodDef,
-                                 final List<JavaParameter> parameters) {
+                                 final SyncList<JavaParameter> parameters) {
         return null;
     }
 
@@ -161,45 +161,45 @@ public class DefaultEnsembleTypeGenerationSession implements
 
     @Override
     public JavaCodeBlock statements(final JavaCodeBlock codeBlockDef,
-                                    final List<JavaStatement> statements) {
+                                    final SyncList<JavaStatement> statements) {
         return null;
     }
 
     @Override
-    public List<JavaStatement> getStatementsForCodeBlock(final JavaCodeBlock codeBlockDef) {
+    public SyncList<JavaStatement> getStatementsForCodeBlock(final JavaCodeBlock codeBlockDef) {
         return codeBlockDef.getStatements();
     }
 
     @Override
     public JavaStatement assignmentStatement(final JavaType assigneeType,
                                              final String assigneeName,
-                                             final List<JavaExpression> expressions) {
+                                             final SyncList<JavaExpression> expressions) {
         return null;
     }
 
     @Override
-    public JavaStatement returnStatement(final List<JavaExpression> expression) {
+    public JavaStatement returnStatement(final SyncList<JavaExpression> expression) {
         return null;
     }
 
     @Override
-    public List<JavaExpression> getExpressionsInStatement(final JavaStatement statementDef) {
+    public SyncList<JavaExpression> getExpressionsInStatement(final JavaStatement statementDef) {
         return statementDef.getExpressions();
     }
 
     @Override
-    public JavaExpression simpleExpression(final List<String> text) {
+    public JavaExpression simpleExpression(final SyncList<String> text) {
         return null;
     }
 
     @Override
     public JavaExpression templateExpression(final String templateName,
-                                             final List<String> templateParameters) {
+                                             final SyncList<String> templateParameters) {
         return null;
     }
 
     @Override
-    public JavaExpression lambdaExpression(final List<JavaParameter> parameters,
+    public JavaExpression lambdaExpression(final SyncList<JavaParameter> parameters,
                                            final JavaExpression... lambdaBodyExpression) {
         return null;
     }

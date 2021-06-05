@@ -1,10 +1,8 @@
 package funcify.typedef;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import funcify.tool.SyncList;
 import funcify.typedef.javatype.JavaType;
-import funcify.typedef.javatype.SimpleJavaType;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +10,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author smccarron
@@ -22,11 +21,12 @@ import lombok.Setter;
 @Setter(AccessLevel.PACKAGE)
 @Builder
 @Getter
+@ToString
 public class JavaField {
 
     @JsonProperty("modifiers")
     @Default
-    private List<JavaModifier> modifiers = new ArrayList<>();
+    private SyncList<JavaModifier> modifiers = SyncList.empty();
 
     @JsonProperty("type")
     private JavaType type;

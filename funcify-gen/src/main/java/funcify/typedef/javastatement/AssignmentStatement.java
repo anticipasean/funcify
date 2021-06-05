@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import funcify.typedef.javaexpr.JavaExpression;
 import funcify.typedef.javatype.JavaType;
 import java.util.ArrayList;
-import java.util.List;
+import funcify.tool.SyncList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +32,6 @@ public class AssignmentStatement implements JavaStatement {
 
     @Default
     @JsonProperty("expressions")
-    private List<JavaExpression> expressions = new ArrayList<>();
+    private SyncList<JavaExpression> expressions = SyncList.empty();
 
 }

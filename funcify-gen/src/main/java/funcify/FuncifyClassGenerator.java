@@ -1,6 +1,7 @@
 package funcify;
 
 import funcify.commandline.PathConverter;
+import funcify.tool.SyncList;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -39,11 +40,10 @@ public class FuncifyClassGenerator implements Callable<File> {
     private DefaultGenerationSession buildInitialGenerationSession() {
         return DefaultGenerationSession.builder()
                                        .destinationDirectoryPath(destinationDirectory)
-                                       .ensembleKinds(Stream.of(EnsembleKind.values())
-                                                     .filter(ek -> (valueParameterLimit >= 1
+                                       .ensembleKinds(SyncList.of(EnsembleKind.values())
+                                                              .filter(ek -> (valueParameterLimit >= 1
                                                          && ek.getNumberOfValueParameters() <= valueParameterLimit)
-                                                         || valueParameterLimit <= 0)
-                                                     .collect(Collectors.toList()))
+                                                         || valueParameterLimit <= 0))
                                        .build();
     }
 }

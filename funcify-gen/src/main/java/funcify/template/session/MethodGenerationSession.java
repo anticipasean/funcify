@@ -1,10 +1,10 @@
 package funcify.template.session;
 
+import funcify.tool.SyncList;
 import funcify.tool.SyncMap;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
 import funcify.typedef.javatype.JavaType;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -25,10 +25,10 @@ public interface MethodGenerationSession<SWT, TD, MD, CD, SD, ED> extends CodeBl
     }
 
     TD methodModifiers(final MD methodDef,
-                       final List<JavaModifier> modifiers);
+                       final SyncList<JavaModifier> modifiers);
 
     MD methodTypeVariables(final MD methodDef,
-                           final List<JavaType> typeVariables);
+                           final SyncList<JavaType> typeVariables);
 
     MD returnType(final MD methodDef,
                   final JavaType returnType);
@@ -37,7 +37,7 @@ public interface MethodGenerationSession<SWT, TD, MD, CD, SD, ED> extends CodeBl
                   final String name);
 
     MD parameters(final MD methodDef,
-                  final List<JavaParameter> parameters);
+                  final SyncList<JavaParameter> parameters);
 
     MD codeBlock(final MD methodDef,
                  final CD codeBlock);

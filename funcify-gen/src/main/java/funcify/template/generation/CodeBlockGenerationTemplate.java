@@ -1,9 +1,7 @@
 package funcify.template.generation;
 
-import static java.util.Arrays.asList;
-
 import funcify.template.session.TypeGenerationSession;
-import java.util.List;
+import funcify.tool.SyncList;
 
 /**
  * @author smccarron
@@ -22,13 +20,14 @@ public interface CodeBlockGenerationTemplate<SWT> extends StatementGenerationTem
                                               final SD... statement) {
         return statements(session,
                           codeBlockDef,
-                          asList(statement));
+                          SyncList.of(statement));
     }
 
     default <TD, MD, CD, SD, ED> CD statements(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                final CD codeBlockDef,
-                                               final List<SD> statements) {
-        return session.statements(codeBlockDef, statements);
+                                               final SyncList<SD> statements) {
+        return session.statements(codeBlockDef,
+                                  statements);
     }
 
 }

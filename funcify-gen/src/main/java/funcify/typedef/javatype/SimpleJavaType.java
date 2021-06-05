@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author smccarron
@@ -18,6 +19,7 @@ import lombok.Setter;
 @Setter(AccessLevel.PACKAGE)
 @Getter
 @Builder
+@ToString
 public class SimpleJavaType implements JavaType {
 
     @JsonProperty("package")

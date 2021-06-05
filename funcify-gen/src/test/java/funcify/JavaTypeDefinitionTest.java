@@ -1,10 +1,9 @@
 package funcify;
 
-import static java.util.Arrays.asList;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import funcify.tool.SyncList;
 import funcify.typedef.JavaImport;
 import funcify.typedef.JavaMethod;
 import funcify.typedef.JavaModifier;
@@ -20,9 +19,6 @@ import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.stringtemplate.v4.ST;
@@ -40,18 +36,18 @@ public class JavaTypeDefinitionTest {
                                                                         .javaPackage(JavaPackage.builder()
                                                                                                 .name("funcify")
                                                                                                 .build())
-                                                                        .javaImports(Collections.emptyList())
-                                                                        .annotations(Collections.emptyList())
-                                                                        .modifiers(asList(JavaModifier.PUBLIC))
+                                                                        .javaImports(SyncList.empty())
+                                                                        .annotations(SyncList.empty())
+                                                                        .modifiers(SyncList.of(JavaModifier.PUBLIC))
                                                                         .typeKind(JavaTypeKind.CLASS)
                                                                         .name("Solo")
-                                                                        .typeVariables(asList(SimpleJavaTypeVariable.of("W"),
-                                                                                              SimpleJavaTypeVariable.of("A")))
+                                                                        .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("W"),
+                                                                                                   SimpleJavaTypeVariable.of("A")))
 
                                                                         .superType(null)
-                                                                        .implementedInterfaceTypes(Collections.emptyList())
-                                                                        .fields(Collections.emptyList())
-                                                                        .methods(Collections.emptyList())
+                                                                        .implementedInterfaceTypes(SyncList.empty())
+                                                                        .fields(SyncList.empty())
+                                                                        .methods(SyncList.empty())
                                                                         .build();
         Assertions.assertNotNull(javaTypeDefinition);
     }
@@ -65,21 +61,19 @@ public class JavaTypeDefinitionTest {
                                                                               .javaPackage(JavaPackage.builder()
                                                                                                       .name("funcify")
                                                                                                       .build())
-                                                                              .javaImports(Collections.emptyList())
-                                                                              .annotations(Collections.emptyList())
-                                                                              .modifiers(Stream.of(JavaModifier.PUBLIC)
-                                                                                               .collect(Collectors.toList()))
+                                                                              .javaImports(SyncList.empty())
+                                                                              .annotations(SyncList.empty())
+                                                                              .modifiers(SyncList.of(JavaModifier.PUBLIC))
                                                                               .typeKind(JavaTypeKind.CLASS)
 
                                                                               .name("Solo")
-                                                                              .typeVariables(Stream.of(SimpleJavaTypeVariable.of("W"),
-                                                                                                       SimpleJavaTypeVariable.of("A"))
-                                                                                                   .collect(Collectors.toList()))
+                                                                              .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("W"),
+                                                                                                         SimpleJavaTypeVariable.of("A")))
 
                                                                               .superType(null)
-                                                                              .implementedInterfaceTypes(Collections.emptyList())
-                                                                              .fields(Collections.emptyList())
-                                                                              .methods(Collections.emptyList())
+                                                                              .implementedInterfaceTypes(SyncList.empty())
+                                                                              .fields(SyncList.empty())
+                                                                              .methods(SyncList.empty())
                                                                               .build());
         } catch (JsonProcessingException e) {
             Assertions.fail("json_processing_error: " + e.getMessage());
@@ -108,56 +102,52 @@ public class JavaTypeDefinitionTest {
                                                                              .javaPackage(JavaPackage.builder()
                                                                                                      .name("funcify")
                                                                                                      .build())
-                                                                             .javaImports(Collections.singletonList(JavaImport.builder()
-                                                                                                                              .javaPackage(JavaPackage.of("java.util"))
-                                                                                                                              .simpleClassName("Function")
-                                                                                                                              .build()))
-                                                                             .annotations(Collections.emptyList())
-                                                                             .modifiers(Stream.of(JavaModifier.PUBLIC)
-                                                                                              .collect(Collectors.toList()))
+                                                                             .javaImports(SyncList.of(JavaImport.builder()
+                                                                                                                .javaPackage(JavaPackage.of("java.util"))
+                                                                                                                .simpleClassName("Function")
+                                                                                                                .build()))
+                                                                             .annotations(SyncList.empty())
+                                                                             .modifiers(SyncList.of(JavaModifier.PUBLIC))
                                                                              .typeKind(JavaTypeKind.INTERFACE)
 
                                                                              .name("Solo")
-                                                                             .typeVariables(asList(SimpleJavaTypeVariable.of("W"),
-                                                                                                      SimpleJavaTypeVariable.of("A")))
+                                                                             .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("W"),
+                                                                                                        SimpleJavaTypeVariable.of("A")))
 
                                                                              .superType(null)
-                                                                             .implementedInterfaceTypes(Collections.singletonList(VariableParameterJavaType.builder()
-                                                                                                                                                           .name("Ensemble")
-                                                                                                                                                           .typeVariables(Stream.of(SimpleJavaTypeVariable.of("W"))
-                                                                                                                                                                                .collect(Collectors.toList()))
-                                                                                                                                                           .build()))
-                                                                             .fields(Collections.emptyList())
-                                                                             .methods(Collections.singletonList(JavaMethod.builder()
-                                                                                                                          .modifiers(Collections.singletonList(JavaModifier.PUBLIC))
-                                                                                                                          .typeVariables(Collections.singletonList(SimpleJavaTypeVariable.of("R")))
-                                                                                                                          .returnType(SimpleJavaTypeVariable.of("R"))
-                                                                                                                          .name("convert")
-                                                                                                                          .parameters(Collections.singletonList(JavaParameter.builder()
-                                                                                                                                                                             .name("converter")
-                                                                                                                                                                             .modifiers(Collections.singletonList(JavaModifier.FINAL))
-                                                                                                                                                                             .type(VariableParameterJavaType.builder()
-                                                                                                                                                                                                            .javaPackage(JavaPackage.builder()
-                                                                                                                                                                                                                                    .name("java.util")
-                                                                                                                                                                                                                                    .build())
-                                                                                                                                                                                                            .name("Function")
-                                                                                                                                                                                                            .typeVariables(Stream.of(BoundedJavaTypeVariable.builder()
-                                                                                                                                                                                                                                                            .baseType(VariableParameterJavaType.builder()
-                                                                                                                                                                                                                                                                                               .name("Solo")
-                                                                                                                                                                                                                                                                                               .typeVariables(Stream.of(SimpleJavaTypeVariable.of("W"),
-                                                                                                                                                                                                                                                                                                                        SimpleJavaTypeVariable.of("A"))
-                                                                                                                                                                                                                                                                                                                    .collect(Collectors.toList()))
-                                                                                                                                                                                                                                                                                               .build())
-                                                                                                                                                                                                                                                            .lowerBoundTypes(Collections.singletonList(WildcardJavaTypeBound.getInstance()))
-                                                                                                                                                                                                                                                            .build(),
-                                                                                                                                                                                                                                     BoundedJavaTypeVariable.builder()
-                                                                                                                                                                                                                                                            .upperBoundTypes(Collections.singletonList(WildcardJavaTypeBound.getInstance()))
-                                                                                                                                                                                                                                                            .baseType(SimpleJavaTypeVariable.of("R"))
-                                                                                                                                                                                                                                                            .build())
-                                                                                                                                                                                                                                 .collect(Collectors.toList()))
-                                                                                                                                                                                                            .build())
-                                                                                                                                                                             .build()))
-                                                                                                                          .build()))
+                                                                             .implementedInterfaceTypes(SyncList.of(VariableParameterJavaType.builder()
+                                                                                                                                             .name("Ensemble")
+                                                                                                                                             .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("W")))
+                                                                                                                                             .build()))
+                                                                             .fields(SyncList.empty())
+                                                                             .methods(SyncList.of(JavaMethod.builder()
+                                                                                                            .modifiers(SyncList.of(JavaModifier.PUBLIC))
+                                                                                                            .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("R")))
+                                                                                                            .returnType(SimpleJavaTypeVariable.of("R"))
+                                                                                                            .name("convert")
+                                                                                                            .parameters(SyncList.of(JavaParameter.builder()
+                                                                                                                                                 .name("converter")
+                                                                                                                                                 .modifiers(SyncList.of(JavaModifier.FINAL))
+                                                                                                                                                 .type(VariableParameterJavaType.builder()
+                                                                                                                                                                                .javaPackage(JavaPackage.builder()
+                                                                                                                                                                                                        .name("java.util")
+                                                                                                                                                                                                        .build())
+                                                                                                                                                                                .name("Function")
+                                                                                                                                                                                .typeVariables(SyncList.of(BoundedJavaTypeVariable.builder()
+                                                                                                                                                                                                                                  .baseType(VariableParameterJavaType.builder()
+                                                                                                                                                                                                                                                                     .name("Solo")
+                                                                                                                                                                                                                                                                     .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("W"),
+                                                                                                                                                                                                                                                                                                SimpleJavaTypeVariable.of("A")))
+                                                                                                                                                                                                                                                                     .build())
+                                                                                                                                                                                                                                  .lowerBoundTypes(SyncList.of(WildcardJavaTypeBound.getInstance()))
+                                                                                                                                                                                                                                  .build(),
+                                                                                                                                                                                                           BoundedJavaTypeVariable.builder()
+                                                                                                                                                                                                                                  .upperBoundTypes(SyncList.of(WildcardJavaTypeBound.getInstance()))
+                                                                                                                                                                                                                                  .baseType(SimpleJavaTypeVariable.of("R"))
+                                                                                                                                                                                                                                  .build()))
+                                                                                                                                                                                .build())
+                                                                                                                                                 .build()))
+                                                                                                            .build()))
                                                                              .build());
         System.out.println(jsonNode.toPrettyString());
         ST stringTemplate = stGroupFile.getInstanceOf("java_type")

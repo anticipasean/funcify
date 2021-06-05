@@ -1,12 +1,10 @@
 package funcify.template.generation;
 
-import static java.util.Arrays.asList;
-
 import funcify.template.session.TypeGenerationSession;
+import funcify.tool.SyncList;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
 import funcify.typedef.javatype.JavaType;
-import java.util.List;
 
 /**
  * @author smccarron
@@ -20,7 +18,7 @@ public interface MethodGenerationTemplate<SWT> extends CodeBlockGenerationTempla
 
     default <TD, MD, CD, SD, ED> TD methodModifiers(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                     final MD methodDef,
-                                                    final List<JavaModifier> modifiers) {
+                                                    final SyncList<JavaModifier> modifiers) {
         return session.methodModifiers(methodDef,
                                        modifiers);
     }
@@ -30,7 +28,7 @@ public interface MethodGenerationTemplate<SWT> extends CodeBlockGenerationTempla
                                                    final JavaModifier... modifier) {
         return methodModifiers(session,
                                methodDef,
-                               asList(modifier));
+                               SyncList.of(modifier));
     }
 
     default <TD, MD, CD, SD, ED> MD methodTypeVariable(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
@@ -38,12 +36,12 @@ public interface MethodGenerationTemplate<SWT> extends CodeBlockGenerationTempla
                                                        final JavaType... typeVariable) {
         return methodTypeVariables(session,
                                    methodDef,
-                                   asList(typeVariable));
+                                   SyncList.of(typeVariable));
     }
 
     default <TD, MD, CD, SD, ED> MD methodTypeVariables(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                         final MD methodDef,
-                                                        final List<JavaType> typeVariables) {
+                                                        final SyncList<JavaType> typeVariables) {
         return session.methodTypeVariables(methodDef,
                                            typeVariables);
     }
@@ -67,12 +65,12 @@ public interface MethodGenerationTemplate<SWT> extends CodeBlockGenerationTempla
                                               final JavaParameter... parameter) {
         return parameters(session,
                           methodDef,
-                          asList(parameter));
+                          SyncList.of(parameter));
     }
 
     default <TD, MD, CD, SD, ED> MD parameters(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                final MD methodDef,
-                                               final List<JavaParameter> parameters) {
+                                               final SyncList<JavaParameter> parameters) {
         return session.parameters(methodDef,
                                   parameters);
     }

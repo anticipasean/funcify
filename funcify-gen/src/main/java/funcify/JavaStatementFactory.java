@@ -1,8 +1,8 @@
 package funcify;
 
+import funcify.tool.SyncList;
 import funcify.typedef.javaexpr.JavaExpression;
 import funcify.typedef.javastatement.JavaStatement;
-import java.util.List;
 
 /**
  * @author smccarron
@@ -13,7 +13,7 @@ public interface JavaStatementFactory extends JavaDefinitionFactory<JavaStatemen
 
     @Override
     default JavaStatement expressions(final JavaStatement definition,
-                                      final List<JavaExpression> expressions) {
+                                      final SyncList<JavaExpression> expressions) {
         return null;
     }
 }

@@ -1,8 +1,9 @@
 package funcify;
 
-import static funcify.JavaMapTool.fromPair;
-import static java.util.Arrays.asList;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import funcify.tool.LiftOps;
+import funcify.tool.SyncList;
+import funcify.tool.SyncMap;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaMethod;
@@ -10,12 +11,11 @@ import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
 import funcify.typedef.JavaTypeDefinition;
 import funcify.typedef.JavaTypeKind;
-import funcify.typedef.javastatement.ReturnStatement;
 import funcify.typedef.javaexpr.TemplatedExpression;
+import funcify.typedef.javastatement.ReturnStatement;
 import funcify.typedef.javatype.JavaType;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Map;
+import funcify.typedef.javatype.VariableParameterJavaType;
 import java.util.Objects;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -38,14 +38,11 @@ public class EnsembleInterfaceTypeAssembler {
     public DefaultGenerationSession assembleEnsembleInterfaceTypes(final DefaultGenerationSession generationSession) {
         final JavaTypeDefinition baseEnsembleInterfaceTypeDefinition = baseEnsembleInterfaceTypeCreator(JavaTypeDefinitionFactory.getInstance());
         return generationSession.withBaseEnsembleInterfaceTypeDefinition(baseEnsembleInterfaceTypeDefinition)
-                                .withEnsembleInterfaceTypeDefinitionsByEnsembleKind(generationSession.getEnsembleKinds()
-                                                                                                     .stream()
-                                                                                                     .map(ek -> new SimpleImmutableEntry<>(ek,
-                                                                                                                                           buildEnsembleInterfaceTypeDefinitionForEnsembleKind(JavaTypeDefinitionFactory.getInstance(),
-                                                                                                                                                                                               baseEnsembleInterfaceTypeDefinition,
-                                                                                                                                                                                               ek)))
-                                                                                                     .collect(Collectors.toMap(Map.Entry::getKey,
-                                                                                                                               Map.Entry::getValue)));
+                                .withEnsembleInterfaceTypeDefinitionsByEnsembleKind(SyncMap.fromIterable(generationSession.getEnsembleKinds(),
+                                                                                                         ek -> ek,
+                                                                                                         ek -> buildEnsembleInterfaceTypeDefinitionForEnsembleKind(JavaTypeDefinitionFactory.getInstance(),
+                                                                                                                                                                   baseEnsembleInterfaceTypeDefinition,
+                                                                                                                                                                   ek)));
 
     }
 
@@ -62,9 +59,8 @@ public class EnsembleInterfaceTypeAssembler {
                                  .foldUpdate(javaDefinitionFactory::javaPackage,
                                              FUNCIFY_ENSEMBLE_PACKAGE_NAME)
                                  .foldUpdate(javaDefinitionFactory::typeVariables,
-                                             Stream.concat(Stream.of(WITNESS_TYPE_VARIABLE),
-                                                           firstNSimpleJavaTypeVariables(ensembleKind.getNumberOfValueParameters()))
-                                                   .collect(Collectors.toList()))
+                                             SyncList.fromStream(Stream.concat(Stream.of(WITNESS_TYPE_VARIABLE),
+                                                                               firstNSimpleJavaTypeVariables(ensembleKind.getNumberOfValueParameters()))))
                                  .foldUpdate(javaDefinitionFactory::modifier,
                                              JavaModifier.PUBLIC)
                                  .foldUpdate(javaDefinitionFactory::typeKind,
@@ -104,8 +100,8 @@ public class EnsembleInterfaceTypeAssembler {
                                                           .foldUpdate(javaMethodDefinitionFactory::javaAnnotation,
                                                                       JavaAnnotation.builder()
                                                                                     .name("SuppressWarnings")
-                                                                                    .parameters(fromPair("value",
-                                                                                                         "unchecked"))
+                                                                                    .parameters(SyncMap.of("value",
+                                                                                                           "unchecked"))
                                                                                     .build())
                                                           .foldUpdate(javaMethodDefinitionFactory::modifier,
                                                                       JavaModifier.DEFAULT)
@@ -118,11 +114,11 @@ public class EnsembleInterfaceTypeAssembler {
                                                                                           .statement(JavaCodeBlock.builder()
                                                                                                                   .build(),
                                                                                                      ReturnStatement.builder()
-                                                                                                                    .expressions(asList(TemplatedExpression.builder()
-                                                                                                                                                           .templateCall("cast_as")
-                                                                                                                                                           .templateParameters(asList("this",
-                                                                                                                                                                                      "S"))
-                                                                                                                                                           .build()))
+                                                                                                                    .expressions(SyncList.of(TemplatedExpression.builder()
+                                                                                                                                                                .templateCall("cast_as")
+                                                                                                                                                                .templateParameters(SyncList.of("this",
+                                                                                                                                                                                                "S"))
+                                                                                                                                                                .build()))
                                                                                                                     .build())));
         };
     }
@@ -201,11 +197,11 @@ public class EnsembleInterfaceTypeAssembler {
                             .build()
                             .foldUpdate(javaCodeBlockDefinitionFactory::statement,
                                         ReturnStatement.builder()
-                                                       .expressions(asList(TemplatedExpression.builder()
-                                                                                              .templateCall("function_call")
-                                                                                              .templateParameters(asList("converter",
-                                                                                                                         "this"))
-                                                                                              .build()))
+                                                       .expressions(SyncList.of(TemplatedExpression.builder()
+                                                                                                   .templateCall("function_call")
+                                                                                                   .templateParameters(SyncList.of("converter",
+                                                                                                                                   "this"))
+                                                                                                   .build()))
                                                        .build());
     }
 
@@ -216,7 +212,7 @@ public class EnsembleInterfaceTypeAssembler {
                                                                                       final JavaType returnTypeVariable) {
         return JavaParameter.builder()
                             .name("converter")
-                            .modifiers(asList(JavaModifier.FINAL))
+                            .modifiers(SyncList.of(JavaModifier.FINAL))
                             .type(converterFunctionParameterType(javaDefinitionFactory,
                                                                  ensembleKind,
                                                                  ensembleInterfaceSuperType,
@@ -242,9 +238,8 @@ public class EnsembleInterfaceTypeAssembler {
     private static <D extends Definition<D>> JavaType soloEnsembleInterfaceTypeCreator(final JavaDefinitionFactory<D> javaDefinitionFactory) {
         return javaDefinitionFactory.parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
                                                            EnsembleKind.SOLO.getSimpleClassName(),
-                                                           Stream.concat(Stream.of(WITNESS_TYPE_VARIABLE),
-                                                                         firstNSimpleJavaTypeVariables(1))
-                                                                 .collect(Collectors.toList()));
+                                                           SyncList.fromStream(Stream.concat(Stream.of(WITNESS_TYPE_VARIABLE),
+                                                                                             firstNSimpleJavaTypeVariables(1))));
     }
 
     private static <D extends Definition<D>> BinaryOperator<JavaType> nestingSoloTypeVariableCreator(final JavaDefinitionFactory<D> javaDefinitionFactory) {

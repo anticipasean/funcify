@@ -2,11 +2,12 @@ package funcify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import funcify.tool.SyncList;
+import funcify.tool.SyncMap.Tuple2;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Map.Entry;
 import org.junit.jupiter.api.Test;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
@@ -19,7 +20,7 @@ public class FuncifyClassGeneratorTest {
 
     private DefaultGenerationSession buildInitialGenerationSession() {
         return DefaultGenerationSession.builder()
-                                       .ensembleKinds(Arrays.asList(EnsembleKind.values()))
+                                       .ensembleKinds(SyncList.of(EnsembleKind.values()))
                                        .build();
     }
 
@@ -46,22 +47,21 @@ public class FuncifyClassGeneratorTest {
                                                     .add("type_definition",
                                                          eNode);
         System.out.println(ensembleBaseTypeStrTemplate.render());
-        //        System.out.println("ensemble_base_type.json: " + eNode.toPrettyString());
+        //                System.out.println("ensemble_base_type.json: " + eNode.toPrettyString());
 
         updatedSession.getEnsembleInterfaceTypeDefinitionsByEnsembleKind()
-                      .entrySet()
                       .stream()
-                      .sorted(Comparator.comparing(Entry::getKey,
+                      .sorted(Comparator.comparing(Tuple2::_1,
                                                    Comparator.comparing(EnsembleKind::getNumberOfValueParameters)))
                       .forEach(entry -> {
                           try {
-                              final JsonNode jsonNode = objectMapper.valueToTree(entry.getValue());
+                              final JsonNode jsonNode = objectMapper.valueToTree(entry._2());
                               ST stringTemplate = stGroupFile.getInstanceOf("java_type")
                                                              .add("type_definition",
                                                                   jsonNode);
-                              System.out.println("ensemble: " + entry.getKey()
+                              System.out.println("ensemble: " + entry._1()
                                                                      .name());
-                              //                              System.out.println("ensemble.json: " + jsonNode.toPrettyString());
+                              System.out.println("ensemble.json: " + jsonNode.toPrettyString());
                               System.out.println(stringTemplate.render());
                           } catch (Exception e) {
                               e.printStackTrace();

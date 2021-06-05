@@ -1,6 +1,6 @@
 package funcify.template.session;
 
-import java.util.List;
+import funcify.tool.SyncList;
 import java.util.Optional;
 
 /**
@@ -14,5 +14,5 @@ public interface CodeBlockGenerationSession<SWT, TD, MD, CD, SD, ED> extends Sta
     Optional<CD> getCodeBlockForMethodDefinition(final MD methodDef);
 
     CD statements(final CD codeBlockDef,
-                  final List<SD> statements);
+                  final SyncList<SD> statements);
 }

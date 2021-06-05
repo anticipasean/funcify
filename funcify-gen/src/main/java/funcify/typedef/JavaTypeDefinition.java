@@ -2,10 +2,9 @@ package funcify.typedef;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import funcify.Definition;
+import funcify.tool.SyncList;
 import funcify.typedef.javatype.JavaType;
 import funcify.typedef.javatype.VariableParameterJavaType;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +12,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.With;
 
 /**
@@ -25,6 +25,7 @@ import lombok.With;
 @Builder
 @Getter
 @With
+@ToString
 public class JavaTypeDefinition implements Definition<JavaTypeDefinition> {
 
     @JsonProperty("package")
@@ -32,15 +33,15 @@ public class JavaTypeDefinition implements Definition<JavaTypeDefinition> {
 
     @JsonProperty("imports")
     @Default
-    private List<JavaImport> javaImports = new ArrayList<>();
+    private SyncList<JavaImport> javaImports = SyncList.empty();
 
     @JsonProperty("annotations")
     @Default
-    private List<JavaAnnotation> annotations = new ArrayList<>();
+    private SyncList<JavaAnnotation> annotations = SyncList.empty();
 
     @JsonProperty("modifiers")
     @Default
-    private List<JavaModifier> modifiers = new ArrayList<>();
+    private SyncList<JavaModifier> modifiers = SyncList.empty();
 
     @JsonProperty("type_kind")
     private JavaTypeKind typeKind;
@@ -50,26 +51,26 @@ public class JavaTypeDefinition implements Definition<JavaTypeDefinition> {
 
     @JsonProperty("type_variables")
     @Default
-    private List<JavaType> typeVariables = new ArrayList<>();
+    private SyncList<JavaType> typeVariables = SyncList.empty();
 
     @JsonProperty("super_type")
     private JavaType superType;
 
     @JsonProperty("implemented_interface_types")
     @Default
-    private List<JavaType> implementedInterfaceTypes = new ArrayList<>();
+    private SyncList<JavaType> implementedInterfaceTypes = SyncList.empty();
 
     @JsonProperty("fields")
     @Default
-    private List<JavaField> fields = new ArrayList<>();
+    private SyncList<JavaField> fields = SyncList.empty();
 
     @JsonProperty("methods")
     @Default
-    private List<JavaMethod> methods = new ArrayList<>();
+    private SyncList<JavaMethod> methods = SyncList.empty();
 
     @JsonProperty("sub_type_definitions")
     @Default
-    private List<JavaTypeDefinition> subTypeDefinitions = new ArrayList<>();
+    private SyncList<JavaTypeDefinition> subTypeDefinitions = SyncList.empty();
 
     public JavaType getJavaType() {
         return VariableParameterJavaType.builder()

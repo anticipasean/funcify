@@ -1,9 +1,9 @@
 package funcify.template.generation;
 
-import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 
 import funcify.template.session.TypeGenerationSession;
+import funcify.tool.SyncList;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaField;
 import funcify.typedef.JavaImport;
@@ -11,7 +11,6 @@ import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaPackage;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javatype.JavaType;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -97,19 +96,19 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                                final JavaImport... javaImport) {
         return javaImports(session,
                            typeDef,
-                           asList(javaImport));
+                           SyncList.of(javaImport));
     }
 
     default <TD, MD, CD, SD, ED> TD javaImports(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                 final TD typeDef,
-                                                final List<JavaImport> javaImports) {
+                                                final SyncList<JavaImport> javaImports) {
         return session.javaImports(typeDef,
                                    javaImports);
     }
 
     default <TD, MD, CD, SD, ED> TD javaAnnotations(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                     final TD typeDef,
-                                                    final List<JavaAnnotation> javaAnnotations) {
+                                                    final SyncList<JavaAnnotation> javaAnnotations) {
         return session.javaAnnotations(typeDef,
                                        javaAnnotations);
     }
@@ -119,12 +118,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                                    final JavaAnnotation... annotation) {
         return javaAnnotations(session,
                                typeDef,
-                               asList(annotation));
+                               SyncList.of(annotation));
     }
 
     default <TD, MD, CD, SD, ED> TD typeModifiers(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                   final TD typeDef,
-                                                  final List<JavaModifier> modifiers) {
+                                                  final SyncList<JavaModifier> modifiers) {
         return session.typeModifiers(typeDef,
                                      modifiers);
     }
@@ -134,7 +133,7 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                                   final JavaModifier... modifier) {
         return typeModifiers(session,
                              typeDef,
-                             asList(modifier));
+                             SyncList.of(modifier));
     }
 
     default <TD, MD, CD, SD, ED> TD typeKind(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
@@ -156,12 +155,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                                              final JavaType... implementedInterfaceType) {
         return implementedInterfaceTypes(session,
                                          typeDef,
-                                         asList(implementedInterfaceType));
+                                         SyncList.of(implementedInterfaceType));
     }
 
     default <TD, MD, CD, SD, ED> TD implementedInterfaceTypes(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                               final TD typeDef,
-                                                              final List<JavaType> implementedInterfaceTypes) {
+                                                              final SyncList<JavaType> implementedInterfaceTypes) {
         return session.implementedInterfaceTypes(typeDef,
                                                  implementedInterfaceTypes);
     }
@@ -171,12 +170,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                           final JavaField... field) {
         return fields(session,
                       typeDef,
-                      asList(field));
+                      SyncList.of(field));
     }
 
     default <TD, MD, CD, SD, ED> TD fields(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                            final TD typeDef,
-                                           final List<JavaField> fields) {
+                                           final SyncList<JavaField> fields) {
         return session.fields(typeDef,
                               fields);
     }
@@ -187,12 +186,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                            final MD... method) {
         return methods(session,
                        typeDef,
-                       asList(method));
+                       SyncList.of(method));
     }
 
     default <TD, MD, CD, SD, ED> TD methods(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                             final TD typeDef,
-                                            final List<MD> methods) {
+                                            final SyncList<MD> methods) {
         return session.methods(typeDef,
                                methods);
     }
@@ -203,12 +202,12 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                                       final TD... subTypeDefinitions) {
         return subTypeDefinitions(session,
                                   typeDef,
-                                  asList(subTypeDefinitions));
+                                  SyncList.of(subTypeDefinitions));
     }
 
     default <TD, MD, CD, SD, ED> TD subTypeDefinitions(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                        final TD typeDef,
-                                                       final List<TD> subTypeDefinitions) {
+                                                       final SyncList<TD> subTypeDefinitions) {
         return session.subTypeDefinitions(typeDef,
                                           subTypeDefinitions);
     }

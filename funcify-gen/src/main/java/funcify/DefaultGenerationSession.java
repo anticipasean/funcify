@@ -1,11 +1,11 @@
 package funcify;
 
+import funcify.tool.SyncList;
+import funcify.tool.SyncMap;
 import funcify.typedef.JavaTypeDefinition;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -27,12 +27,12 @@ public class DefaultGenerationSession {
     private final Path destinationDirectoryPath;
 
     @Default
-    private final List<EnsembleKind> ensembleKinds = Collections.emptyList();
+    private final SyncList<EnsembleKind> ensembleKinds = SyncList.empty();
 
     private final JavaTypeDefinition baseEnsembleInterfaceTypeDefinition;
 
     @Default
-    private final Map<EnsembleKind, JavaTypeDefinition> ensembleInterfaceTypeDefinitionsByEnsembleKind = new HashMap<>();
+    private final SyncMap<EnsembleKind, JavaTypeDefinition> ensembleInterfaceTypeDefinitionsByEnsembleKind = SyncMap.empty();
 
 
 }

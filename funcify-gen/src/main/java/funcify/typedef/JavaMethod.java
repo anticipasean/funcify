@@ -2,9 +2,8 @@ package funcify.typedef;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import funcify.Definition;
+import funcify.tool.SyncList;
 import funcify.typedef.javatype.JavaType;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +11,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.With;
 
 /**
@@ -24,19 +24,20 @@ import lombok.With;
 @Getter
 @With
 @Builder
+@ToString
 public class JavaMethod implements Definition<JavaMethod> {
 
     @JsonProperty("annotations")
     @Default
-    private List<JavaAnnotation> annotations = new ArrayList<>();
+    private SyncList<JavaAnnotation> annotations = SyncList.empty();
 
     @JsonProperty("modifiers")
     @Default
-    private List<JavaModifier> modifiers = new ArrayList<>();
+    private SyncList<JavaModifier> modifiers = SyncList.empty();
 
     @JsonProperty("type_variables")
     @Default
-    private List<JavaType> typeVariables = new ArrayList<>();
+    private SyncList<JavaType> typeVariables = SyncList.empty();
 
     @JsonProperty("return_type")
     private JavaType returnType;
@@ -46,7 +47,7 @@ public class JavaMethod implements Definition<JavaMethod> {
 
     @JsonProperty("parameters")
     @Default
-    private List<JavaParameter> parameters = new ArrayList<>();
+    private SyncList<JavaParameter> parameters = SyncList.empty();
 
     @JsonProperty("code_block")
     private JavaCodeBlock codeBlock;

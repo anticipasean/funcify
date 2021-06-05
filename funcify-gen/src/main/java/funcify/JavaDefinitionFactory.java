@@ -1,8 +1,9 @@
 package funcify;
 
-import static java.util.Arrays.asList;
+import static funcify.tool.SyncList.of;
 import static java.util.Arrays.stream;
 
+import funcify.tool.SyncList;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaField;
@@ -15,7 +16,6 @@ import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javaexpr.JavaExpression;
 import funcify.typedef.javastatement.JavaStatement;
 import funcify.typedef.javatype.JavaType;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -79,34 +79,34 @@ public interface JavaDefinitionFactory<D extends Definition<D>> extends JavaType
     default D javaImport(final D definition,
                          final JavaImport... javaImport) {
         return javaImports(definition,
-                           asList(javaImport));
+                           of(javaImport));
     }
 
     default D javaImports(final D definition,
-                          final List<JavaImport> javaImport) {
+                          final SyncList<JavaImport> javaImport) {
         return definition;
     }
 
     default D javaAnnotations(final D definition,
-                              final List<JavaAnnotation> javaAnnotations) {
+                              final SyncList<JavaAnnotation> javaAnnotations) {
         return definition;
     }
 
     default D javaAnnotation(final D definition,
                              final JavaAnnotation... annotation) {
         return javaAnnotations(definition,
-                               asList(annotation));
+                               of(annotation));
     }
 
     default D modifiers(final D definition,
-                        final List<JavaModifier> modifiers) {
+                        final SyncList<JavaModifier> modifiers) {
         return definition;
     }
 
     default D modifier(final D definition,
                        final JavaModifier... modifier) {
         return modifiers(definition,
-                         asList(modifier));
+                         of(modifier));
     }
 
     default D typeKind(final D definition,
@@ -122,33 +122,33 @@ public interface JavaDefinitionFactory<D extends Definition<D>> extends JavaType
     default D implementedInterfaceType(final D definition,
                                        final JavaType... implementedInterfaceType) {
         return implementedInterfaceTypes(definition,
-                                         asList(implementedInterfaceType));
+                                         of(implementedInterfaceType));
     }
 
     default D implementedInterfaceTypes(final D definition,
-                                        final List<JavaType> implementedInterfaceTypes) {
+                                        final SyncList<JavaType> implementedInterfaceTypes) {
         return definition;
     }
 
     default D field(final D definition,
                     final JavaField... field) {
         return fields(definition,
-                      asList(field));
+                      of(field));
     }
 
     default D fields(final D definition,
-                     final List<JavaField> fields) {
+                     final SyncList<JavaField> fields) {
         return definition;
     }
 
     default D method(final D definition,
                      final JavaMethod... method) {
         return methods(definition,
-                       asList(method));
+                       of(method));
     }
 
     default D methods(final D definition,
-                      final List<JavaMethod> methods) {
+                      final SyncList<JavaMethod> methods) {
         return definition;
     }
 
@@ -156,22 +156,22 @@ public interface JavaDefinitionFactory<D extends Definition<D>> extends JavaType
     default D subTypeDefinition(final D definition,
                                 final D... subTypeDefinitions) {
         return subTypeDefinitions(definition,
-                                  asList(subTypeDefinitions));
+                                  of(subTypeDefinitions));
     }
 
     default D subTypeDefinitions(final D definition,
-                                 final List<D> subTypeDefinitions) {
+                                 final SyncList<D> subTypeDefinitions) {
         return definition;
     }
 
     default D typeVariable(final D definition,
                            final JavaType... typeVariable) {
         return typeVariables(definition,
-                             asList(typeVariable));
+                             of(typeVariable));
     }
 
     default D typeVariables(final D definition,
-                            final List<JavaType> typeVariables) {
+                            final SyncList<JavaType> typeVariables) {
         return definition;
     }
 
@@ -183,11 +183,11 @@ public interface JavaDefinitionFactory<D extends Definition<D>> extends JavaType
     default D parameter(final D definition,
                         final JavaParameter... parameter) {
         return parameters(definition,
-                          asList(parameter));
+                          of(parameter));
     }
 
     default D parameters(final D definition,
-                         final List<JavaParameter> parameters) {
+                         final SyncList<JavaParameter> parameters) {
         return definition;
     }
 
@@ -199,22 +199,22 @@ public interface JavaDefinitionFactory<D extends Definition<D>> extends JavaType
     default D statement(final D definition,
                         final JavaStatement... statement) {
         return statements(definition,
-                          asList(statement));
+                          of(statement));
     }
 
     default D statements(final D definition,
-                         final List<JavaStatement> statements) {
+                         final SyncList<JavaStatement> statements) {
         return definition;
     }
 
     default D expression(final D definition,
                          final JavaExpression... expression) {
         return expressions(definition,
-                           asList(expression));
+                           of(expression));
     }
 
     default D expressions(final D definition,
-                          final List<JavaExpression> expressions) {
+                          final SyncList<JavaExpression> expressions) {
         return definition;
     }
 

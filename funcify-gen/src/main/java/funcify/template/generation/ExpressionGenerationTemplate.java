@@ -1,11 +1,9 @@
 package funcify.template.generation;
 
-import static java.util.Arrays.asList;
-
 import funcify.JavaTypeFactory;
 import funcify.template.session.TypeGenerationSession;
+import funcify.tool.SyncList;
 import funcify.typedef.JavaParameter;
-import java.util.List;
 
 /**
  * @author smccarron
@@ -16,11 +14,11 @@ public interface ExpressionGenerationTemplate<SWT> extends JavaTypeFactory {
     default <TD, MD, CD, SD, ED> ED simpleExpression(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                      final String... text) {
         return simpleExpression(session,
-                                asList(text));
+                                SyncList.of(text));
     }
 
     default <TD, MD, CD, SD, ED> ED simpleExpression(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                                     final List<String> text) {
+                                                     final SyncList<String> text) {
         return session.simpleExpression(text);
     }
 
@@ -29,19 +27,19 @@ public interface ExpressionGenerationTemplate<SWT> extends JavaTypeFactory {
                                                        final String... templateParameter) {
         return templateExpression(session,
                                   templateName,
-                                  asList(templateParameter));
+                                  SyncList.of(templateParameter));
     }
 
     default <TD, MD, CD, SD, ED> ED templateExpression(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                        final String templateName,
-                                                       final List<String> templateParameters) {
+                                                       final SyncList<String> templateParameters) {
         return session.templateExpression(templateName,
                                           templateParameters);
     }
 
     @SuppressWarnings("unchecked")
     default <TD, MD, CD, SD, ED> ED lambdaExpression(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                                     final List<JavaParameter> parameters,
+                                                     final SyncList<JavaParameter> parameters,
                                                      final ED... lambdaBodyExpression) {
         return session.lambdaExpression(parameters,
                                         lambdaBodyExpression);
