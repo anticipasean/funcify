@@ -1,4 +1,4 @@
-package funcify;
+package funcify.ensemble;
 
 /**
  * @author smccarron
@@ -53,7 +53,6 @@ public enum EnsembleKind {
 
 
     private final int numberOfValueParameters;
-    private final int numberOfWitnessParameters = 1;
     private final String simpleClassName;
 
     private EnsembleKind(final int numberOfValueParameters,
@@ -64,10 +63,6 @@ public enum EnsembleKind {
 
     public int getNumberOfValueParameters() {
         return numberOfValueParameters;
-    }
-
-    public int getNumberOfWitnessParameters() {
-        return numberOfWitnessParameters;
     }
 
     public String getSimpleClassName() {

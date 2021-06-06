@@ -3,6 +3,7 @@ package funcify;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import funcify.codegen.JsonNodeModelAdapter;
 import funcify.tool.container.SyncList;
 import funcify.typedef.JavaImport;
 import funcify.typedef.JavaMethod;

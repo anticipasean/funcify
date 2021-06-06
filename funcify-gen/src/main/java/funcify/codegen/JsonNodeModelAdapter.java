@@ -1,4 +1,4 @@
-package funcify;
+package funcify.codegen;
 
 import static java.util.Objects.requireNonNull;
 

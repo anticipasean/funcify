@@ -1,6 +1,7 @@
 package funcify;
 
 import funcify.commandline.PathConverter;
+import funcify.ensemble.EnsembleKind;
 import funcify.tool.container.SyncList;
 import java.io.File;
 import java.nio.file.Path;

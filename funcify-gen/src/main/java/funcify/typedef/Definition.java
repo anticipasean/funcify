@@ -1,4 +1,4 @@
-package funcify;
+package funcify.typedef;
 
 import static java.util.Objects.requireNonNull;
 

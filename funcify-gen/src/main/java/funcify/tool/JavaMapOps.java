@@ -1,4 +1,4 @@
-package funcify;
+package funcify.tool;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,7 +8,7 @@ import java.util.Map;
  * @author smccarron
  * @created 2021-05-27
  */
-public interface JavaMapTool {
+public interface JavaMapOps {
 
     static <K, V> Map<K, V> fromPair(final K k,
                                      final V v) {

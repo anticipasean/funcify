@@ -2,6 +2,9 @@ package funcify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import funcify.codegen.JsonNodeModelAdapter;
+import funcify.ensemble.EnsembleInterfaceTypeAssembler;
+import funcify.ensemble.EnsembleKind;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap.Tuple2;
 import java.nio.file.Path;

@@ -1,6 +1,6 @@
 package funcify.factory.session;
 
-import funcify.EnsembleKind;
+import funcify.ensemble.EnsembleKind;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaAnnotation;

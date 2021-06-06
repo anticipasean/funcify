@@ -1,8 +1,15 @@
-package funcify;
+package funcify.ensemble;
 
+import funcify.DefaultGenerationSession;
+import funcify.JavaCodeBlockFactory;
+import funcify.JavaDefinitionFactory;
+import funcify.JavaMethodFactory;
+import funcify.JavaTypeDefinitionFactory;
+import funcify.ensemble.EnsembleKind;
 import funcify.tool.CharacterOps;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
+import funcify.typedef.Definition;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaMethod;

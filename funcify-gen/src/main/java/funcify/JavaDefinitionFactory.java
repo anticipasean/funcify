@@ -4,6 +4,7 @@ import static funcify.tool.container.SyncList.of;
 import static java.util.Arrays.stream;
 
 import funcify.tool.container.SyncList;
+import funcify.typedef.Definition;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaField;

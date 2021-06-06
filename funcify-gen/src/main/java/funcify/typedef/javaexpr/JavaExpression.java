@@ -1,6 +1,6 @@
 package funcify.typedef.javaexpr;
 
-import funcify.Definition;
+import funcify.typedef.Definition;
 
 /**
  * @author smccarron
