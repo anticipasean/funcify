@@ -1,6 +1,6 @@
 package funcify.template.session;
 
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 import funcify.typedef.javatype.JavaType;
 import java.util.Optional;
 

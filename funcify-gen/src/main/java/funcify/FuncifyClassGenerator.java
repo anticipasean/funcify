@@ -1,12 +1,10 @@
 package funcify;
 
 import funcify.commandline.PathConverter;
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 

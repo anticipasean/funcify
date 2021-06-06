@@ -1,15 +1,17 @@
-package funcify.tool;
+package funcify.tool.container;
 
 import static funcify.tool.LiftOps.tryCatchLift;
 import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import funcify.tool.LiftOps;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -208,6 +210,23 @@ public interface SyncList<E> extends Iterable<E> {
                                   initialValue,
                                   foldFunction);
     }
+
+    default String join(final String delimiter) {
+        return factory().join(this,
+                              delimiter,
+                              "",
+                              "");
+    }
+
+    default String join(final String delimiter,
+                        final String prefix,
+                        final String suffix) {
+        return factory().join(this,
+                              delimiter,
+                              prefix,
+                              suffix);
+    }
+
 
     @AllArgsConstructor(staticName = "of", access = AccessLevel.PACKAGE)
     static class SyncListFactory {
@@ -534,7 +553,22 @@ public interface SyncList<E> extends Iterable<E> {
                 return updatedList;
             });
         }
+
+        public <E> String join(final SyncList<E> syncList,
+                               final String delimiter,
+                               final String prefix,
+                               final String suffix) {
+            return stream(syncList).map(LiftOps.<E, String>tryCatchLift(Objects::toString))
+                                   .map(opt -> opt.orElse(""))
+                                   .collect(Collectors.joining(requireNonNull(delimiter,
+                                                                              () -> "delimiter"),
+                                                               requireNonNull(prefix,
+                                                                              () -> "prefix"),
+                                                               requireNonNull(suffix,
+                                                                              () -> "suffix")));
+        }
     }
+
 
     @AllArgsConstructor(staticName = "of", access = AccessLevel.PACKAGE)
     @EqualsAndHashCode

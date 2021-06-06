@@ -1,7 +1,7 @@
 package funcify.typedef.javaexpr;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

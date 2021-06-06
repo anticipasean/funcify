@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 import org.junit.jupiter.api.Test;
 
 /**

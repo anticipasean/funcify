@@ -1,11 +1,9 @@
 package funcify;
 
-import funcify.tool.SyncList;
-import funcify.tool.SyncMap;
+import funcify.tool.container.SyncList;
+import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaTypeDefinition;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;

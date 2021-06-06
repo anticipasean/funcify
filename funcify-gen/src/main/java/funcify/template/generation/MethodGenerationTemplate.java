@@ -1,7 +1,7 @@
 package funcify.template.generation;
 
 import funcify.template.session.TypeGenerationSession;
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
 import funcify.typedef.javatype.JavaType;
@@ -16,14 +16,14 @@ public interface MethodGenerationTemplate<SWT> extends CodeBlockGenerationTempla
         return session.emptyMethodDefinition();
     }
 
-    default <TD, MD, CD, SD, ED> TD methodModifiers(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+    default <TD, MD, CD, SD, ED> MD methodModifiers(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                     final MD methodDef,
                                                     final SyncList<JavaModifier> modifiers) {
         return session.methodModifiers(methodDef,
                                        modifiers);
     }
 
-    default <TD, MD, CD, SD, ED> TD methodModifier(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+    default <TD, MD, CD, SD, ED> MD methodModifier(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                    final MD methodDef,
                                                    final JavaModifier... modifier) {
         return methodModifiers(session,

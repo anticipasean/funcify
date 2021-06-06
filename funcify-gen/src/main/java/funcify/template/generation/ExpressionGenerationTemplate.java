@@ -2,7 +2,7 @@ package funcify.template.generation;
 
 import funcify.JavaTypeFactory;
 import funcify.template.session.TypeGenerationSession;
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 import funcify.typedef.JavaParameter;
 
 /**

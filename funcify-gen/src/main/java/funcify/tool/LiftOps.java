@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * @author smccarron
@@ -63,6 +64,13 @@ public interface LiftOps {
             } catch (final Throwable t) {
                 return false;
             }
+        };
+    }
+
+    static <A> Function<Optional<A>, Stream<A>> optionalStreamLift() {
+        return (Optional<A> opt) -> {
+            return opt == null ? Stream.empty() : opt.map(Stream::of)
+                                                     .orElseGet(Stream::empty);
         };
     }
 }

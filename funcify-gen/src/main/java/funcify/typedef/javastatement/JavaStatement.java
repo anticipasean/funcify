@@ -2,7 +2,7 @@ package funcify.typedef.javastatement;
 
 import funcify.Definition;
 import funcify.typedef.javaexpr.JavaExpression;
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 
 /**
  * @author smccarron

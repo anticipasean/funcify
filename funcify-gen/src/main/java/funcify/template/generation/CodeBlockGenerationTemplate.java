@@ -1,7 +1,7 @@
 package funcify.template.generation;
 
 import funcify.template.session.TypeGenerationSession;
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 
 /**
  * @author smccarron

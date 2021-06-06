@@ -3,7 +3,7 @@ package funcify.template.generation;
 import static java.util.Arrays.stream;
 
 import funcify.template.session.TypeGenerationSession;
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaField;
 import funcify.typedef.JavaImport;

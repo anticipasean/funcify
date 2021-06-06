@@ -1,9 +1,8 @@
 package funcify;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import funcify.tool.LiftOps;
-import funcify.tool.SyncList;
-import funcify.tool.SyncMap;
+import funcify.tool.CharacterOps;
+import funcify.tool.container.SyncList;
+import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaMethod;
@@ -15,7 +14,6 @@ import funcify.typedef.javaexpr.TemplatedExpression;
 import funcify.typedef.javastatement.ReturnStatement;
 import funcify.typedef.javatype.JavaType;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
-import funcify.typedef.javatype.VariableParameterJavaType;
 import java.util.Objects;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -250,30 +248,8 @@ public class EnsembleInterfaceTypeAssembler {
     }
 
     private static Stream<JavaType> firstNSimpleJavaTypeVariables(int n) {
-        return firstNLetters(n).map(SimpleJavaTypeVariable::of);
-    }
-
-    private static Stream<String> firstNLetters(int n) {
-        return rangeOfCharactersFrom('A',
-                                     (char) (((int) 'A') + Math.min(26,
-                                                                    n)));
-    }
-
-    private static Stream<String> rangeOfCharactersFrom(char start,
-                                                        char end) {
-        if (start == end) {
-            return Stream.of(String.valueOf(start));
-        }
-        if ((start - end) > 0) {
-            return Stream.empty();
-        } else {
-            return Stream.iterate(start,
-                                  (Character c) -> {
-                                      return (char) (((int) c) + 1);
-                                  })
-                         .limit(end - start)
-                         .map(String::valueOf);
-        }
+        return CharacterOps.firstNAlphabetLettersAsStrings(n)
+                           .map(SimpleJavaTypeVariable::of);
     }
 
 }

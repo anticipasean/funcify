@@ -1,7 +1,7 @@
 package funcify.template.session;
 
-import funcify.tool.SyncList;
-import funcify.tool.SyncMap;
+import funcify.tool.container.SyncList;
+import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
 import funcify.typedef.javatype.JavaType;
@@ -24,7 +24,7 @@ public interface MethodGenerationSession<SWT, TD, MD, CD, SD, ED> extends CodeBl
                                                                               () -> "name"));
     }
 
-    TD methodModifiers(final MD methodDef,
+    MD methodModifiers(final MD methodDef,
                        final SyncList<JavaModifier> modifiers);
 
     MD methodTypeVariables(final MD methodDef,

@@ -1,9 +1,9 @@
 package funcify;
 
-import static funcify.tool.SyncList.of;
+import static funcify.tool.container.SyncList.of;
 import static java.util.Arrays.stream;
 
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaField;

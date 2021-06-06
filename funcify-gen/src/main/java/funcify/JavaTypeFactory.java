@@ -1,6 +1,6 @@
 package funcify;
 
-import funcify.tool.SyncList;
+import funcify.tool.container.SyncList;
 import funcify.typedef.JavaPackage;
 import funcify.typedef.javatype.BoundedJavaTypeVariable;
 import funcify.typedef.javatype.JavaType;

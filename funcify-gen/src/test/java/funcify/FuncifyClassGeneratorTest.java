@@ -2,11 +2,10 @@ package funcify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import funcify.tool.SyncList;
-import funcify.tool.SyncMap.Tuple2;
+import funcify.tool.container.SyncList;
+import funcify.tool.container.SyncMap.Tuple2;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Comparator;
 import org.junit.jupiter.api.Test;
 import org.stringtemplate.v4.ST;

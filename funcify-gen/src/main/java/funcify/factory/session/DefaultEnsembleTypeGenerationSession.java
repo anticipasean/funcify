@@ -1,7 +1,8 @@
 package funcify.factory.session;
 
-import funcify.tool.SyncList;
-import funcify.tool.SyncMap;
+import funcify.EnsembleKind;
+import funcify.tool.container.SyncList;
+import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaField;
@@ -13,20 +14,39 @@ import funcify.typedef.JavaParameter;
 import funcify.typedef.JavaTypeDefinition;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javaexpr.JavaExpression;
+import funcify.typedef.javaexpr.LambdaExpression;
+import funcify.typedef.javaexpr.TemplatedExpression;
+import funcify.typedef.javaexpr.TextExpression;
+import funcify.typedef.javastatement.AssignmentStatement;
 import funcify.typedef.javastatement.JavaStatement;
+import funcify.typedef.javastatement.ReturnStatement;
 import funcify.typedef.javatype.JavaType;
+import java.nio.file.Path;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 
 /**
  * @author smccarron
  * @created 2021-05-31
  */
-@AllArgsConstructor(staticName = "of")
+@AllArgsConstructor
+@Builder
 @Getter
 public class DefaultEnsembleTypeGenerationSession implements
                                                   EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> {
+
+    private final Path destinationDirectoryPath;
+
+    @Default
+    private final SyncList<EnsembleKind> ensembleKinds = SyncList.empty();
+
+    private final JavaTypeDefinition baseEnsembleInterfaceTypeDefinition;
+
+    @Default
+    private final SyncMap<EnsembleKind, JavaTypeDefinition> ensembleInterfaceTypeDefinitionsByEnsembleKind = SyncMap.empty();
 
     private final SyncMap<String, JavaTypeDefinition> typeDefinitionsByName;
 
@@ -104,7 +124,8 @@ public class DefaultEnsembleTypeGenerationSession implements
 
     @Override
     public JavaMethod emptyMethodDefinition() {
-        return JavaMethod.builder().build();
+        return JavaMethod.builder()
+                         .build();
     }
 
     @Override
@@ -114,44 +135,48 @@ public class DefaultEnsembleTypeGenerationSession implements
     }
 
     @Override
-    public JavaTypeDefinition methodModifiers(final JavaMethod methodDef,
-                                              final SyncList<JavaModifier> modifiers) {
-        return null;
+    public JavaMethod methodModifiers(final JavaMethod methodDef,
+                                      final SyncList<JavaModifier> modifiers) {
+        return methodDef.withModifiers(methodDef.getModifiers()
+                                                .appendAll(modifiers));
     }
 
     @Override
     public JavaMethod methodTypeVariables(final JavaMethod methodDef,
                                           final SyncList<JavaType> typeVariables) {
-        return null;
+        return methodDef.withTypeVariables(methodDef.getTypeVariables()
+                                                    .appendAll(typeVariables));
     }
 
     @Override
     public JavaMethod returnType(final JavaMethod methodDef,
                                  final JavaType returnType) {
-        return null;
+        return methodDef.withReturnType(returnType);
     }
 
     @Override
     public JavaMethod methodName(final JavaMethod methodDef,
                                  final String name) {
-        return null;
+        return methodDef.withName(name);
     }
 
     @Override
     public JavaMethod parameters(final JavaMethod methodDef,
                                  final SyncList<JavaParameter> parameters) {
-        return null;
+        return methodDef.withParameters(methodDef.getParameters()
+                                                 .appendAll(parameters));
     }
 
     @Override
     public JavaMethod codeBlock(final JavaMethod methodDef,
                                 final JavaCodeBlock codeBlock) {
-        return null;
+        return methodDef.withCodeBlock(codeBlock);
     }
 
     @Override
     public JavaCodeBlock emptyCodeBlockDefinition() {
-        return null;
+        return JavaCodeBlock.builder()
+                            .build();
     }
 
     @Override
@@ -162,7 +187,8 @@ public class DefaultEnsembleTypeGenerationSession implements
     @Override
     public JavaCodeBlock statements(final JavaCodeBlock codeBlockDef,
                                     final SyncList<JavaStatement> statements) {
-        return null;
+        return codeBlockDef.withStatements(codeBlockDef.getStatements()
+                                                       .appendAll(statements));
     }
 
     @Override
@@ -174,12 +200,18 @@ public class DefaultEnsembleTypeGenerationSession implements
     public JavaStatement assignmentStatement(final JavaType assigneeType,
                                              final String assigneeName,
                                              final SyncList<JavaExpression> expressions) {
-        return null;
+        return AssignmentStatement.builder()
+                                  .assigneeName(assigneeName)
+                                  .assigneeType(assigneeType)
+                                  .expressions(expressions)
+                                  .build();
     }
 
     @Override
     public JavaStatement returnStatement(final SyncList<JavaExpression> expression) {
-        return null;
+        return ReturnStatement.builder()
+                              .expressions(expression)
+                              .build();
     }
 
     @Override
@@ -189,18 +221,24 @@ public class DefaultEnsembleTypeGenerationSession implements
 
     @Override
     public JavaExpression simpleExpression(final SyncList<String> text) {
-        return null;
+        return TextExpression.of(text.join(""));
     }
 
     @Override
     public JavaExpression templateExpression(final String templateName,
                                              final SyncList<String> templateParameters) {
-        return null;
+        return TemplatedExpression.builder()
+                                  .templateCall(templateName)
+                                  .templateParameters(templateParameters)
+                                  .build();
     }
 
     @Override
     public JavaExpression lambdaExpression(final SyncList<JavaParameter> parameters,
                                            final JavaExpression... lambdaBodyExpression) {
-        return null;
+        return LambdaExpression.builder()
+                               .parameters(parameters)
+                               .lambdaBody(SyncList.of(lambdaBodyExpression))
+                               .build();
     }
 }

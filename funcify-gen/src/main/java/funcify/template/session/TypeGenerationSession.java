@@ -1,7 +1,7 @@
 package funcify.template.session;
 
-import funcify.tool.SyncList;
-import funcify.tool.SyncMap;
+import funcify.tool.container.SyncList;
+import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaField;
 import funcify.typedef.JavaImport;

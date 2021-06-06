@@ -1,4 +1,4 @@
-package funcify.tool;
+package funcify.tool.container;
 
 import static funcify.tool.LiftOps.tryCatchLift;
 import static java.util.Objects.requireNonNull;
@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import funcify.tool.SyncMap.Tuple2;
+import funcify.tool.container.SyncMap.Tuple2;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Iterator;
 import java.util.Map;
