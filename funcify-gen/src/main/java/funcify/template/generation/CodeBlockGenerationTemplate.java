@@ -13,8 +13,7 @@ public interface CodeBlockGenerationTemplate<SWT> extends StatementGenerationTem
         return session.emptyCodeBlockDefinition();
     }
 
-
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "varargs"})
     default <TD, MD, CD, SD, ED> CD statement(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                               final CD codeBlockDef,
                                               final SD... statement) {

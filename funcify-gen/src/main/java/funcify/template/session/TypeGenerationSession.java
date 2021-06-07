@@ -33,6 +33,9 @@ public interface TypeGenerationSession<SWT, TD, MD, CD, SD, ED> extends MethodGe
     TD typeName(final TD typeDef,
                 final String name);
 
+    TD typeDefinitionTypeVariables(final TD typeDef,
+                                   final SyncList<JavaType> typeVariables);
+
     TD javaPackage(final TD typeDef,
                    final JavaPackage javaPackage);
 
@@ -64,5 +67,6 @@ public interface TypeGenerationSession<SWT, TD, MD, CD, SD, ED> extends MethodGe
     TD subTypeDefinitions(final TD typeDef,
                           final SyncList<TD> subTypeDefinitions);
 
+    JavaType javaTypeOfTypeDefinition(final TD typeDef);
 
 }

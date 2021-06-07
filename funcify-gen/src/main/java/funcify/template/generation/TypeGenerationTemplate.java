@@ -34,6 +34,20 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                 name);
     }
 
+    default <TD, MD, CD, SD, ED> TD typeDefinitionTypeVariables(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                                                final TD typeDef,
+                                                                final SyncList<JavaType> typeVariables) {
+        return session.typeDefinitionTypeVariables(typeDef,
+                                                   typeVariables);
+    }
+
+    default <TD, MD, CD, SD, ED> TD typeDefinitionTypeVariable(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                                               final TD typeDef,
+                                                               final JavaType... typeVariable) {
+        return session.typeDefinitionTypeVariables(typeDef,
+                                                   SyncList.of(typeVariable));
+    }
+
     default <TD, MD, CD, SD, ED> TD javaPackage(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                 final TD typeDef,
                                                 final String javaPackage) {
@@ -128,9 +142,9 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                      modifiers);
     }
 
-    default <TD, MD, CD, SD, ED> TD typeModifiers(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                                  final TD typeDef,
-                                                  final JavaModifier... modifier) {
+    default <TD, MD, CD, SD, ED> TD typeModifier(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+                                                 final TD typeDef,
+                                                 final JavaModifier... modifier) {
         return typeModifiers(session,
                              typeDef,
                              SyncList.of(modifier));

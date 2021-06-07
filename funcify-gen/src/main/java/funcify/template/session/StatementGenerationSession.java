@@ -14,14 +14,11 @@ public interface StatementGenerationSession<SWT, TD, MD, CD, SD, ED> extends
     SyncList<SD> getStatementsForCodeBlock(final CD codeBlockDef);
 
     default Optional<SD> getFirstStatementForCodeBlock(final CD codeBlockDef) {
-        return getStatementsForCodeBlock(codeBlockDef).stream()
-                                                      .findFirst();
+        return getStatementsForCodeBlock(codeBlockDef).first();
     }
 
     default Optional<SD> getLastStatementForCodeBlock(final CD codeBlockDef) {
-        final SyncList<SD> statementsForCodeBlock = getStatementsForCodeBlock(codeBlockDef);
-        return statementsForCodeBlock.size() > 0 ? statementsForCodeBlock.get(statementsForCodeBlock.size() - 1)
-            : Optional.empty();
+        return getStatementsForCodeBlock(codeBlockDef).last();
     }
 
     SD assignmentStatement(final JavaType assigneeType,

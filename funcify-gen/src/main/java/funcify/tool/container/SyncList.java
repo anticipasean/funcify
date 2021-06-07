@@ -9,6 +9,7 @@ import funcify.tool.LiftOps;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -225,6 +226,11 @@ public interface SyncList<E> extends Iterable<E> {
                               delimiter,
                               prefix,
                               suffix);
+    }
+
+    default SyncList<E> sorted(final Comparator<? super E> comparator) {
+        return factory().sorted(this,
+                                comparator);
     }
 
 
@@ -566,6 +572,20 @@ public interface SyncList<E> extends Iterable<E> {
                                                                               () -> "prefix"),
                                                                requireNonNull(suffix,
                                                                               () -> "suffix")));
+        }
+
+        public <E> SyncList<E> sorted(final SyncList<E> syncList,
+                                      final Comparator<? super E> comparator) {
+            return narrow(syncList).mapInternal(l -> {
+                final List<E> sortedList = l.stream()
+                                            .sorted(requireNonNull(comparator,
+                                                                   () -> "comparator"))
+                                            .collect(Collectors.toList());
+                if (l instanceof CopyOnWriteArrayList) {
+                    return new CopyOnWriteArrayList<>(sortedList);
+                }
+                return sortedList;
+            });
         }
     }
 

@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.With;
 
 /**
  * @author smccarron
@@ -35,6 +36,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
+@With
 public class DefaultEnsembleTypeGenerationSession implements
                                                   EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> {
 
@@ -63,6 +65,13 @@ public class DefaultEnsembleTypeGenerationSession implements
     }
 
     @Override
+    public JavaTypeDefinition typeDefinitionTypeVariables(final JavaTypeDefinition typeDef,
+                                                          final SyncList<JavaType> typeVariables) {
+        return typeDef.withTypeVariables(typeDef.getTypeVariables()
+                                                .appendAll(typeVariables));
+    }
+
+    @Override
     public JavaTypeDefinition javaPackage(final JavaTypeDefinition typeDef,
                                           final JavaPackage javaPackage) {
         return typeDef.withJavaPackage(javaPackage);
@@ -71,19 +80,22 @@ public class DefaultEnsembleTypeGenerationSession implements
     @Override
     public JavaTypeDefinition javaImports(final JavaTypeDefinition typeDef,
                                           final SyncList<JavaImport> javaImports) {
-        return typeDef.withJavaImports(javaImports);
+        return typeDef.withJavaImports(typeDef.getJavaImports()
+                                              .appendAll(javaImports));
     }
 
     @Override
     public JavaTypeDefinition javaAnnotations(final JavaTypeDefinition typeDef,
                                               final SyncList<JavaAnnotation> javaAnnotations) {
-        return typeDef.withAnnotations(javaAnnotations);
+        return typeDef.withAnnotations(typeDef.getAnnotations()
+                                              .appendAll(javaAnnotations));
     }
 
     @Override
     public JavaTypeDefinition typeModifiers(final JavaTypeDefinition typeDef,
                                             final SyncList<JavaModifier> modifiers) {
-        return typeDef.withModifiers(modifiers);
+        return typeDef.withModifiers(typeDef.getModifiers()
+                                            .appendAll(modifiers));
     }
 
     @Override
@@ -101,25 +113,28 @@ public class DefaultEnsembleTypeGenerationSession implements
     @Override
     public JavaTypeDefinition implementedInterfaceTypes(final JavaTypeDefinition typeDef,
                                                         final SyncList<JavaType> implementedInterfaceTypes) {
-        return typeDef.withImplementedInterfaceTypes(implementedInterfaceTypes);
+        return typeDef.withImplementedInterfaceTypes(typeDef.getImplementedInterfaceTypes()
+                                                            .appendAll(implementedInterfaceTypes));
     }
 
     @Override
     public JavaTypeDefinition fields(final JavaTypeDefinition typeDef,
                                      final SyncList<JavaField> fields) {
-        return typeDef.withFields(fields);
+        return typeDef.withFields(typeDef.getFields()
+                                         .appendAll(fields));
     }
 
     @Override
     public JavaTypeDefinition methods(final JavaTypeDefinition typeDef,
                                       final SyncList<JavaMethod> methods) {
-        return typeDef.withMethods(methods);
+        return typeDef.withMethods(typeDef.getMethods()
+                                          .appendAll(methods));
     }
 
     @Override
     public JavaTypeDefinition subTypeDefinitions(final JavaTypeDefinition typeDef,
                                                  final SyncList<JavaTypeDefinition> subTypeDefinitions) {
-        return typeDef.withSubTypeDefinitions(subTypeDefinitions);
+        return typeDef.withSubTypeDefinitions(typeDef.getSubTypeDefinitions().appendAll(subTypeDefinitions));
     }
 
     @Override
@@ -240,5 +255,10 @@ public class DefaultEnsembleTypeGenerationSession implements
                                .parameters(parameters)
                                .lambdaBody(SyncList.of(lambdaBodyExpression))
                                .build();
+    }
+
+    @Override
+    public JavaType javaTypeOfTypeDefinition(final JavaTypeDefinition typeDef) {
+        return typeDef.getJavaType();
     }
 }

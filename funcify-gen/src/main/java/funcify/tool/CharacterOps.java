@@ -1,5 +1,7 @@
 package funcify.tool;
 
+import java.util.Optional;
+import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
 /**
@@ -33,6 +35,28 @@ public interface CharacterOps {
                                       return (char) (((int) c) + 1);
                                   })
                          .limit(end - start);
+        }
+    }
+
+    static Optional<Character> uppercaseAlphabetLetterByIndex(final int index) {
+        return CharacterOpsMapHolder.INSTANCE.uppercaseAlphabetLetterByIndex()
+                                             .apply(index);
+    }
+
+    static enum CharacterOpsMapHolder {
+        INSTANCE(streamRangeOfCharactersFrom('A',
+                                             'Z').toArray(Character[]::new));
+
+        private final Character[] alphabetArray;
+
+        CharacterOpsMapHolder(final Character[] alphabetArray) {
+            this.alphabetArray = alphabetArray;
+        }
+
+        public IntFunction<Optional<Character>> uppercaseAlphabetLetterByIndex() {
+            return (int i) -> {
+                return i >= 0 && i < alphabetArray.length ? Optional.of(alphabetArray[i]) : Optional.empty();
+            };
         }
     }
 
