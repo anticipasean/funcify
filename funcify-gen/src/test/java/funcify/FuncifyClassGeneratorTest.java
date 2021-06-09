@@ -3,10 +3,18 @@ package funcify;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import funcify.codegen.JsonNodeModelAdapter;
-import funcify.ensemble.EnsembleInterfaceTypeAssembler;
+import funcify.ensemble.DefaultEnsembleInterfaceTypeDesign;
 import funcify.ensemble.EnsembleKind;
+import funcify.factory.generation.EnsembleTypeGenerationFactory;
+import funcify.factory.session.DefaultEnsembleTypeGenerationSession;
+import funcify.factory.session.EnsembleTypeGenerationSession;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap.Tuple2;
+import funcify.typedef.JavaCodeBlock;
+import funcify.typedef.JavaMethod;
+import funcify.typedef.JavaTypeDefinition;
+import funcify.typedef.javaexpr.JavaExpression;
+import funcify.typedef.javastatement.JavaStatement;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
@@ -26,10 +34,19 @@ public class FuncifyClassGeneratorTest {
                                        .build();
     }
 
+    private EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> buildInitialEnsembleInterfaceTypeGenerationSession() {
+        return DefaultEnsembleTypeGenerationSession.builder()
+                                                   .ensembleKinds(SyncList.of(EnsembleKind.values()))
+                                                   .build();
+    }
+
     @Test
     public void generateEnsembleInterfaceTypesTest() {
-        final DefaultGenerationSession updatedSession = new EnsembleInterfaceTypeAssembler().assembleEnsembleInterfaceTypes(buildInitialGenerationSession());
-
+        final EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> session = buildInitialEnsembleInterfaceTypeGenerationSession();
+        final DefaultEnsembleInterfaceTypeDesign design = DefaultEnsembleInterfaceTypeDesign.of();
+        final EnsembleTypeGenerationFactory template = EnsembleTypeGenerationFactory.of();
+        final EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> updatedSession = EnsembleTypeGenerationSession.narrowK(design.fold(template,
+                                                                                                                                                                                             session));
         //        final URI uri = URI.create("file:///" + Paths.get("src/main/antlr/funcify/java_type_definition.stg")
         //                                                     .toAbsolutePath());
 

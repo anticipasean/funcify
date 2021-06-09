@@ -1,4 +1,4 @@
-package funcify.factory.definition;
+package funcify.factory.generation;
 
 import funcify.factory.session.EnsembleTypeGenerationSession.EnsembleTypeGenerationSessionWT;
 import funcify.template.generation.ExpressionGenerationTemplate;

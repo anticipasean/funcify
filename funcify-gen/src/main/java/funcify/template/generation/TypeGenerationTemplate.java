@@ -1,7 +1,5 @@
 package funcify.template.generation;
 
-import static java.util.Arrays.stream;
-
 import funcify.template.session.TypeGenerationSession;
 import funcify.tool.container.SyncList;
 import funcify.typedef.JavaAnnotation;
@@ -11,7 +9,6 @@ import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaPackage;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javatype.JavaType;
-import java.util.Objects;
 
 /**
  * The template provides the framework for the updates that can be made to the session and what the session can and should provide
@@ -67,18 +64,16 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
 
     default <TD, MD, CD, SD, ED> TD javaImport(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                final TD typeDef,
-                                               final Class<?>... cls) {
+                                               final Class cls) {
         return javaImport(session,
                           typeDef,
-                          stream(cls).filter(Objects::nonNull)
-                                     .map(c -> JavaImport.builder()
-                                                         .javaPackage(JavaPackage.builder()
-                                                                                 .name(c.getPackage()
-                                                                                        .getName())
-                                                                                 .build())
-                                                         .simpleClassName(c.getSimpleName())
-                                                         .build())
-                                     .toArray(JavaImport[]::new));
+                          JavaImport.builder()
+                                    .javaPackage(JavaPackage.builder()
+                                                            .name(cls.getPackage()
+                                                                     .getName())
+                                                            .build())
+                                    .simpleClassName(cls.getSimpleName())
+                                    .build());
     }
 
     default <TD, MD, CD, SD, ED> TD javaImport(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
@@ -120,17 +115,17 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                                    javaImports);
     }
 
-    default <TD, MD, CD, SD, ED> TD javaAnnotations(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+    default <TD, MD, CD, SD, ED> TD typeAnnotations(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                     final TD typeDef,
                                                     final SyncList<JavaAnnotation> javaAnnotations) {
-        return session.javaAnnotations(typeDef,
+        return session.typeAnnotations(typeDef,
                                        javaAnnotations);
     }
 
-    default <TD, MD, CD, SD, ED> TD javaAnnotation(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
+    default <TD, MD, CD, SD, ED> TD typeAnnotation(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                    final TD typeDef,
                                                    final JavaAnnotation... annotation) {
-        return javaAnnotations(session,
+        return typeAnnotations(session,
                                typeDef,
                                SyncList.of(annotation));
     }
@@ -194,10 +189,9 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
                               fields);
     }
 
-    @SuppressWarnings("unchecked")
     default <TD, MD, CD, SD, ED> TD method(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                            final TD typeDef,
-                                           final MD... method) {
+                                           final MD method) {
         return methods(session,
                        typeDef,
                        SyncList.of(method));

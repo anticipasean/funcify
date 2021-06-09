@@ -1,6 +1,5 @@
 package funcify.template.generation;
 
-import funcify.JavaTypeFactory;
 import funcify.template.session.TypeGenerationSession;
 import funcify.tool.container.SyncList;
 import funcify.typedef.JavaParameter;
@@ -9,7 +8,7 @@ import funcify.typedef.JavaParameter;
  * @author smccarron
  * @created 2021-05-29
  */
-public interface ExpressionGenerationTemplate<SWT> extends JavaTypeFactory {
+public interface ExpressionGenerationTemplate<SWT> extends JavaTypeGenerationTemplate {
 
     default <TD, MD, CD, SD, ED> ED simpleExpression(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                      final String... text) {

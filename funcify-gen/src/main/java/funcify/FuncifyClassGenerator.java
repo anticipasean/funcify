@@ -2,7 +2,14 @@ package funcify;
 
 import funcify.commandline.PathConverter;
 import funcify.ensemble.EnsembleKind;
+import funcify.factory.session.DefaultEnsembleTypeGenerationSession;
+import funcify.factory.session.EnsembleTypeGenerationSession;
 import funcify.tool.container.SyncList;
+import funcify.typedef.JavaCodeBlock;
+import funcify.typedef.JavaMethod;
+import funcify.typedef.JavaTypeDefinition;
+import funcify.typedef.javaexpr.JavaExpression;
+import funcify.typedef.javastatement.JavaStatement;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -32,17 +39,18 @@ public class FuncifyClassGenerator implements Callable<File> {
 
     @Override
     public File call() throws Exception {
-        final DefaultGenerationSession generationSession = buildInitialGenerationSession();
+        final EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> generationSession = buildInitialGenerationSession();
         return null;
     }
 
-    private DefaultGenerationSession buildInitialGenerationSession() {
-        return DefaultGenerationSession.builder()
-                                       .destinationDirectoryPath(destinationDirectory)
-                                       .ensembleKinds(SyncList.of(EnsembleKind.values())
-                                                              .filter(ek -> (valueParameterLimit >= 1
-                                                         && ek.getNumberOfValueParameters() <= valueParameterLimit)
-                                                         || valueParameterLimit <= 0))
-                                       .build();
+    private EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> buildInitialGenerationSession() {
+        return DefaultEnsembleTypeGenerationSession.builder()
+                                                   .destinationDirectoryPath(destinationDirectory)
+                                                   .ensembleKinds(SyncList.of(EnsembleKind.values())
+                                                                          .filter(ek -> (valueParameterLimit >= 1
+                                                                              && ek.getNumberOfValueParameters()
+                                                                              <= valueParameterLimit)
+                                                                              || valueParameterLimit <= 0))
+                                                   .build();
     }
 }

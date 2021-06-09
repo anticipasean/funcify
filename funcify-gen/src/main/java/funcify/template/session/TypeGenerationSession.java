@@ -42,7 +42,7 @@ public interface TypeGenerationSession<SWT, TD, MD, CD, SD, ED> extends MethodGe
     TD javaImports(final TD typeDef,
                    final SyncList<JavaImport> javaImport);
 
-    TD javaAnnotations(final TD typeDef,
+    TD typeAnnotations(final TD typeDef,
                        final SyncList<JavaAnnotation> javaAnnotations);
 
     TD typeModifiers(final TD typeDef,

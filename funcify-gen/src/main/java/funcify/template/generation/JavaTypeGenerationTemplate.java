@@ -1,4 +1,4 @@
-package funcify;
+package funcify.template.generation;
 
 import funcify.tool.container.SyncList;
 import funcify.typedef.JavaPackage;
@@ -13,7 +13,12 @@ import funcify.typedef.javatype.WildcardJavaTypeBound;
  * @author smccarron
  * @created 2021-05-24
  */
-public interface JavaTypeFactory {
+public interface JavaTypeGenerationTemplate {
+
+    default SyncList<JavaType> typeVariablesForJavaType(final JavaType javaType) {
+        return javaType != null && javaType.isParameterized() && javaType instanceof VariableParameterJavaType
+            ? ((VariableParameterJavaType) javaType).getTypeVariables() : SyncList.empty();
+    }
 
     default JavaType javaType(final Class<?> cls) {
         return javaType(JavaPackage.builder()

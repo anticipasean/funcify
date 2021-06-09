@@ -10,11 +10,11 @@ import funcify.typedef.javatype.JavaType;
  */
 public interface StatementGenerationTemplate<SWT> extends ExpressionGenerationTemplate<SWT> {
 
-    @SuppressWarnings("unchecked")
+
     default <TD, MD, CD, SD, ED> SD assignmentStatement(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
                                                         final JavaType assigneeType,
                                                         final String assigneeName,
-                                                        final ED... expression) {
+                                                        final ED expression) {
         return assignmentStatement(session,
                                    assigneeType,
                                    assigneeName,
@@ -35,9 +35,9 @@ public interface StatementGenerationTemplate<SWT> extends ExpressionGenerationTe
         return session.returnStatement(expressions);
     }
 
-    @SuppressWarnings("unchecked")
+
     default <TD, MD, CD, SD, ED> SD returnStatement(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                                    final ED... expression) {
+                                                    final ED expression) {
         return returnStatement(session,
                                SyncList.of(expression));
     }

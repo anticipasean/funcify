@@ -2,6 +2,7 @@ package funcify.template.session;
 
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
+import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
 import funcify.typedef.javatype.JavaType;
@@ -23,6 +24,9 @@ public interface MethodGenerationSession<SWT, TD, MD, CD, SD, ED> extends CodeBl
         return getMethodDefinitionsByName(typeDef).get(Objects.requireNonNull(name,
                                                                               () -> "name"));
     }
+
+    MD methodAnnotations(final MD methodDef,
+                         final SyncList<JavaAnnotation> javaAnnotations);
 
     MD methodModifiers(final MD methodDef,
                        final SyncList<JavaModifier> modifiers);

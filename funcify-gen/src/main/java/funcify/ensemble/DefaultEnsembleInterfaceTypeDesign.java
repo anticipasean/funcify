@@ -1,24 +1,17 @@
 package funcify.ensemble;
 
-import funcify.JavaCodeBlockFactory;
-import funcify.JavaDefinitionFactory;
-import funcify.JavaMethodFactory;
 import funcify.factory.session.EnsembleTypeGenerationSession;
 import funcify.factory.session.EnsembleTypeGenerationSession.EnsembleTypeGenerationSessionWT;
 import funcify.template.generation.TypeGenerationTemplate;
 import funcify.template.session.TypeGenerationSession;
 import funcify.tool.CharacterOps;
-import funcify.tool.TemplateExecutor;
+import funcify.tool.TypeGenerationExecutor;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaAnnotation;
-import funcify.typedef.JavaCodeBlock;
-import funcify.typedef.JavaMethod;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
 import funcify.typedef.JavaTypeKind;
-import funcify.typedef.javaexpr.TemplatedExpression;
-import funcify.typedef.javastatement.ReturnStatement;
 import funcify.typedef.javatype.JavaType;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
 import java.util.Comparator;
@@ -47,67 +40,66 @@ public class DefaultEnsembleInterfaceTypeDesign implements EnsembleInterfaceType
         return EnsembleTypeGenerationSession.narrowK(session)
                                             .getEnsembleKinds()
                                             .sorted(Comparator.comparing(EnsembleKind::getNumberOfValueParameters))
-                                            .foldLeft(baseEnsembleInterfaceTypeCreator(template,
-                                                                                       session),
+                                            .foldLeft(baseEnsembleInterfaceTypeSessionUpdater(template,
+                                                                                              session),
                                                       (s, ek) -> {
-                                                          return s;
+                                                          return ensembleInterfaceTypeDefinitionForEnsembleKindUpdater(template,
+                                                                                                                       s,
+                                                                                                                       ek);
                                                       });
     }
 
-    private static <TD, MD, CD, SD, ED> TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> baseEnsembleInterfaceTypeCreator(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
-                                                                                                                                                    final TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> session) {
-        return TemplateExecutor.of(template,
-                                   session,
-                                   template.emptyTypeDefinition(session))
-                               .definitionUpdate(TypeGenerationTemplate::typeName,
-                                                 "Ensemble")
-                               .definitionUpdate(TypeGenerationTemplate::javaPackage,
-                                                 FUNCIFY_ENSEMBLE_PACKAGE_NAME)
-                               .definitionUpdate(TypeGenerationTemplate::typeModifier,
-                                                 JavaModifier.PUBLIC)
-                               .definitionUpdate(TypeGenerationTemplate::typeKind,
-                                                 JavaTypeKind.INTERFACE)
-                               .definitionUpdate(TypeGenerationTemplate::typeDefinitionTypeVariable,
-                                                 WITNESS_TYPE_VARIABLE)
-                               .sessionUpdate((t, s, d) -> EnsembleTypeGenerationSession.narrowK(s)
-                                                                                        .withBaseEnsembleInterfaceTypeDefinition(d))
-                               .getSession();
+    private static <TD, MD, CD, SD, ED> TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> baseEnsembleInterfaceTypeSessionUpdater(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
+                                                                                                                                                           final TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> session) {
+        return TypeGenerationExecutor.of(template,
+                                         session,
+                                         template.emptyTypeDefinition(session))
+                                     .updateDefinition(TypeGenerationTemplate::typeName,
+                                                       "Ensemble")
+                                     .updateDefinition(TypeGenerationTemplate::javaPackage,
+                                                       FUNCIFY_ENSEMBLE_PACKAGE_NAME)
+                                     .updateDefinition(TypeGenerationTemplate::typeModifier,
+                                                       JavaModifier.PUBLIC)
+                                     .updateDefinition(TypeGenerationTemplate::typeKind,
+                                                       JavaTypeKind.INTERFACE)
+                                     .updateDefinition(TypeGenerationTemplate::typeDefinitionTypeVariable,
+                                                       WITNESS_TYPE_VARIABLE)
+                                     .updateSession((t, s, d) -> EnsembleTypeGenerationSession.narrowK(s)
+                                                                                              .withBaseEnsembleInterfaceTypeDefinition(d))
+                                     .getSession();
     }
 
-    private static <TD, MD, CD, SD, ED> TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> ensembleInterfaceTypeDefinitionForEnsembleKind(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
-                                                                                                                                                                  final TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> session,
-                                                                                                                                                                  final EnsembleKind ensembleKind) {
+    private static <TD, MD, CD, SD, ED> TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> ensembleInterfaceTypeDefinitionForEnsembleKindUpdater(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
+                                                                                                                                                                         final TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> session,
+                                                                                                                                                                         final EnsembleKind ensembleKind) {
         final JavaType ensembleInterfaceSuperType = ensembleKindInterfaceTypeSuperTypeCreator(template,
                                                                                               session,
                                                                                               ensembleKind);
-        return TemplateExecutor.of(template,
-                                   session,
-                                   template.emptyTypeDefinition(session))
-                               .definitionUpdate(TypeGenerationTemplate::typeName,
-                                                 ensembleKind.getSimpleClassName())
-                               .definitionUpdate(TypeGenerationTemplate::javaPackage,
-                                                 FUNCIFY_ENSEMBLE_PACKAGE_NAME)
-                               .definitionUpdate(TypeGenerationTemplate::typeDefinitionTypeVariables,
-                                                 alphabeticTypeVariablesWithLimit(ensembleKind.getNumberOfValueParameters()))
-                               .definitionUpdate(TypeGenerationTemplate::typeModifier,
-                                                 JavaModifier.PUBLIC)
-                               .definitionUpdate(TypeGenerationTemplate::typeKind,
-                                                 JavaTypeKind.INTERFACE)
-                               .definitionUpdate(TypeGenerationTemplate::superType,
-                                                 ensembleInterfaceSuperType)
-                               .definitionUpdate(TypeGenerationTemplate::methods,
-                                                 SyncList.of(createConverterMethodForEnsembleInterfaceType(template,
-                                                                                                           session,
-                                                                                                           ensembleKind),
-                                                             createAndUpdateWithNarrowMethodIfSolo(template,
-                                                                                                   session,
-                                                                                                   ensembleKind)))
-                               .sessionUpdate((t, s, d) -> EnsembleTypeGenerationSession.narrowK(s)
-                                                                                        .withEnsembleInterfaceTypeDefinitionsByEnsembleKind(EnsembleTypeGenerationSession.narrowK(s)
-                                                                                                                                                                         .getEnsembleInterfaceTypeDefinitionsByEnsembleKind()
-                                                                                                                                                                         .put(ensembleKind,
-                                                                                                                                                                              d)))
-                               .getSession();
+        return TypeGenerationExecutor.of(template,
+                                         session,
+                                         template.emptyTypeDefinition(session))
+                                     .updateDefinition(TypeGenerationTemplate::typeName,
+                                                       ensembleKind.getSimpleClassName())
+                                     .updateDefinition(TypeGenerationTemplate::javaPackage,
+                                                       FUNCIFY_ENSEMBLE_PACKAGE_NAME)
+                                     .updateDefinition(TypeGenerationTemplate::typeDefinitionTypeVariables,
+                                                       alphabeticTypeVariablesWithLimit(ensembleKind.getNumberOfValueParameters()))
+                                     .updateDefinition(TypeGenerationTemplate::typeModifier,
+                                                       JavaModifier.PUBLIC)
+                                     .updateDefinition(TypeGenerationTemplate::typeKind,
+                                                       JavaTypeKind.INTERFACE)
+                                     .updateDefinition(TypeGenerationTemplate::superType,
+                                                       ensembleInterfaceSuperType)
+                                     .updateDefinition(DefaultEnsembleInterfaceTypeDesign::createConverterMethodForEnsembleInterfaceType,
+                                                       ensembleKind)
+                                     .updateDefinition(DefaultEnsembleInterfaceTypeDesign::createAndUpdateWithNarrowMethodIfSolo,
+                                                       ensembleKind)
+                                     .updateSession((t, s, d) -> EnsembleTypeGenerationSession.narrowK(s)
+                                                                                              .withEnsembleInterfaceTypeDefinitionsByEnsembleKind(EnsembleTypeGenerationSession.narrowK(s)
+                                                                                                                                                                               .getEnsembleInterfaceTypeDefinitionsByEnsembleKind()
+                                                                                                                                                                               .put(ensembleKind,
+                                                                                                                                                                                    d)))
+                                     .getSession();
 
     }
 
@@ -116,85 +108,94 @@ public class DefaultEnsembleInterfaceTypeDesign implements EnsembleInterfaceType
                                                  firstNSimpleJavaTypeVariables(numberOfValueParameters)));
     }
 
-    private static <TD, MD, CD, SD, ED> MD createAndUpdateWithNarrowMethodIfSolo(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
-                                                                                             final TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> session,
-                                                                                             final EnsembleKind ensembleKind) {
-        return (D definition) -> {
-            if (ensembleKind != EnsembleKind.SOLO) {
-                return definition;
-            }
-            final JavaType returnTypeBaseVariable = template.simpleJavaTypeVariable("S");
-            final JavaType lowerBoundWildcardValueTypeParameter = template.javaTypeVariableWithWildcardLowerBounds(firstNSimpleJavaTypeVariables(ensembleKind.getNumberOfValueParameters()).findFirst()
-                                                                                                                                                                                           .orElseThrow(IllegalStateException::new));
-            final JavaType returnTypeBaseVariableSuperType = template.parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
-                                                                                            ensembleKind.getSimpleClassName(),
-                                                                                            WITNESS_TYPE_VARIABLE,
-                                                                                            lowerBoundWildcardValueTypeParameter);
-            final JavaType returnTypeVariable = template.javaTypeVariableWithUpperBounds(returnTypeBaseVariable,
-                                                                                         returnTypeBaseVariableSuperType);
+    private static <TD, MD, CD, SD, ED> TD createAndUpdateWithNarrowMethodIfSolo(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
+                                                                                 final TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> session,
+                                                                                 final TD typeDef,
+                                                                                 final EnsembleKind ensembleKind) {
 
-            final JavaDefinitionFactory<JavaMethod> javaMethodDefinitionFactory = JavaMethodFactory.getInstance();
-            return template.method(definition,
-                                   JavaMethod.builder()
-                                             .build()
-                                             .foldUpdate(javaMethodDefinitionFactory::name,
-                                                         "narrow")
-                                             .foldUpdate(javaMethodDefinitionFactory::javaAnnotation,
-                                                         JavaAnnotation.builder()
-                                                                       .name("SuppressWarnings")
-                                                                       .parameters(SyncMap.of("value",
-                                                                                              "unchecked"))
-                                                                       .build())
-                                             .foldUpdate(javaMethodDefinitionFactory::modifier,
-                                                         JavaModifier.DEFAULT)
-                                             .foldUpdate(javaMethodDefinitionFactory::typeVariable,
-                                                         returnTypeVariable)
-                                             .foldUpdate(javaMethodDefinitionFactory::returnType,
-                                                         returnTypeBaseVariable)
-                                             .foldUpdate(javaMethodDefinitionFactory::codeBlock,
-                                                         JavaCodeBlockFactory.getInstance()
-                                                                             .statement(JavaCodeBlock.builder()
-                                                                                                     .build(),
-                                                                                        ReturnStatement.builder()
-                                                                                                       .expressions(SyncList.of(TemplatedExpression.builder()
-                                                                                                                                                   .templateCall("cast_as")
-                                                                                                                                                   .templateParameters(SyncList.of("this",
-                                                                                                                                                                                   "S"))
-                                                                                                                                                   .build()))
-                                                                                                       .build())));
-        };
+        if (ensembleKind != EnsembleKind.SOLO) {
+            return typeDef;
+        }
+        final JavaType returnTypeBaseVariable = template.simpleJavaTypeVariable("S");
+        final JavaType lowerBoundWildcardValueTypeParameter = template.javaTypeVariableWithWildcardLowerBounds(firstNSimpleJavaTypeVariables(ensembleKind.getNumberOfValueParameters()).findFirst()
+                                                                                                                                                                                       .orElseThrow(IllegalStateException::new));
+        final JavaType returnTypeBaseVariableSuperType = template.parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
+                                                                                        ensembleKind.getSimpleClassName(),
+                                                                                        WITNESS_TYPE_VARIABLE,
+                                                                                        lowerBoundWildcardValueTypeParameter);
+        final JavaType returnTypeVariable = template.javaTypeVariableWithUpperBounds(returnTypeBaseVariable,
+                                                                                     returnTypeBaseVariableSuperType);
+        return TypeGenerationExecutor.of(template,
+                                         session,
+                                         typeDef)
+                                     .updateDefinition(TypeGenerationTemplate::method,
+                                                       TypeGenerationExecutor.of(template,
+                                                                                 session,
+                                                                                 template.emptyMethodDefinition(session))
+                                                                             .updateDefinition(TypeGenerationTemplate::methodName,
+                                                                                               "narrow")
+                                                                             .updateDefinition(TypeGenerationTemplate::methodAnnotation,
+                                                                                               JavaAnnotation.builder()
+                                                                                                             .name("SuppressWarnings")
+                                                                                                             .parameters(SyncMap.of("value",
+                                                                                                                                    "unchecked"))
+                                                                                                             .build())
+                                                                             .updateDefinition(TypeGenerationTemplate::methodModifier,
+                                                                                               JavaModifier.DEFAULT)
+                                                                             .updateDefinition(TypeGenerationTemplate::methodTypeVariable,
+                                                                                               returnTypeVariable)
+                                                                             .updateDefinition(TypeGenerationTemplate::returnType,
+                                                                                               returnTypeBaseVariable)
+                                                                             .addChildDefinition(TypeGenerationTemplate::codeBlock,
+                                                                                                 TypeGenerationTemplate::emptyCodeBlockDefinition,
+                                                                                                 TypeGenerationTemplate::statement,
+                                                                                                 TypeGenerationTemplate::returnStatement,
+                                                                                                 template.templateExpression(session,
+                                                                                                                             "cast_as",
+                                                                                                                             "this",
+                                                                                                                             returnTypeBaseVariable.getName()))
+                                                                             .getDefinition())
+                                     .getDefinition();
+
     }
 
 
-    private static <TD, MD, CD, SD, ED> MD createConverterMethodForEnsembleInterfaceType(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
+    private static <TD, MD, CD, SD, ED> TD createConverterMethodForEnsembleInterfaceType(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
                                                                                          final TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> session,
+                                                                                         final TD typeDef,
                                                                                          final EnsembleKind ensembleKind) {
         final JavaType returnTypeVariable = simpleJavaTypeVariableByIndex(ensembleKind.getNumberOfValueParameters()).orElseThrow(IllegalStateException::new);
 
-        return TemplateExecutor.of(template,
-                                   session,
-                                   template.emptyMethodDefinition(session))
-                               .definitionUpdate(TypeGenerationTemplate::javaImport,
-                                                 Function.class,
-                                                 Objects.class)
+        return TypeGenerationExecutor.of(template,
+                                         session,
+                                         typeDef)
+                                     .updateDefinition(TypeGenerationTemplate::javaImport,
+                                                       Function.class)
+                                     .updateDefinition(TypeGenerationTemplate::javaImport,
+                                                       Objects.class)
+                                     .updateDefinition(TypeGenerationTemplate::method,
+                                                       TypeGenerationExecutor.of(template,
+                                                                                 session,
+                                                                                 template.emptyMethodDefinition(session))
 
-                               .definitionUpdate(TypeGenerationTemplate::methodName,
-                                                 "convert")
-                               .definitionUpdate(TypeGenerationTemplate::methodModifier,
-                                                 JavaModifier.DEFAULT)
-                               .definitionUpdate(TypeGenerationTemplate::methodTypeVariable,
-                                                 returnTypeVariable)
-                               .definitionUpdate(TypeGenerationTemplate::returnType,
-                                                 returnTypeVariable)
-                               .definitionUpdate(TypeGenerationTemplate::parameter,
-                                                 converterFunctionParameter(template,
-                                                                            session,
-                                                                            ensembleKind,
-                                                                            returnTypeVariable))
-                               .definitionUpdate(TypeGenerationTemplate::codeBlock,
-                                                 converterMethodCodeBlock(template,
-                                                                          session))
-                               .getDefinition();
+                                                                             .updateDefinition(TypeGenerationTemplate::methodName,
+                                                                                               "convert")
+                                                                             .updateDefinition(TypeGenerationTemplate::methodModifier,
+                                                                                               JavaModifier.DEFAULT)
+                                                                             .updateDefinition(TypeGenerationTemplate::methodTypeVariable,
+                                                                                               returnTypeVariable)
+                                                                             .updateDefinition(TypeGenerationTemplate::returnType,
+                                                                                               returnTypeVariable)
+                                                                             .updateDefinition(TypeGenerationTemplate::parameter,
+                                                                                               converterFunctionParameter(template,
+                                                                                                                          session,
+                                                                                                                          ensembleKind,
+                                                                                                                          returnTypeVariable))
+                                                                             .updateDefinition(TypeGenerationTemplate::codeBlock,
+                                                                                               converterMethodCodeBlock(template,
+                                                                                                                        session))
+                                                                             .getDefinition())
+                                     .getDefinition();
     }
 
     private static <TD, MD, CD, SD, ED> JavaType ensembleKindInterfaceTypeSuperTypeCreator(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
@@ -214,16 +215,16 @@ public class DefaultEnsembleInterfaceTypeDesign implements EnsembleInterfaceType
     //TODO: Expand methods within code block def factory to streamline the creation of these expressions
     private static <TD, MD, CD, SD, ED> CD converterMethodCodeBlock(final TypeGenerationTemplate<EnsembleTypeGenerationSessionWT> template,
                                                                     final TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> session) {
-        return TemplateExecutor.of(template,
-                                   session,
-                                   template.emptyCodeBlockDefinition(session))
-                               .definitionUpdate(TypeGenerationTemplate::statement,
-                                                 template.returnStatement(session,
-                                                                          SyncList.of(template.templateExpression(session,
-                                                                                                                  "function_call",
-                                                                                                                  SyncList.of("converter",
-                                                                                                                              "this")))))
-                               .getDefinition();
+        return TypeGenerationExecutor.of(template,
+                                         session,
+                                         template.emptyCodeBlockDefinition(session))
+                                     .addChildDefinition(TypeGenerationTemplate::statement,
+                                                         TypeGenerationTemplate::returnStatement,
+                                                         template.templateExpression(session,
+                                                                                     "function_call",
+                                                                                     SyncList.of("converter",
+                                                                                                 "this")))
+                                     .getDefinition();
     }
 
 
@@ -235,7 +236,7 @@ public class DefaultEnsembleInterfaceTypeDesign implements EnsembleInterfaceType
                             .name("converter")
                             .modifiers(SyncList.of(JavaModifier.FINAL))
                             .type(converterFunctionParameterType(template,
-                                                                 ensembleInterfaceSuperType,
+                                                                 session,
                                                                  ensembleKind,
                                                                  returnTypeVariable))
                             .build();
@@ -251,7 +252,8 @@ public class DefaultEnsembleInterfaceTypeDesign implements EnsembleInterfaceType
                                                                    returnTypeVariable);
         } else {
             return template.covariantParameterizedFunctionJavaType(Function.class,
-                                                                   ensembleInterfaceSuperType,
+                                                                   session.javaTypeOfTypeDefinition(EnsembleTypeGenerationSession.narrowK(session)
+                                                                                                                                 .getBaseEnsembleInterfaceTypeDefinition()),
                                                                    returnTypeVariable);
         }
     }

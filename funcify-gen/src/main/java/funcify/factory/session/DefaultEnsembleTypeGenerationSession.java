@@ -85,7 +85,7 @@ public class DefaultEnsembleTypeGenerationSession implements
     }
 
     @Override
-    public JavaTypeDefinition javaAnnotations(final JavaTypeDefinition typeDef,
+    public JavaTypeDefinition typeAnnotations(final JavaTypeDefinition typeDef,
                                               final SyncList<JavaAnnotation> javaAnnotations) {
         return typeDef.withAnnotations(typeDef.getAnnotations()
                                               .appendAll(javaAnnotations));
@@ -134,7 +134,8 @@ public class DefaultEnsembleTypeGenerationSession implements
     @Override
     public JavaTypeDefinition subTypeDefinitions(final JavaTypeDefinition typeDef,
                                                  final SyncList<JavaTypeDefinition> subTypeDefinitions) {
-        return typeDef.withSubTypeDefinitions(typeDef.getSubTypeDefinitions().appendAll(subTypeDefinitions));
+        return typeDef.withSubTypeDefinitions(typeDef.getSubTypeDefinitions()
+                                                     .appendAll(subTypeDefinitions));
     }
 
     @Override
@@ -147,6 +148,13 @@ public class DefaultEnsembleTypeGenerationSession implements
     public SyncMap<String, JavaMethod> getMethodDefinitionsByName(final JavaTypeDefinition typeDef) {
         return SyncMap.fromIterable(typeDef.getMethods(),
                                     JavaMethod::getName);
+    }
+
+    @Override
+    public JavaMethod methodAnnotations(final JavaMethod methodDef,
+                                        final SyncList<JavaAnnotation> javaAnnotations) {
+        return methodDef.withAnnotations(methodDef.getAnnotations()
+                                                  .appendAll(javaAnnotations));
     }
 
     @Override
