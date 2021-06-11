@@ -1,4 +1,4 @@
-package funcify.factory.session;
+package funcify.ensemble.factory.session;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.tool.container.SyncList;

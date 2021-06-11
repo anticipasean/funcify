@@ -3,11 +3,10 @@ package funcify;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import funcify.codegen.JsonNodeModelAdapter;
-import funcify.ensemble.DefaultEnsembleInterfaceTypeDesign;
 import funcify.ensemble.EnsembleKind;
-import funcify.factory.generation.EnsembleTypeGenerationFactory;
-import funcify.factory.session.DefaultEnsembleTypeGenerationSession;
-import funcify.factory.session.EnsembleTypeGenerationSession;
+import funcify.ensemble.factory.generation.EnsembleTypeGenerationFactory;
+import funcify.ensemble.factory.session.DefaultEnsembleTypeGenerationSession;
+import funcify.ensemble.factory.session.EnsembleTypeGenerationSession;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap.Tuple2;
 import funcify.typedef.JavaCodeBlock;
@@ -28,25 +27,9 @@ import org.stringtemplate.v4.STGroupFile;
  */
 public class FuncifyClassGeneratorTest {
 
-    private DefaultGenerationSession buildInitialGenerationSession() {
-        return DefaultGenerationSession.builder()
-                                       .ensembleKinds(SyncList.of(EnsembleKind.values()))
-                                       .build();
-    }
-
-    private EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> buildInitialEnsembleInterfaceTypeGenerationSession() {
-        return DefaultEnsembleTypeGenerationSession.builder()
-                                                   .ensembleKinds(SyncList.of(EnsembleKind.values()))
-                                                   .build();
-    }
-
     @Test
     public void generateEnsembleInterfaceTypesTest() {
-        final EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> session = buildInitialEnsembleInterfaceTypeGenerationSession();
-        final DefaultEnsembleInterfaceTypeDesign design = DefaultEnsembleInterfaceTypeDesign.of();
-        final EnsembleTypeGenerationFactory template = EnsembleTypeGenerationFactory.of();
-        final EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> updatedSession = EnsembleTypeGenerationSession.narrowK(design.fold(template,
-                                                                                                                                                                                             session));
+        final EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> session = runEnsembleTypeGenerationSession();
         //        final URI uri = URI.create("file:///" + Paths.get("src/main/antlr/funcify/java_type_definition.stg")
         //                                                     .toAbsolutePath());
 
@@ -60,33 +43,44 @@ public class FuncifyClassGeneratorTest {
                                          new JsonNodeModelAdapter());
         ObjectMapper objectMapper = new ObjectMapper();
 
-        System.out.println(updatedSession.getBaseEnsembleInterfaceTypeDefinition());
-        final JsonNode eNode = objectMapper.valueToTree(updatedSession.getBaseEnsembleInterfaceTypeDefinition());
+        System.out.println(session.getBaseEnsembleInterfaceTypeDefinition());
+        final JsonNode eNode = objectMapper.valueToTree(session.getBaseEnsembleInterfaceTypeDefinition());
         ST ensembleBaseTypeStrTemplate = stGroupFile.getInstanceOf("java_type")
                                                     .add("type_definition",
                                                          eNode);
         System.out.println(ensembleBaseTypeStrTemplate.render());
         //                System.out.println("ensemble_base_type.json: " + eNode.toPrettyString());
 
-        updatedSession.getEnsembleInterfaceTypeDefinitionsByEnsembleKind()
-                      .stream()
-                      .sorted(Comparator.comparing(Tuple2::_1,
-                                                   Comparator.comparing(EnsembleKind::getNumberOfValueParameters)))
-                      .forEach(entry -> {
-                          try {
-                              final JsonNode jsonNode = objectMapper.valueToTree(entry._2());
-                              ST stringTemplate = stGroupFile.getInstanceOf("java_type")
-                                                             .add("type_definition",
-                                                                  jsonNode);
-                              System.out.println("ensemble: " + entry._1()
-                                                                     .name());
-                              System.out.println("ensemble.json: " + jsonNode.toPrettyString());
-                              System.out.println(stringTemplate.render());
-                          } catch (Exception e) {
-                              e.printStackTrace();
-                          }
-                      });
+        session.getEnsembleInterfaceTypeDefinitionsByEnsembleKind()
+               .stream()
+               .sorted(Comparator.comparing(Tuple2::_1,
+                                            Comparator.comparing(EnsembleKind::getNumberOfValueParameters)))
+               .forEach(entry -> {
+                   try {
+                       final JsonNode jsonNode = objectMapper.valueToTree(entry._2());
+                       ST stringTemplate = stGroupFile.getInstanceOf("java_type")
+                                                      .add("type_definition",
+                                                           jsonNode);
+                       System.out.println("ensemble: " + entry._1()
+                                                              .name());
+                       System.out.println("ensemble.json: " + jsonNode.toPrettyString());
+                       System.out.println(stringTemplate.render());
+                   } catch (Exception e) {
+                       e.printStackTrace();
+                   }
+               });
 
+    }
+
+    private static EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> runEnsembleTypeGenerationSession() {
+        return EnsembleTypeGenerationSession.narrowK(EnsembleTypeGenerationFactory.of()
+                                                                                  .generateEnsembleTypesInSession(buildInitialEnsembleInterfaceTypeGenerationSession()));
+    }
+
+    private static EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> buildInitialEnsembleInterfaceTypeGenerationSession() {
+        return DefaultEnsembleTypeGenerationSession.builder()
+                                                   .ensembleKinds(SyncList.of(EnsembleKind.values()))
+                                                   .build();
     }
 
 }

@@ -2,8 +2,8 @@ package funcify;
 
 import funcify.commandline.PathConverter;
 import funcify.ensemble.EnsembleKind;
-import funcify.factory.session.DefaultEnsembleTypeGenerationSession;
-import funcify.factory.session.EnsembleTypeGenerationSession;
+import funcify.ensemble.factory.session.DefaultEnsembleTypeGenerationSession;
+import funcify.ensemble.factory.session.EnsembleTypeGenerationSession;
 import funcify.tool.container.SyncList;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaMethod;

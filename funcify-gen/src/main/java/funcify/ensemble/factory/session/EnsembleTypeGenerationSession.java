@@ -1,7 +1,7 @@
-package funcify.factory.session;
+package funcify.ensemble.factory.session;
 
 import funcify.ensemble.EnsembleKind;
-import funcify.factory.session.EnsembleTypeGenerationSession.EnsembleTypeGenerationSessionWT;
+import funcify.ensemble.factory.session.EnsembleTypeGenerationSession.ETSWT;
 import funcify.template.session.TypeGenerationSession;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
@@ -10,17 +10,16 @@ import funcify.tool.container.SyncMap;
  * @author smccarron
  * @created 2021-05-29
  */
-public interface EnsembleTypeGenerationSession<TD, MD, CD, SD, ED> extends
-                                                                   TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> {
+public interface EnsembleTypeGenerationSession<TD, MD, CD, SD, ED> extends TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> {
 
     /**
      * Session Witness Type for Higher Kinded Typing
      */
-    public static enum EnsembleTypeGenerationSessionWT {
+    public static enum ETSWT {
 
     }
 
-    static <TD, MD, CD, SD, ED> EnsembleTypeGenerationSession<TD, MD, CD, SD, ED> narrowK(final TypeGenerationSession<EnsembleTypeGenerationSessionWT, TD, MD, CD, SD, ED> typeGenerationSession) {
+    static <TD, MD, CD, SD, ED> EnsembleTypeGenerationSession<TD, MD, CD, SD, ED> narrowK(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> typeGenerationSession) {
         return (EnsembleTypeGenerationSession<TD, MD, CD, SD, ED>) typeGenerationSession;
     }
 
