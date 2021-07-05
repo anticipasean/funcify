@@ -226,7 +226,7 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
         }
     }
 
-    default <TD, MD, CD, SD, ED> JavaType createSoloEnsembleInterfaceJavaType() {
+    default JavaType createSoloEnsembleInterfaceJavaType() {
         return parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
                                      EnsembleKind.SOLO.getSimpleClassName(),
                                      alphabeticTypeVariablesWithLimit(1));

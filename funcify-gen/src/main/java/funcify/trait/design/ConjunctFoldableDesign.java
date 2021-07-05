@@ -1,4 +1,4 @@
-package funcify.trait;
+package funcify.trait.design;
 
 /**
  * @author smccarron
