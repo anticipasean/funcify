@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    
+    implementation("org.antlr:ST4:${stringTemplateVersion}")
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    compileClasspath("org.projectlombok:lombok:${lombokVersion}")
+    compileClasspath("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    compileClasspath("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}")
+    compileClasspath("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
+    compileClasspath("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+    implementation "info.picocli:picocli:${picoCliVersion}"
+
+    testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    testCompileClasspath("org.projectlombok:lombok:${lombokVersion}")
+    testImplementation("org.antlr:ST4:${stringTemplateVersion}")
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}")
+    testImplementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
+    testImplementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+}
+
+test {
+    useJUnitPlatform()
+}

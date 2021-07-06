@@ -1,0 +1,28 @@
+package funcify.typedef;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * @author smccarron
+ * @created 2021-05-19
+ */
+@JsonFormat(shape = Shape.OBJECT)
+public enum JavaTypeKind {
+
+    CLASS("class"),
+    INTERFACE("interface"),
+    ENUM("enum");
+
+    @JsonProperty("keyword")
+    private final String keyword;
+
+    JavaTypeKind(final String keyword) {
+        this.keyword = keyword;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+}

@@ -1,0 +1,11 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    compileClasspath "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testCompileClasspath "org.projectlombok:lombok:${lombokVersion}"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+}
