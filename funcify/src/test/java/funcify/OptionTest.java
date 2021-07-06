@@ -1,8 +1,7 @@
 package funcify;
 
-
 import funcify.option.Option;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author smccarron
@@ -12,7 +11,8 @@ class OptionTest {
 
     @Test
     void flatMapTest() {
-        Option.of("Hello").map(s -> s.substring(1));
+        Option.of("Hello")
+              .map(s -> s.substring(1));
 
     }
 }
