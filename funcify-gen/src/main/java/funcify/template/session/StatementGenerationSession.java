@@ -1,6 +1,9 @@
 package funcify.template.session;
 
 import funcify.tool.container.SyncList;
+import funcify.typedef.JavaCodeBlock;
+import funcify.typedef.javaexpr.JavaExpression;
+import funcify.typedef.javastatement.JavaStatement;
 import funcify.typedef.javatype.JavaType;
 import java.util.Optional;
 
@@ -8,24 +11,23 @@ import java.util.Optional;
  * @author smccarron
  * @created 2021-05-29
  */
-public interface StatementGenerationSession<SWT, TD, MD, CD, SD, ED> extends
-                                                                     ExpressionGenerationSession<SWT, TD, MD, CD, SD, ED> {
+public interface StatementGenerationSession<SWT> extends ExpressionGenerationSession<SWT> {
 
-    SyncList<SD> getStatementsForCodeBlock(final CD codeBlockDef);
+    SyncList<JavaStatement> getStatementsForCodeBlock(final JavaCodeBlock codeBlockDef);
 
-    default Optional<SD> getFirstStatementForCodeBlock(final CD codeBlockDef) {
+    default Optional<JavaStatement> getFirstStatementForCodeBlock(final JavaCodeBlock codeBlockDef) {
         return getStatementsForCodeBlock(codeBlockDef).first();
     }
 
-    default Optional<SD> getLastStatementForCodeBlock(final CD codeBlockDef) {
+    default Optional<JavaStatement> getLastStatementForCodeBlock(final JavaCodeBlock codeBlockDef) {
         return getStatementsForCodeBlock(codeBlockDef).last();
     }
 
-    SD assignmentStatement(final JavaType assigneeType,
-                           final String assigneeName,
-                           final SyncList<ED> expressions);
+    JavaStatement assignmentStatement(final JavaType assigneeType,
+                                      final String assigneeName,
+                                      final SyncList<JavaExpression> expressions);
 
 
-    SD returnStatement(final SyncList<ED> expression);
+    JavaStatement returnStatement(final SyncList<JavaExpression> expression);
 
 }

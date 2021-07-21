@@ -14,5 +14,5 @@ public interface FoldableTemplate<SWT> extends TraitTemplate<SWT> {
     }
 
     @Override
-    <TD, MD, CD, SD, ED> TypeGenerationSession<SWT, TD, MD, CD, SD, ED> applyTrait(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session);
+     TypeGenerationSession<SWT> applyTrait(final TypeGenerationSession<SWT> session);
 }

@@ -10,8 +10,10 @@ import funcify.tool.TypeGenerationExecutor;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaAnnotation;
+import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
+import funcify.typedef.JavaTypeDefinition;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javatype.JavaType;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
@@ -36,9 +38,9 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
         return DefaultEnsembleTypeGenerationFactory.of();
     }
 
-    <TD, MD, CD, SD, ED> TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> generateEnsembleTypesInSession(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session);
+    TypeGenerationSession<ETSWT> generateEnsembleTypesInSession(final TypeGenerationSession<ETSWT> session);
 
-    default <TD, MD, CD, SD, ED> TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> addBaseEnsembleInterfaceTypeToSession(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session) {
+    default TypeGenerationSession<ETSWT> addBaseEnsembleInterfaceTypeToSession(final TypeGenerationSession<ETSWT> session) {
         return TypeGenerationExecutor.of(this,
                                          session,
                                          emptyTypeDefinition(session))
@@ -57,8 +59,8 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
                                      .getSession();
     }
 
-    default <TD, MD, CD, SD, ED> TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> addEnsembleInterfaceTypeForEnsembleKindToSession(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session,
-                                                                                                                                   final EnsembleKind ensembleKind) {
+    default TypeGenerationSession<ETSWT> addEnsembleInterfaceTypeForEnsembleKindToSession(final TypeGenerationSession<ETSWT> session,
+                                                                                          final EnsembleKind ensembleKind) {
         final JavaType ensembleInterfaceSuperType = createEnsembleInterfaceTypeSuperType(session,
                                                                                          ensembleKind);
         return TypeGenerationExecutor.of(this,
@@ -89,8 +91,8 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
 
     }
 
-    default <TD, MD, CD, SD, ED> JavaType createEnsembleInterfaceTypeSuperType(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session,
-                                                                               final EnsembleKind ensembleKind) {
+    default JavaType createEnsembleInterfaceTypeSuperType(final TypeGenerationSession<ETSWT> session,
+                                                          final EnsembleKind ensembleKind) {
         if (ensembleKind == EnsembleKind.SOLO) {
             return session.javaTypeOfTypeDefinition(EnsembleTypeGenerationSession.narrowK(session)
                                                                                  .getBaseEnsembleInterfaceTypeDefinition());
@@ -101,16 +103,16 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
         }
     }
 
-    default <TD, MD, CD, SD, ED> BinaryOperator<JavaType> createNestedSoloTypeVariable() {
+    default BinaryOperator<JavaType> createNestedSoloTypeVariable() {
         return (jt1, jt2) -> parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
                                                    jt1.getName(),
                                                    jt1,
                                                    jt2);
     }
 
-    default <TD, MD, CD, SD, ED> TD addNarrowMethodIfSoloEnsembleInterfaceTypeDefinition(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session,
-                                                                                         final TD typeDef,
-                                                                                         final EnsembleKind ensembleKind) {
+    default JavaTypeDefinition addNarrowMethodIfSoloEnsembleInterfaceTypeDefinition(final TypeGenerationSession<ETSWT> session,
+                                                                                    final JavaTypeDefinition typeDef,
+                                                                                    final EnsembleKind ensembleKind) {
 
         if (ensembleKind != EnsembleKind.SOLO) {
             return typeDef;
@@ -158,9 +160,9 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
 
     }
 
-    default <TD, MD, CD, SD, ED> TD addConvertMethodToEnsembleInterfaceType(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session,
-                                                                            final TD typeDef,
-                                                                            final EnsembleKind ensembleKind) {
+    default JavaTypeDefinition addConvertMethodToEnsembleInterfaceType(final TypeGenerationSession<ETSWT> session,
+                                                                       final JavaTypeDefinition typeDef,
+                                                                       final EnsembleKind ensembleKind) {
         final JavaType returnTypeVariable = simpleJavaTypeVariableByIndex(ensembleKind.getNumberOfValueParameters()).orElseThrow(IllegalStateException::new);
 
         return TypeGenerationExecutor.of(this,
@@ -199,9 +201,9 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
                            .map(SimpleJavaTypeVariable::of);
     }
 
-    default <TD, MD, CD, SD, ED> JavaParameter createConvertMethodFunctionParameter(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session,
-                                                                                    final EnsembleKind ensembleKind,
-                                                                                    final JavaType returnTypeVariable) {
+    default JavaParameter createConvertMethodFunctionParameter(final TypeGenerationSession<ETSWT> session,
+                                                               final EnsembleKind ensembleKind,
+                                                               final JavaType returnTypeVariable) {
         return JavaParameter.builder()
                             .name("converter")
                             .modifiers(SyncList.of(JavaModifier.FINAL))
@@ -211,9 +213,9 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
                             .build();
     }
 
-    default <TD, MD, CD, SD, ED> JavaType createConvertMethodParameterJavaType(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session,
-                                                                               final EnsembleKind ensembleKind,
-                                                                               final JavaType returnTypeVariable) {
+    default JavaType createConvertMethodParameterJavaType(final TypeGenerationSession<ETSWT> session,
+                                                          final EnsembleKind ensembleKind,
+                                                          final JavaType returnTypeVariable) {
         if (ensembleKind == EnsembleKind.SOLO) {
             return covariantParameterizedFunctionJavaType(Function.class,
                                                           createSoloEnsembleInterfaceJavaType(),
@@ -243,7 +245,7 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
     }
 
     //TODO: Expand methods within code block def factory to streamline the creation of these expressions
-    default <TD, MD, CD, SD, ED> CD createConvertMethodCodeBlock(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session) {
+    default JavaCodeBlock createConvertMethodCodeBlock(final TypeGenerationSession<ETSWT> session) {
         return TypeGenerationExecutor.of(this,
                                          session,
                                          emptyCodeBlockDefinition(session))
@@ -260,7 +262,7 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
     static class DefaultEnsembleTypeGenerationFactory implements EnsembleTypeGenerationFactory {
 
         @Override
-        public <TD, MD, CD, SD, ED> TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> generateEnsembleTypesInSession(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> session) {
+        public TypeGenerationSession<ETSWT> generateEnsembleTypesInSession(final TypeGenerationSession<ETSWT> session) {
             return EnsembleTypeGenerationSession.narrowK(session)
                                                 .getEnsembleKinds()
                                                 .sorted(Comparator.comparing(EnsembleKind::getNumberOfValueParameters))

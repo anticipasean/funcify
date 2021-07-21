@@ -1,18 +1,21 @@
 package funcify.template.session;
 
 import funcify.tool.container.SyncList;
+import funcify.typedef.JavaCodeBlock;
+import funcify.typedef.JavaMethod;
+import funcify.typedef.javastatement.JavaStatement;
 import java.util.Optional;
 
 /**
  * @author smccarron
  * @created 2021-05-29
  */
-public interface CodeBlockGenerationSession<SWT, TD, MD, CD, SD, ED> extends StatementGenerationSession<SWT, TD, MD, CD, SD, ED> {
+public interface CodeBlockGenerationSession<SWT> extends StatementGenerationSession<SWT> {
 
-    CD emptyCodeBlockDefinition();
+    JavaCodeBlock emptyCodeBlockDefinition();
 
-    Optional<CD> getCodeBlockForMethodDefinition(final MD methodDef);
+    Optional<JavaCodeBlock> getCodeBlockForMethodDefinition(final JavaMethod methodDef);
 
-    CD statements(final CD codeBlockDef,
-                  final SyncList<SD> statements);
+    JavaCodeBlock statements(final JavaCodeBlock codeBlockDef,
+                             final SyncList<JavaStatement> statements);
 }

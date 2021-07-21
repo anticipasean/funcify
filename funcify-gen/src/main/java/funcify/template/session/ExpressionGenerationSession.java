@@ -2,23 +2,22 @@ package funcify.template.session;
 
 import funcify.tool.container.SyncList;
 import funcify.typedef.JavaParameter;
+import funcify.typedef.javaexpr.JavaExpression;
+import funcify.typedef.javastatement.JavaStatement;
 
 /**
  * @author smccarron
  * @created 2021-05-29
  */
-public interface ExpressionGenerationSession<SWT, TD, MD, CD, SD, ED> {
+public interface ExpressionGenerationSession<SWT> {
 
-    SyncList<ED> getExpressionsInStatement(final SD statementDef);
+    SyncList<JavaExpression> getExpressionsInStatement(final JavaStatement statementDef);
 
-    ED simpleExpression(final SyncList<String> text);
-
-
-    ED templateExpression(final String templateName,
-                          final SyncList<String> templateParameters);
+    JavaExpression simpleExpression(final SyncList<String> text);
 
 
-    @SuppressWarnings("unchecked")
-    ED lambdaExpression(final SyncList<JavaParameter> parameters,
-                        final ED... lambdaBodyExpression);
+    JavaExpression templateExpression(final String templateName,
+                                      final SyncList<String> templateParameters);
+    JavaExpression lambdaExpression(final SyncList<JavaParameter> parameters,
+                                    final SyncList<JavaExpression> lambdaBodyExpression);
 }

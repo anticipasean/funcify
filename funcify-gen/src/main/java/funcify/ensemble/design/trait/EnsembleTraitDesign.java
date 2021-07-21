@@ -6,9 +6,9 @@ import funcify.ensemble.EnsembleKind;
  * @author smccarron
  * @created 2021-07-03
  */
-public interface EnsembleTraitDesign<TD, MD, CD, SD, ED> {
+public interface EnsembleTraitDesign {
 
-    EnsembleTraitDesign<TD, MD, CD, SD, ED> createOrFindApplicableTraitInterfaceForEnsembleKind(final EnsembleKind ensembleKind);
+    EnsembleTraitDesign createOrFindApplicableTraitInterfaceForEnsembleKind(final EnsembleKind ensembleKind);
 
 
 }

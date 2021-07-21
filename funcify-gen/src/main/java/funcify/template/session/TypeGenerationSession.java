@@ -5,8 +5,10 @@ import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaField;
 import funcify.typedef.JavaImport;
+import funcify.typedef.JavaMethod;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaPackage;
+import funcify.typedef.JavaTypeDefinition;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javatype.JavaType;
 import java.util.Objects;
@@ -19,54 +21,54 @@ import java.util.Optional;
  * @author smccarron
  * @created 2021-05-28
  */
-public interface TypeGenerationSession<SWT, TD, MD, CD, SD, ED> extends MethodGenerationSession<SWT, TD, MD, CD, SD, ED> {
+public interface TypeGenerationSession<SWT> extends MethodGenerationSession<SWT> {
 
-    TD emptyTypeDefinition();
+    JavaTypeDefinition emptyTypeDefinition();
 
-    default Optional<TD> findTypeDefinitionWithName(final String name) {
+    default Optional<JavaTypeDefinition> findTypeDefinitionWithName(final String name) {
         return getTypeDefinitionsByName().get(Objects.requireNonNull(name,
                                                                      () -> "name"));
     }
 
-    SyncMap<String, TD> getTypeDefinitionsByName();
+    SyncMap<String, JavaTypeDefinition> getTypeDefinitionsByName();
 
-    TD typeName(final TD typeDef,
-                final String name);
+    JavaTypeDefinition typeName(final JavaTypeDefinition typeDef,
+                                final String name);
 
-    TD typeDefinitionTypeVariables(final TD typeDef,
-                                   final SyncList<JavaType> typeVariables);
+    JavaTypeDefinition typeDefinitionTypeVariables(final JavaTypeDefinition typeDef,
+                                                   final SyncList<JavaType> typeVariables);
 
-    TD javaPackage(final TD typeDef,
-                   final JavaPackage javaPackage);
+    JavaTypeDefinition javaPackage(final JavaTypeDefinition typeDef,
+                                   final JavaPackage javaPackage);
 
-    TD javaImports(final TD typeDef,
-                   final SyncList<JavaImport> javaImport);
+    JavaTypeDefinition javaImports(final JavaTypeDefinition typeDef,
+                                   final SyncList<JavaImport> javaImport);
 
-    TD typeAnnotations(final TD typeDef,
-                       final SyncList<JavaAnnotation> javaAnnotations);
+    JavaTypeDefinition typeAnnotations(final JavaTypeDefinition typeDef,
+                                       final SyncList<JavaAnnotation> javaAnnotations);
 
-    TD typeModifiers(final TD typeDef,
-                     final SyncList<JavaModifier> modifiers);
+    JavaTypeDefinition typeModifiers(final JavaTypeDefinition typeDef,
+                                     final SyncList<JavaModifier> modifiers);
 
-    TD typeKind(final TD typeDef,
-                final JavaTypeKind typeKind);
+    JavaTypeDefinition typeKind(final JavaTypeDefinition typeDef,
+                                final JavaTypeKind typeKind);
 
-    TD superType(final TD typeDef,
-                 final JavaType superType);
+    JavaTypeDefinition superType(final JavaTypeDefinition typeDef,
+                                 final JavaType superType);
 
-    TD implementedInterfaceTypes(final TD typeDef,
-                                 final SyncList<JavaType> implementedInterfaceTypes);
+    JavaTypeDefinition implementedInterfaceTypes(final JavaTypeDefinition typeDef,
+                                                 final SyncList<JavaType> implementedInterfaceTypes);
 
 
-    TD fields(final TD typeDef,
-              final SyncList<JavaField> fields);
+    JavaTypeDefinition fields(final JavaTypeDefinition typeDef,
+                              final SyncList<JavaField> fields);
 
-    TD methods(final TD typeDef,
-               final SyncList<MD> methods);
+    JavaTypeDefinition methods(final JavaTypeDefinition typeDef,
+                               final SyncList<JavaMethod> methods);
 
-    TD subTypeDefinitions(final TD typeDef,
-                          final SyncList<TD> subTypeDefinitions);
+    JavaTypeDefinition subTypeDefinitions(final JavaTypeDefinition typeDef,
+                                          final SyncList<JavaTypeDefinition> subTypeDefinitions);
 
-    JavaType javaTypeOfTypeDefinition(final TD typeDef);
+    JavaType javaTypeOfTypeDefinition(final JavaTypeDefinition typeDef);
 
 }

@@ -9,11 +9,6 @@ import funcify.ensemble.factory.session.DefaultEnsembleTypeGenerationSession;
 import funcify.ensemble.factory.session.EnsembleTypeGenerationSession;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap.Tuple2;
-import funcify.typedef.JavaCodeBlock;
-import funcify.typedef.JavaMethod;
-import funcify.typedef.JavaTypeDefinition;
-import funcify.typedef.javaexpr.JavaExpression;
-import funcify.typedef.javastatement.JavaStatement;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
@@ -29,7 +24,7 @@ public class FuncifyClassGeneratorTest {
 
     @Test
     public void generateEnsembleInterfaceTypesTest() {
-        final EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> session = runEnsembleTypeGenerationSession();
+        final EnsembleTypeGenerationSession session = runEnsembleTypeGenerationSession();
         //        final URI uri = URI.create("file:///" + Paths.get("src/main/antlr/funcify/java_type_definition.stg")
         //                                                     .toAbsolutePath());
 
@@ -72,12 +67,12 @@ public class FuncifyClassGeneratorTest {
 
     }
 
-    private static EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> runEnsembleTypeGenerationSession() {
+    private static EnsembleTypeGenerationSession runEnsembleTypeGenerationSession() {
         return EnsembleTypeGenerationSession.narrowK(EnsembleTypeGenerationFactory.of()
                                                                                   .generateEnsembleTypesInSession(buildInitialEnsembleInterfaceTypeGenerationSession()));
     }
 
-    private static EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> buildInitialEnsembleInterfaceTypeGenerationSession() {
+    private static EnsembleTypeGenerationSession buildInitialEnsembleInterfaceTypeGenerationSession() {
         return DefaultEnsembleTypeGenerationSession.builder()
                                                    .ensembleKinds(SyncList.of(EnsembleKind.values()))
                                                    .build();

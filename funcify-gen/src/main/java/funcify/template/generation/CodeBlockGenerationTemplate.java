@@ -2,6 +2,8 @@ package funcify.template.generation;
 
 import funcify.template.session.TypeGenerationSession;
 import funcify.tool.container.SyncList;
+import funcify.typedef.JavaCodeBlock;
+import funcify.typedef.javastatement.JavaStatement;
 
 /**
  * @author smccarron
@@ -9,21 +11,21 @@ import funcify.tool.container.SyncList;
  */
 public interface CodeBlockGenerationTemplate<SWT> extends StatementGenerationTemplate<SWT> {
 
-    default <TD, MD, CD, SD, ED> CD emptyCodeBlockDefinition(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session) {
+    default JavaCodeBlock emptyCodeBlockDefinition(final TypeGenerationSession<SWT> session) {
         return session.emptyCodeBlockDefinition();
     }
 
-    default <TD, MD, CD, SD, ED> CD statement(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                              final CD codeBlockDef,
-                                              final SD statement) {
+    default JavaCodeBlock statement(final TypeGenerationSession<SWT> session,
+                                    final JavaCodeBlock codeBlockDef,
+                                    final JavaStatement statement) {
         return statements(session,
                           codeBlockDef,
                           SyncList.of(statement));
     }
 
-    default <TD, MD, CD, SD, ED> CD statements(final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session,
-                                               final CD codeBlockDef,
-                                               final SyncList<SD> statements) {
+    default JavaCodeBlock statements(final TypeGenerationSession<SWT> session,
+                                     final JavaCodeBlock codeBlockDef,
+                                     final SyncList<JavaStatement> statements) {
         return session.statements(codeBlockDef,
                                   statements);
     }

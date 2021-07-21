@@ -5,12 +5,13 @@ import funcify.ensemble.factory.session.EnsembleTypeGenerationSession.ETSWT;
 import funcify.template.session.TypeGenerationSession;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
+import funcify.typedef.JavaTypeDefinition;
 
 /**
  * @author smccarron
  * @created 2021-05-29
  */
-public interface EnsembleTypeGenerationSession<TD, MD, CD, SD, ED> extends TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> {
+public interface EnsembleTypeGenerationSession extends TypeGenerationSession<ETSWT> {
 
     /**
      * Session Witness Type for Higher Kinded Typing
@@ -19,18 +20,18 @@ public interface EnsembleTypeGenerationSession<TD, MD, CD, SD, ED> extends TypeG
 
     }
 
-    static <TD, MD, CD, SD, ED> EnsembleTypeGenerationSession<TD, MD, CD, SD, ED> narrowK(final TypeGenerationSession<ETSWT, TD, MD, CD, SD, ED> typeGenerationSession) {
-        return (EnsembleTypeGenerationSession<TD, MD, CD, SD, ED>) typeGenerationSession;
+    static  EnsembleTypeGenerationSession narrowK(final TypeGenerationSession<ETSWT> typeGenerationSession) {
+        return (EnsembleTypeGenerationSession) typeGenerationSession;
     }
 
     SyncList<EnsembleKind> getEnsembleKinds();
 
-    TD getBaseEnsembleInterfaceTypeDefinition();
+    JavaTypeDefinition getBaseEnsembleInterfaceTypeDefinition();
 
-    EnsembleTypeGenerationSession<TD, MD, CD, SD, ED> withBaseEnsembleInterfaceTypeDefinition(final TD baseEnsembleInterfaceTypeDefinition);
+    EnsembleTypeGenerationSession withBaseEnsembleInterfaceTypeDefinition(final JavaTypeDefinition baseEnsembleInterfaceTypeDefinition);
 
-    SyncMap<EnsembleKind, TD> getEnsembleInterfaceTypeDefinitionsByEnsembleKind();
+    SyncMap<EnsembleKind, JavaTypeDefinition> getEnsembleInterfaceTypeDefinitionsByEnsembleKind();
 
-    EnsembleTypeGenerationSession<TD, MD, CD, SD, ED> withEnsembleInterfaceTypeDefinitionsByEnsembleKind(final SyncMap<EnsembleKind, TD> ensembleInterfaceTypeDefinitionsByEnsembleKind);
+    EnsembleTypeGenerationSession withEnsembleInterfaceTypeDefinitionsByEnsembleKind(final SyncMap<EnsembleKind, JavaTypeDefinition> ensembleInterfaceTypeDefinitionsByEnsembleKind);
 
 }

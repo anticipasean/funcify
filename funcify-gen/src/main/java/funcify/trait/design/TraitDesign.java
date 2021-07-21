@@ -7,11 +7,11 @@ import funcify.trait.template.TraitTemplate;
  * @author smccarron
  * @created 2021-05-29
  */
-public interface TraitDesign<TD, MD, CD, SD, ED> {
+public interface TraitDesign {
 
 
-    default <SWT> TypeGenerationSession<SWT, TD, MD, CD, SD, ED> fold(final TraitTemplate<SWT> template,
-                                                                      final TypeGenerationSession<SWT, TD, MD, CD, SD, ED> session) {
+    default <SWT> TypeGenerationSession<SWT> fold(final TraitTemplate<SWT> template,
+                                                                      final TypeGenerationSession<SWT> session) {
         return template.applyTrait(session);
     }
 

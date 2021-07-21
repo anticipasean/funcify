@@ -37,8 +37,7 @@ import lombok.With;
 @Builder
 @Getter
 @With
-public class DefaultEnsembleTypeGenerationSession implements
-                                                  EnsembleTypeGenerationSession<JavaTypeDefinition, JavaMethod, JavaCodeBlock, JavaStatement, JavaExpression> {
+public class DefaultEnsembleTypeGenerationSession implements EnsembleTypeGenerationSession {
 
     private final Path destinationDirectoryPath;
 
@@ -258,10 +257,10 @@ public class DefaultEnsembleTypeGenerationSession implements
 
     @Override
     public JavaExpression lambdaExpression(final SyncList<JavaParameter> parameters,
-                                           final JavaExpression... lambdaBodyExpression) {
+                                           final SyncList<JavaExpression> lambdaBodyExpression) {
         return LambdaExpression.builder()
                                .parameters(parameters)
-                               .lambdaBody(SyncList.of(lambdaBodyExpression))
+                               .lambdaBody(lambdaBodyExpression)
                                .build();
     }
 
