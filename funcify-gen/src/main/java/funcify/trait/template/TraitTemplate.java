@@ -1,7 +1,7 @@
 package funcify.trait.template;
 
-import funcify.template.generation.TypeGenerationTemplate;
-import funcify.template.session.TypeGenerationSession;
+import funcify.base.template.TypeGenerationTemplate;
+import funcify.base.session.TypeGenerationSession;
 import funcify.typedef.JavaMethod;
 
 /**

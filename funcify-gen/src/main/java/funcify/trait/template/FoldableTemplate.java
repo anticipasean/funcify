@@ -1,6 +1,6 @@
 package funcify.trait.template;
 
-import funcify.template.session.TypeGenerationSession;
+import funcify.base.session.TypeGenerationSession;
 
 /**
  * @author smccarron

@@ -2,8 +2,8 @@ package funcify;
 
 import funcify.commandline.PathConverter;
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.factory.session.DefaultEnsembleTypeGenerationSession;
-import funcify.ensemble.factory.session.EnsembleTypeGenerationSession;
+import funcify.ensemble.basetype.session.DefaultEnsembleTypeGenerationSession;
+import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession;
 import funcify.tool.container.SyncList;
 import java.io.File;
 import java.nio.file.Path;

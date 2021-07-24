@@ -2,7 +2,7 @@ package funcify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import funcify.codegen.JsonNodeModelAdapter;
+import funcify.st.adapter.model.JsonNodeModelAdapter;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.factory.generation.EnsembleTypeGenerationFactory;
 import funcify.ensemble.factory.session.DefaultEnsembleTypeGenerationSession;
