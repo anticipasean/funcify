@@ -2,11 +2,11 @@ package funcify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import funcify.st.adapter.model.JsonNodeModelAdapter;
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.factory.generation.EnsembleTypeGenerationFactory;
-import funcify.ensemble.factory.session.DefaultEnsembleTypeGenerationSession;
-import funcify.ensemble.factory.session.EnsembleTypeGenerationSession;
+import funcify.ensemble.basetype.session.DefaultEnsembleTypeGenerationSession;
+import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession;
+import funcify.ensemble.basetype.template.EnsembleTypeGenerationFactory;
+import funcify.st.adapter.model.JsonNodeModelAdapter;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap.Tuple2;
 import java.nio.file.Path;
