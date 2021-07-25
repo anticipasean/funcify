@@ -52,6 +52,7 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
                                String propertyName) {
         switch (model.getNodeType()) {
             case POJO:
+                return model.asText();
             case OBJECT:
                 if (propertyFoundAndContainerPropertyValue(String.class).test(model,
                                                                               propertyName)) {

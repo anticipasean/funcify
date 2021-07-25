@@ -13,7 +13,6 @@ import funcify.typedef.JavaParameter;
 import funcify.typedef.JavaTypeDefinition;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javaexpr.JavaExpression;
-import funcify.typedef.javaexpr.LambdaExpression;
 import funcify.typedef.javaexpr.TemplatedExpression;
 import funcify.typedef.javaexpr.TextExpression;
 import funcify.typedef.javastatement.AssignmentStatement;
@@ -220,21 +219,12 @@ public abstract class AbstractTypeGenerationSession<SWT> implements TypeGenerati
     }
 
     @Override
-    public JavaExpression templateExpression(final String templateName,
-                                             final SyncList<String> templateParameters) {
+    public JavaExpression templateExpression(final String templateFunction,
+                                             final SyncMap<String, Object> input) {
         return TemplatedExpression.builder()
-                                  .templateCall(templateName)
-                                  .templateParameters(templateParameters)
+                                  .templateFunction(templateFunction)
+                                  .input(input)
                                   .build();
-    }
-
-    @Override
-    public JavaExpression lambdaExpression(final SyncList<JavaParameter> parameters,
-                                           final SyncList<JavaExpression> lambdaBodyExpression) {
-        return LambdaExpression.builder()
-                               .parameters(parameters)
-                               .lambdaBody(lambdaBodyExpression)
-                               .build();
     }
 
 }

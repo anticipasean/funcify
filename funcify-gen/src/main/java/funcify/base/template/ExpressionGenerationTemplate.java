@@ -2,7 +2,7 @@ package funcify.base.template;
 
 import funcify.base.session.TypeGenerationSession;
 import funcify.tool.container.SyncList;
-import funcify.typedef.JavaParameter;
+import funcify.tool.container.SyncMap;
 import funcify.typedef.javaexpr.JavaExpression;
 
 /**
@@ -24,24 +24,33 @@ public interface ExpressionGenerationTemplate<SWT> extends JavaTypeGenerationTem
 
     default JavaExpression templateExpression(final TypeGenerationSession<SWT> session,
                                               final String templateName,
-                                              final String... templateParameter) {
+                                              final String inputKey,
+                                              final Object inputValue) {
         return templateExpression(session,
                                   templateName,
-                                  SyncList.of(templateParameter));
+                                  SyncMap.of(inputKey,
+                                             inputValue));
     }
 
     default JavaExpression templateExpression(final TypeGenerationSession<SWT> session,
                                               final String templateName,
-                                              final SyncList<String> templateParameters) {
-        return session.templateExpression(templateName,
-                                          templateParameters);
+                                              final String inputKey1,
+                                              final Object inputValue1,
+                                              final String inputKey2,
+                                              final Object inputValue2) {
+        return templateExpression(session,
+                                  templateName,
+                                  SyncMap.of(inputKey1,
+                                             inputValue1,
+                                             inputKey2,
+                                             inputValue2));
     }
 
-    default JavaExpression lambdaExpression(final TypeGenerationSession<SWT> session,
-                                            final SyncList<JavaParameter> parameters,
-                                            final SyncList<JavaExpression> lambdaBodyExpression) {
-        return session.lambdaExpression(parameters,
-                                        lambdaBodyExpression);
+    default JavaExpression templateExpression(final TypeGenerationSession<SWT> session,
+                                              final String templateName,
+                                              final SyncMap<String, Object> input) {
+        return session.templateExpression(templateName,
+                                          input);
     }
 
 }

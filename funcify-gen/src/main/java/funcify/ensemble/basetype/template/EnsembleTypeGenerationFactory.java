@@ -154,8 +154,10 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
                                                                                                  TypeGenerationTemplate::returnStatement,
                                                                                                  templateExpression(session,
                                                                                                                     "cast_as",
+                                                                                                                    "variable_name",
                                                                                                                     "this",
-                                                                                                                    returnTypeBaseVariable.getName()))
+                                                                                                                    "java_type",
+                                                                                                                    returnTypeBaseVariable))
                                                                              .getDefinition())
                                      .getDefinition();
 
@@ -253,8 +255,10 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
                                                          TypeGenerationTemplate::returnStatement,
                                                          templateExpression(session,
                                                                             "function_call",
-                                                                            SyncList.of("converter",
-                                                                                        "this")))
+                                                                            "function_name",
+                                                                            "converter",
+                                                                            "function_parameters",
+                                                                            "this"))
                                      .getDefinition();
     }
 

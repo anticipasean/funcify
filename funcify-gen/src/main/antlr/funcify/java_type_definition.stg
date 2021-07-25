@@ -67,16 +67,9 @@ method_statement(statement) ::= <<
 >>
 
 expression(expression) ::= <<
-<if(expression.is_lambda)><lambda_expression(expr)><\\>
-<elseif(expression.template_call)><(expression.template_call)(expression.template_parameters:{p | <p.(i0)>})><\\>
+<if(expression.template_function)><(expression.template_function)(expression.input)><\\>
 <elseif(expression.text)><expression.text><\\>
 <endif>
 >>
 
 local_variable_declaration(statement) ::= ""
-
-lambda_expression(statement) ::= <<
-<if(statement.expression.lambda_type_parameters)>(<statement.expression.lambda_type_parameters:method_parameter();separator={, }>}>) -> <\\>
-<statement.expression.lambda_body><\\>
-<endif>
->>

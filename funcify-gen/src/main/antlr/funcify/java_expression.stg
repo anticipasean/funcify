@@ -2,15 +2,21 @@ import "java_type_definition.stg"
 
 null_check(name) ::= "Objects.requireNonNull(<name>, () -> \"<name>\")"
 
-function_call(function) ::= <<
-<if(rest(function))><null_check(first(function))>.apply(<rest(function):{p | <p>};separator=", ">)<\\>
-<elseif(first(function))><null_check(first(function))>.apply()<\\>
-<else><null_check(first(function))>.apply()<\\>
-<endif>
+function_call(input) ::= <<
+<if(input.function_name && input.function_parameters)><null_check(input.function_name)>.apply(<input.function_parameters:{p | <p>};separator=", ">)<\\>
+<elseif(input.function_name)><null_check(input.function_name)>.apply()<endif>
 >>
 
 parens(expression) ::= "(<expression>)"
 
-cast_as(parameters) ::= <<
-<if(first(rest(parameters)))><first(rest(parameters)):parens()> <first(parameters)><endif>
+cast_as(input) ::= <<
+<if(input.java_type && input.variable_name)><type_declaration(input.java_type):parens()> <input.variable_name><\\>
+<elseif(input.java_type && input.expression)><type_declaration(input.java_type):parens()><parens(expression(input.expression))><endif>
+>>
+
+lambda(input) ::= <<
+<if(input.parameters)>(<input.parameters:method_parameter()>) -> <\\>
+<if(input.code_block)><code_block(input)><\\>
+<elseif(input.expression)><expression(input.expression)><endif>
+<endif>
 >>

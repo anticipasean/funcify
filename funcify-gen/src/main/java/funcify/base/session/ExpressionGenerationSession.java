@@ -1,7 +1,7 @@
 package funcify.base.session;
 
 import funcify.tool.container.SyncList;
-import funcify.typedef.JavaParameter;
+import funcify.tool.container.SyncMap;
 import funcify.typedef.javaexpr.JavaExpression;
 import funcify.typedef.javastatement.JavaStatement;
 
@@ -16,8 +16,7 @@ public interface ExpressionGenerationSession<SWT> {
     JavaExpression simpleExpression(final SyncList<String> text);
 
 
-    JavaExpression templateExpression(final String templateName,
-                                      final SyncList<String> templateParameters);
-    JavaExpression lambdaExpression(final SyncList<JavaParameter> parameters,
-                                    final SyncList<JavaExpression> lambdaBodyExpression);
+    JavaExpression templateExpression(final String templateFunction,
+                                      final SyncMap<String, Object> input);
+
 }

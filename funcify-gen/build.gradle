@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    
+
     implementation("org.antlr:ST4:${stringTemplateVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     compileClasspath("org.projectlombok:lombok:${lombokVersion}")
@@ -22,6 +22,7 @@ dependencies {
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
     testImplementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
 }
+
 
 test {
     useJUnitPlatform()
