@@ -6,4 +6,8 @@ package funcify.trait.design;
  */
 public interface StreamableDesign extends TraitDesign {
 
+    @Override
+    default String getTraitMethodName() {
+        return "stream";
+    }
 }

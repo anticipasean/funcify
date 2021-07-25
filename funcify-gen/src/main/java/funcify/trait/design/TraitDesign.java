@@ -9,10 +9,13 @@ import funcify.trait.template.TraitTemplate;
  */
 public interface TraitDesign {
 
+    String getTraitMethodName();
+
+
 
     default <SWT> TypeGenerationSession<SWT> fold(final TraitTemplate<SWT> template,
-                                                                      final TypeGenerationSession<SWT> session) {
-        return template.applyTrait(session);
+                                                  final TypeGenerationSession<SWT> session) {
+        return template.buildOrApplyTrait(session);
     }
 
 }

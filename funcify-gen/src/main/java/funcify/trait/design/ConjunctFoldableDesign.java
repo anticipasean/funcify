@@ -6,5 +6,4 @@ package funcify.trait.design;
  */
 public interface ConjunctFoldableDesign extends FoldableDesign {
 
-
 }

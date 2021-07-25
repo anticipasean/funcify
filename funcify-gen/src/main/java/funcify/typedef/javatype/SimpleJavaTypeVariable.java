@@ -24,7 +24,4 @@ public class SimpleJavaTypeVariable implements JavaType {
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("parameterized")
-    private final boolean parameterized = false;
-
 }

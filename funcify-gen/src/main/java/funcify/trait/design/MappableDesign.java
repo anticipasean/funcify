@@ -6,4 +6,8 @@ package funcify.trait.design;
  */
 public interface MappableDesign extends TraitDesign {
 
+    @Override
+    default String getTraitMethodName() {
+        return "map";
+    }
 }

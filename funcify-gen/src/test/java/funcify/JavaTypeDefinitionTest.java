@@ -14,7 +14,7 @@ import funcify.typedef.JavaTypeDefinition;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javatype.BoundedJavaTypeVariable;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
-import funcify.typedef.javatype.VariableParameterJavaType;
+import funcify.typedef.javatype.ParametricJavaType;
 import funcify.typedef.javatype.WildcardJavaTypeBound;
 import java.io.File;
 import java.net.URI;
@@ -116,10 +116,10 @@ public class JavaTypeDefinitionTest {
                                                                                                         SimpleJavaTypeVariable.of("A")))
 
                                                                              .superType(null)
-                                                                             .implementedInterfaceTypes(SyncList.of(VariableParameterJavaType.builder()
-                                                                                                                                             .name("Ensemble")
-                                                                                                                                             .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("W")))
-                                                                                                                                             .build()))
+                                                                             .implementedInterfaceTypes(SyncList.of(ParametricJavaType.builder()
+                                                                                                                                      .name("Ensemble")
+                                                                                                                                      .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("W")))
+                                                                                                                                      .build()))
                                                                              .fields(SyncList.empty())
                                                                              .methods(SyncList.of(JavaMethod.builder()
                                                                                                             .modifiers(SyncList.of(JavaModifier.PUBLIC))
@@ -129,24 +129,24 @@ public class JavaTypeDefinitionTest {
                                                                                                             .parameters(SyncList.of(JavaParameter.builder()
                                                                                                                                                  .name("converter")
                                                                                                                                                  .modifiers(SyncList.of(JavaModifier.FINAL))
-                                                                                                                                                 .type(VariableParameterJavaType.builder()
-                                                                                                                                                                                .javaPackage(JavaPackage.builder()
+                                                                                                                                                 .type(ParametricJavaType.builder()
+                                                                                                                                                                         .javaPackage(JavaPackage.builder()
                                                                                                                                                                                                         .name("java.util")
                                                                                                                                                                                                         .build())
-                                                                                                                                                                                .name("Function")
-                                                                                                                                                                                .typeVariables(SyncList.of(BoundedJavaTypeVariable.builder()
-                                                                                                                                                                                                                                  .baseType(VariableParameterJavaType.builder()
-                                                                                                                                                                                                                                                                     .name("Solo")
-                                                                                                                                                                                                                                                                     .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("W"),
+                                                                                                                                                                         .name("Function")
+                                                                                                                                                                         .typeVariables(SyncList.of(BoundedJavaTypeVariable.builder()
+                                                                                                                                                                                                                                  .baseType(ParametricJavaType.builder()
+                                                                                                                                                                                                                                                              .name("Solo")
+                                                                                                                                                                                                                                                              .typeVariables(SyncList.of(SimpleJavaTypeVariable.of("W"),
                                                                                                                                                                                                                                                                                                 SimpleJavaTypeVariable.of("A")))
-                                                                                                                                                                                                                                                                     .build())
+                                                                                                                                                                                                                                                              .build())
                                                                                                                                                                                                                                   .lowerBoundTypes(SyncList.of(WildcardJavaTypeBound.getInstance()))
                                                                                                                                                                                                                                   .build(),
                                                                                                                                                                                                            BoundedJavaTypeVariable.builder()
                                                                                                                                                                                                                                   .upperBoundTypes(SyncList.of(WildcardJavaTypeBound.getInstance()))
                                                                                                                                                                                                                                   .baseType(SimpleJavaTypeVariable.of("R"))
                                                                                                                                                                                                                                   .build()))
-                                                                                                                                                                                .build())
+                                                                                                                                                                         .build())
                                                                                                                                                  .build()))
                                                                                                             .build()))
                                                                              .build());

@@ -6,7 +6,7 @@ import funcify.typedef.javatype.BoundedJavaTypeVariable;
 import funcify.typedef.javatype.JavaType;
 import funcify.typedef.javatype.SimpleJavaType;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
-import funcify.typedef.javatype.VariableParameterJavaType;
+import funcify.typedef.javatype.ParametricJavaType;
 import funcify.typedef.javatype.WildcardJavaTypeBound;
 
 /**
@@ -16,8 +16,8 @@ import funcify.typedef.javatype.WildcardJavaTypeBound;
 public interface JavaTypeGenerationTemplate {
 
     default SyncList<JavaType> typeVariablesForJavaType(final JavaType javaType) {
-        return javaType != null && javaType.isParameterized() && javaType instanceof VariableParameterJavaType
-            ? ((VariableParameterJavaType) javaType).getTypeVariables() : SyncList.empty();
+        return javaType instanceof ParametricJavaType ? ((ParametricJavaType) javaType).getTypeVariables()
+            : SyncList.empty();
     }
 
     default JavaType javaType(final Class<?> cls) {
@@ -90,23 +90,23 @@ public interface JavaTypeGenerationTemplate {
     default JavaType parameterizedJavaType(final String javaPackage,
                                            final String name,
                                            final SyncList<JavaType> typeVariableList) {
-        return VariableParameterJavaType.builder()
-                                        .javaPackage(JavaPackage.builder()
+        return ParametricJavaType.builder()
+                                 .javaPackage(JavaPackage.builder()
                                                                 .name(javaPackage)
                                                                 .build())
-                                        .name(name)
-                                        .typeVariables(typeVariableList)
-                                        .build();
+                                 .name(name)
+                                 .typeVariables(typeVariableList)
+                                 .build();
     }
 
     default JavaType parameterizedJavaType(final JavaPackage javaPackage,
                                            final String name,
                                            final SyncList<JavaType> typeVariableList) {
-        return VariableParameterJavaType.builder()
-                                        .javaPackage(javaPackage)
-                                        .name(name)
-                                        .typeVariables(typeVariableList)
-                                        .build();
+        return ParametricJavaType.builder()
+                                 .javaPackage(javaPackage)
+                                 .name(name)
+                                 .typeVariables(typeVariableList)
+                                 .build();
     }
 
     default JavaType parameterizedWildcardJavaType(final JavaPackage javaPackage,

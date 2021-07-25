@@ -1,10 +1,10 @@
 package funcify.ensemble.basetype.template;
 
+import funcify.base.session.TypeGenerationSession;
+import funcify.base.template.TypeGenerationTemplate;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession;
 import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession.ETSWT;
-import funcify.base.template.TypeGenerationTemplate;
-import funcify.base.session.TypeGenerationSession;
 import funcify.tool.CharacterOps;
 import funcify.tool.TypeGenerationExecutor;
 import funcify.tool.container.SyncList;
@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
  * @author smccarron
  * @created 2021-05-28
  */
-public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ETSWT>, EnsembleMethodGenerationFactory {
+public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ETSWT> {
 
     String FUNCIFY_ENSEMBLE_PACKAGE_NAME = "funcify.ensemble";
     SimpleJavaTypeVariable WITNESS_TYPE_VARIABLE = SimpleJavaTypeVariable.of("WT");
@@ -94,8 +94,9 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
     default JavaType createEnsembleInterfaceTypeSuperType(final TypeGenerationSession<ETSWT> session,
                                                           final EnsembleKind ensembleKind) {
         if (ensembleKind == EnsembleKind.SOLO) {
-            return session.javaTypeOfTypeDefinition(EnsembleTypeGenerationSession.narrowK(session)
-                                                                                 .getBaseEnsembleInterfaceTypeDefinition());
+            return EnsembleTypeGenerationSession.narrowK(session)
+                                                .getBaseEnsembleInterfaceTypeDefinition()
+                                                .getJavaType();
         } else {
             return firstNSimpleJavaTypeVariables(ensembleKind.getNumberOfValueParameters()).skip(1)
                                                                                            .reduce(createSoloEnsembleInterfaceJavaType(),
@@ -196,7 +197,7 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
     }
 
     static Optional<JavaType> simpleJavaTypeVariableByIndex(int index) {
-        return CharacterOps.uppercaseAlphabetLetterByIndex(index)
+        return CharacterOps.uppercaseLetterByIndex(index)
                            .map(String::valueOf)
                            .map(SimpleJavaTypeVariable::of);
     }
@@ -207,14 +208,12 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
         return JavaParameter.builder()
                             .name("converter")
                             .modifiers(SyncList.of(JavaModifier.FINAL))
-                            .type(createConvertMethodParameterJavaType(session,
-                                                                       ensembleKind,
+                            .type(createConvertMethodParameterJavaType(ensembleKind,
                                                                        returnTypeVariable))
                             .build();
     }
 
-    default JavaType createConvertMethodParameterJavaType(final TypeGenerationSession<ETSWT> session,
-                                                          final EnsembleKind ensembleKind,
+    default JavaType createConvertMethodParameterJavaType(final EnsembleKind ensembleKind,
                                                           final JavaType returnTypeVariable) {
         if (ensembleKind == EnsembleKind.SOLO) {
             return covariantParameterizedFunctionJavaType(Function.class,
@@ -222,8 +221,9 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
                                                           returnTypeVariable);
         } else {
             return covariantParameterizedFunctionJavaType(Function.class,
-                                                          session.javaTypeOfTypeDefinition(EnsembleTypeGenerationSession.narrowK(session)
-                                                                                                                        .getBaseEnsembleInterfaceTypeDefinition()),
+                                                          parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
+                                                                                ensembleKind.getSimpleClassName(),
+                                                                                alphabeticTypeVariablesWithLimit(ensembleKind.getNumberOfValueParameters())),
                                                           returnTypeVariable);
         }
     }

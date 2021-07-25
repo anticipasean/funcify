@@ -237,9 +237,4 @@ public abstract class AbstractTypeGenerationSession<SWT> implements TypeGenerati
                                .build();
     }
 
-    @Override
-    public JavaType javaTypeOfTypeDefinition(final JavaTypeDefinition typeDef) {
-        return typeDef.getJavaType();
-    }
-
 }

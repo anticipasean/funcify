@@ -6,4 +6,8 @@ package funcify.trait.design;
  */
 public interface PeekableDesign extends TraitDesign {
 
+    @Override
+    default String getTraitMethodName() {
+        return "peek";
+    }
 }

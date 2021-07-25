@@ -3,7 +3,7 @@ package funcify.typedef;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import funcify.tool.container.SyncList;
 import funcify.typedef.javatype.JavaType;
-import funcify.typedef.javatype.VariableParameterJavaType;
+import funcify.typedef.javatype.ParametricJavaType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -72,11 +72,11 @@ public class JavaTypeDefinition implements Definition<JavaTypeDefinition> {
     private SyncList<JavaTypeDefinition> subTypeDefinitions = SyncList.empty();
 
     public JavaType getJavaType() {
-        return VariableParameterJavaType.builder()
-                                        .javaPackage(javaPackage)
-                                        .name(name)
-                                        .typeVariables(typeVariables)
-                                        .build();
+        return ParametricJavaType.builder()
+                                 .javaPackage(javaPackage)
+                                 .name(name)
+                                 .typeVariables(typeVariables)
+                                 .build();
     }
 
 }

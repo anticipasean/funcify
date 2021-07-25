@@ -23,9 +23,6 @@ import lombok.ToString;
 @ToString
 public class BoundedJavaTypeVariable implements JavaType {
 
-    @JsonProperty("parameterized")
-    private final boolean parameterized = true;
-
     @Override
     public String getName() {
         return getBaseType().getName();

@@ -6,4 +6,8 @@ package funcify.trait.design;
  */
 public interface TraversableDesign extends TraitDesign {
 
+    @Override
+    default String getTraitMethodName() {
+        return "iterator";
+    }
 }

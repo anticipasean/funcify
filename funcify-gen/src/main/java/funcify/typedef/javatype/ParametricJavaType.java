@@ -22,10 +22,7 @@ import lombok.ToString;
 @Getter
 @Builder
 @ToString
-public class VariableParameterJavaType implements JavaType {
-
-    @JsonProperty("parameterized")
-    private final boolean parameterized = true;
+public class ParametricJavaType implements JavaType {
 
     @JsonProperty("package")
     private JavaPackage javaPackage;

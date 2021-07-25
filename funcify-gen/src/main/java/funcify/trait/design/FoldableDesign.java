@@ -6,7 +6,10 @@ package funcify.trait.design;
  */
 public interface FoldableDesign extends TraitDesign {
 
-
+    @Override
+    default String getTraitMethodName() {
+        return "fold";
+    }
 
 
 }

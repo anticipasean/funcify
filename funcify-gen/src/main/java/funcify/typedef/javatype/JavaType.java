@@ -8,6 +8,4 @@ public interface JavaType {
 
     String getName();
 
-    boolean isParameterized();
-
 }

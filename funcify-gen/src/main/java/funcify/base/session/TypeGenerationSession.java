@@ -69,6 +69,4 @@ public interface TypeGenerationSession<SWT> extends MethodGenerationSession<SWT>
     JavaTypeDefinition subTypeDefinitions(final JavaTypeDefinition typeDef,
                                           final SyncList<JavaTypeDefinition> subTypeDefinitions);
 
-    JavaType javaTypeOfTypeDefinition(final JavaTypeDefinition typeDef);
-
 }
