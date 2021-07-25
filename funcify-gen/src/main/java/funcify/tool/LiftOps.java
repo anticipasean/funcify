@@ -69,8 +69,12 @@ public interface LiftOps {
 
     static <A> Function<Optional<A>, Stream<A>> optionalStreamLift() {
         return (Optional<A> opt) -> {
-            return opt == null ? Stream.empty() : opt.map(Stream::of)
-                                                     .orElseGet(Stream::empty);
+            if (opt == null) {
+                return Stream.empty();
+            } else {
+                return opt.map(Stream::of)
+                          .orElseGet(Stream::empty);
+            }
         };
     }
 }

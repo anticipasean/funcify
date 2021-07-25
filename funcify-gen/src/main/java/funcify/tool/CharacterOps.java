@@ -2,6 +2,7 @@ package funcify.tool;
 
 import java.util.Optional;
 import java.util.function.IntFunction;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -11,6 +12,9 @@ import java.util.stream.Stream;
 public interface CharacterOps {
 
     static Stream<String> firstNAlphabetLettersAsStrings(int n) {
+        if (n <= 0) {
+            return Stream.empty();
+        }
         return streamRangeOfCharactersAsStringsFrom('A',
                                                     (char) (((int) 'A') + Math.min(26,
                                                                                    n)));
@@ -26,36 +30,36 @@ public interface CharacterOps {
                                                          char end) {
         if (start == end) {
             return Stream.of(start);
-        }
-        if ((start - end) > 0) {
-            return Stream.empty();
         } else {
-            return Stream.iterate(start,
-                                  (Character c) -> {
-                                      return (char) (((int) c) + 1);
-                                  })
-                         .limit(end - start);
+            return IntStream.range(start,
+                                   end)
+                            .mapToObj(i -> {
+                                return (char) i;
+                            });
         }
     }
 
-    static Optional<Character> uppercaseAlphabetLetterByIndex(final int index) {
-        return CharacterOpsMapHolder.INSTANCE.uppercaseAlphabetLetterByIndex()
-                                             .apply(index);
+    static Optional<Character> uppercaseLetterByIndex(final int index) {
+        return uppercaseLetterByIndexMapper().apply(index);
+    }
+
+    static IntFunction<Optional<Character>> uppercaseLetterByIndexMapper() {
+        return CharacterOpsMapHolder.INSTANCE.uppercaseLetterByIndexMapper();
     }
 
     static enum CharacterOpsMapHolder {
         INSTANCE(streamRangeOfCharactersFrom('A',
                                              'Z').toArray(Character[]::new));
 
-        private final Character[] alphabetArray;
+        private final Character[] uppercaseLettersArr;
 
-        CharacterOpsMapHolder(final Character[] alphabetArray) {
-            this.alphabetArray = alphabetArray;
+        CharacterOpsMapHolder(final Character[] uppercaseLettersArr) {
+            this.uppercaseLettersArr = uppercaseLettersArr;
         }
 
-        public IntFunction<Optional<Character>> uppercaseAlphabetLetterByIndex() {
+        public IntFunction<Optional<Character>> uppercaseLetterByIndexMapper() {
             return (int i) -> {
-                return i >= 0 && i < alphabetArray.length ? Optional.of(alphabetArray[i]) : Optional.empty();
+                return i >= 0 && i < uppercaseLettersArr.length ? Optional.of(uppercaseLettersArr[i]) : Optional.empty();
             };
         }
     }
