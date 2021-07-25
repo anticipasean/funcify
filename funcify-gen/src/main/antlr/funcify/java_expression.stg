@@ -1,13 +1,18 @@
 import "java_type_definition.stg"
 
-null_check(name) ::= "Objects.requireNonNull(<name>, () -> \"<name>\")"
-
-function_call(input) ::= <<
-<if(input.function_name && input.function_parameters)><null_check(input.function_name)>.apply(<input.function_parameters:{p | <p>};separator=", ">)<\\>
-<elseif(input.function_name)><null_check(input.function_name)>.apply()<endif>
+null_check(input) ::= <<
+<if(input.expression)>Objects.requireNonNull(<expression(input.expression)>, () -> "<expression(input.expression)>")<\\>
+<elseif(input.parameter.name)>Objects.requireNonNull(<input.parameter.name>, () -> "<input.parameter.name>")<\\>
+<elseif(input.name)>Objects.requireNonNull(<input.name>, () -> "<input.name>")<endif>
 >>
 
-parens(expression) ::= "(<expression>)"
+function_call(input) ::= <<
+<if(input.expression && input.function_parameters)><expression(input.expression)>.apply(<input.function_parameters:{p | <p>};separator=", ">)<\\>
+<elseif(input.function_name && input.function_parameters)><input.function_name>.apply(<input.function_parameters:{p | <p>};separator=", ">)<\\>
+<elseif(input.function_name)><input.function_name>.apply()<endif>
+>>
+
+parens(text) ::= "(<text>)"
 
 cast_as(input) ::= <<
 <if(input.java_type && input.variable_name)><type_declaration(input.java_type):parens()> <input.variable_name><\\>

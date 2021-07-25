@@ -255,8 +255,11 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
                                                          TypeGenerationTemplate::returnStatement,
                                                          templateExpression(session,
                                                                             "function_call",
-                                                                            "function_name",
-                                                                            "converter",
+                                                                            "expression",
+                                                                            templateExpression(session,
+                                                                                               "null_check",
+                                                                                               SyncMap.of("name",
+                                                                                                          "converter")),
                                                                             "function_parameters",
                                                                             "this"))
                                      .getDefinition();

@@ -1,4 +1,4 @@
-package funcify.st.adapter.model;
+package funcify.st.template;
 
 import funcify.base.session.TypeGenerationSession;
 import funcify.base.template.ExpressionGenerationTemplate;
@@ -15,9 +15,9 @@ import funcify.typedef.javatype.JavaType;
  */
 public interface STExpressionGenerationTemplate<SWT> extends ExpressionGenerationTemplate<SWT> {
 
-    default JavaExpression javaLambdaExpression(final TypeGenerationSession<SWT> session,
-                                                final SyncList<JavaParameter> lambdaParameters,
-                                                final JavaExpression lambdaBody) {
+    default JavaExpression lambdaExpression(final TypeGenerationSession<SWT> session,
+                                            final SyncList<JavaParameter> lambdaParameters,
+                                            final JavaExpression lambdaBody) {
         return session.templateExpression("lambda",
                                           SyncMap.<String, Object>of("parameters",
                                                                      lambdaParameters)
@@ -25,9 +25,9 @@ public interface STExpressionGenerationTemplate<SWT> extends ExpressionGeneratio
                                                       lambdaBody));
     }
 
-    default JavaExpression javaLambdaExpression(final TypeGenerationSession<SWT> session,
-                                                final SyncList<JavaParameter> lambdaParameters,
-                                                final JavaCodeBlock lambdaCodeBlock) {
+    default JavaExpression lambdaExpression(final TypeGenerationSession<SWT> session,
+                                            final SyncList<JavaParameter> lambdaParameters,
+                                            final JavaCodeBlock lambdaCodeBlock) {
         return session.templateExpression("lambda",
                                           SyncMap.<String, Object>of("parameters",
                                                                      lambdaParameters)
@@ -53,6 +53,27 @@ public interface STExpressionGenerationTemplate<SWT> extends ExpressionGeneratio
                                                      javaExpression,
                                                      "java_type",
                                                      castType));
+    }
+
+    default JavaExpression nullCheckExpression(final TypeGenerationSession<SWT> session,
+                                               final JavaExpression javaExpression) {
+        return session.templateExpression("null_check",
+                                          SyncMap.of("expression",
+                                                     javaExpression));
+    }
+
+    default JavaExpression nullCheckExpression(final TypeGenerationSession<SWT> session,
+                                               final JavaParameter parameter) {
+        return session.templateExpression("null_check",
+                                          SyncMap.of("parameter",
+                                                     parameter));
+    }
+
+    default JavaExpression nullCheckExpression(final TypeGenerationSession<SWT> session,
+                                               final String variableName) {
+        return session.templateExpression("null_check",
+                                          SyncMap.of("name",
+                                                     variableName));
     }
 
 
