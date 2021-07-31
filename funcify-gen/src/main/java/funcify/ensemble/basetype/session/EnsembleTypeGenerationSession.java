@@ -3,6 +3,7 @@ package funcify.ensemble.basetype.session;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession.ETSWT;
 import funcify.base.session.TypeGenerationSession;
+import funcify.ensemble.trait.name.EnsembleTraitName;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaTypeDefinition;
@@ -31,6 +32,8 @@ public interface EnsembleTypeGenerationSession extends TypeGenerationSession<ETS
     EnsembleTypeGenerationSession withBaseEnsembleInterfaceTypeDefinition(final JavaTypeDefinition baseEnsembleInterfaceTypeDefinition);
 
     SyncMap<EnsembleKind, JavaTypeDefinition> getEnsembleInterfaceTypeDefinitionsByEnsembleKind();
+
+    SyncMap<EnsembleTraitName, JavaTypeDefinition> getEnsembleTraitTypeDefinitionsByEnsembleTraitName();
 
     EnsembleTypeGenerationSession withEnsembleInterfaceTypeDefinitionsByEnsembleKind(final SyncMap<EnsembleKind, JavaTypeDefinition> ensembleInterfaceTypeDefinitionsByEnsembleKind);
 

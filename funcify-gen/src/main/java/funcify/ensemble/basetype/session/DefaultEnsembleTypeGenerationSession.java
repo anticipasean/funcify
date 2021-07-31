@@ -3,6 +3,7 @@ package funcify.ensemble.basetype.session;
 import funcify.base.session.AbstractTypeGenerationSession;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession.ETSWT;
+import funcify.ensemble.trait.name.EnsembleTraitName;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaTypeDefinition;
@@ -34,6 +35,7 @@ public class DefaultEnsembleTypeGenerationSession extends AbstractTypeGeneration
     @Default
     private final SyncMap<EnsembleKind, JavaTypeDefinition> ensembleInterfaceTypeDefinitionsByEnsembleKind = SyncMap.empty();
 
-    private final SyncMap<String, JavaTypeDefinition> typeDefinitionsByName;
+    @Default
+    private final SyncMap<EnsembleTraitName, JavaTypeDefinition> ensembleTraitTypeDefinitionsByEnsembleTraitName = SyncMap.empty();
 
 }

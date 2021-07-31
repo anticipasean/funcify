@@ -25,13 +25,6 @@ public interface TypeGenerationSession<SWT> extends MethodGenerationSession<SWT>
 
     JavaTypeDefinition emptyTypeDefinition();
 
-    default Optional<JavaTypeDefinition> findTypeDefinitionWithName(final String name) {
-        return getTypeDefinitionsByName().get(Objects.requireNonNull(name,
-                                                                     () -> "name"));
-    }
-
-    SyncMap<String, JavaTypeDefinition> getTypeDefinitionsByName();
-
     JavaTypeDefinition typeName(final JavaTypeDefinition typeDef,
                                 final String name);
 
