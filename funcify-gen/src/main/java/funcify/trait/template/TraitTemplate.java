@@ -3,6 +3,7 @@ package funcify.trait.template;
 import funcify.base.session.TypeGenerationSession;
 import funcify.base.template.TypeGenerationTemplate;
 import funcify.typedef.JavaMethod;
+import funcify.typedef.JavaTypeDefinition;
 
 /**
  * @author smccarron
@@ -10,12 +11,18 @@ import funcify.typedef.JavaMethod;
  */
 public interface TraitTemplate<SWT> extends TypeGenerationTemplate<SWT> {
 
-    default JavaMethod emptyTraitMethodDefinition(final TypeGenerationTemplate<SWT> template,
-                                                  final TypeGenerationSession<SWT> session,
+    default JavaTypeDefinition emptyTraitTypeDefinition(final TypeGenerationSession<SWT> session,
+                                                        final String traitName) {
+        return typeName(session,
+                        emptyTypeDefinition(session),
+                        traitName);
+    }
+
+    default JavaMethod emptyTraitMethodDefinition(final TypeGenerationSession<SWT> session,
                                                   final String traitMethodName) {
-        return template.methodName(session,
-                                   template.emptyMethodDefinition(session),
-                                   traitMethodName);
+        return methodName(session,
+                          emptyMethodDefinition(session),
+                          traitMethodName);
     }
 
     TypeGenerationSession<SWT> buildOrApplyTrait(final TypeGenerationSession<SWT> session);

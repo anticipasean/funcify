@@ -5,6 +5,7 @@ import funcify.base.template.TypeGenerationTemplate;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession;
 import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession.ETSWT;
+import funcify.st.template.STExpressionGenerationTemplate;
 import funcify.tool.CharacterOps;
 import funcify.tool.TypeGenerationExecutor;
 import funcify.tool.container.SyncList;
@@ -29,13 +30,13 @@ import lombok.AllArgsConstructor;
  * @author smccarron
  * @created 2021-05-28
  */
-public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ETSWT> {
+public interface EnsembleTypeGenerationTemplate extends TypeGenerationTemplate<ETSWT>, STExpressionGenerationTemplate<ETSWT> {
 
     String FUNCIFY_ENSEMBLE_PACKAGE_NAME = "funcify.ensemble";
     SimpleJavaTypeVariable WITNESS_TYPE_VARIABLE = SimpleJavaTypeVariable.of("WT");
 
-    static EnsembleTypeGenerationFactory of() {
-        return DefaultEnsembleTypeGenerationFactory.of();
+    static EnsembleTypeGenerationTemplate of() {
+        return EnsembleTypeGenerationFactory.of();
     }
 
     TypeGenerationSession<ETSWT> generateEnsembleTypesInSession(final TypeGenerationSession<ETSWT> session);
@@ -78,9 +79,9 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
                                                        JavaTypeKind.INTERFACE)
                                      .updateDefinition(TypeGenerationTemplate::superType,
                                                        ensembleInterfaceSuperType)
-                                     .updateDefinition(EnsembleTypeGenerationFactory::addConvertMethodToEnsembleInterfaceType,
+                                     .updateDefinition(EnsembleTypeGenerationTemplate::addConvertMethodToEnsembleInterfaceType,
                                                        ensembleKind)
-                                     .updateDefinition(EnsembleTypeGenerationFactory::addNarrowMethodIfSoloEnsembleInterfaceTypeDefinition,
+                                     .updateDefinition(EnsembleTypeGenerationTemplate::addNarrowMethodIfSoloEnsembleInterfaceTypeDefinition,
                                                        ensembleKind)
                                      .updateSession((t, s, d) -> EnsembleTypeGenerationSession.narrowK(s)
                                                                                               .withEnsembleInterfaceTypeDefinitionsByEnsembleKind(EnsembleTypeGenerationSession.narrowK(s)
@@ -152,12 +153,9 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
                                                                                                  TypeGenerationTemplate::emptyCodeBlockDefinition,
                                                                                                  TypeGenerationTemplate::statement,
                                                                                                  TypeGenerationTemplate::returnStatement,
-                                                                                                 templateExpression(session,
-                                                                                                                    "cast_as",
-                                                                                                                    "variable_name",
-                                                                                                                    "this",
-                                                                                                                    "java_type",
-                                                                                                                    returnTypeBaseVariable))
+                                                                                                 castAsExpression(session,
+                                                                                                                  "this",
+                                                                                                                  returnTypeBaseVariable))
                                                                              .getDefinition())
                                      .getDefinition();
 
@@ -266,7 +264,7 @@ public interface EnsembleTypeGenerationFactory extends TypeGenerationTemplate<ET
     }
 
     @AllArgsConstructor(staticName = "of")
-    static class DefaultEnsembleTypeGenerationFactory implements EnsembleTypeGenerationFactory {
+    static class EnsembleTypeGenerationFactory implements EnsembleTypeGenerationTemplate {
 
         @Override
         public TypeGenerationSession<ETSWT> generateEnsembleTypesInSession(final TypeGenerationSession<ETSWT> session) {

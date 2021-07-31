@@ -18,7 +18,7 @@ java_type(type_definition) ::= <<
 type_declaration(java_type) ::= "<java_type.name><parameterize_type_declaration(java_type)>"
 
 annotation_declaration(annotation) ::= <<
-<if(annotation.name)>@<annotation.name><if(annotation.parameters)>("<first(annotation.parameters).value>")<endif><endif>
+<if(annotation.name)>@<annotation.name><if(annotation.parameters_as_string)>(<annotation.parameters_as_string>)<endif><endif>
 >>
 
 parameterize_type_declaration(java_type) ::= "<if(java_type.type_variables)>\<<java_type.type_variables:type_variable_declaration();separator={, }>><endif>"

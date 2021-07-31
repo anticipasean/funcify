@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.session.DefaultEnsembleTypeGenerationSession;
 import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession;
-import funcify.ensemble.basetype.template.EnsembleTypeGenerationFactory;
+import funcify.ensemble.basetype.template.EnsembleTypeGenerationTemplate;
 import funcify.st.adapter.model.JsonNodeModelAdapter;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap.Tuple2;
@@ -68,8 +68,8 @@ public class FuncifyClassGeneratorTest {
     }
 
     private static EnsembleTypeGenerationSession runEnsembleTypeGenerationSession() {
-        return EnsembleTypeGenerationSession.narrowK(EnsembleTypeGenerationFactory.of()
-                                                                                  .generateEnsembleTypesInSession(buildInitialEnsembleInterfaceTypeGenerationSession()));
+        return EnsembleTypeGenerationSession.narrowK(EnsembleTypeGenerationTemplate.of()
+                                                                                   .generateEnsembleTypesInSession(buildInitialEnsembleInterfaceTypeGenerationSession()));
     }
 
     private static EnsembleTypeGenerationSession buildInitialEnsembleInterfaceTypeGenerationSession() {
