@@ -1,6 +1,7 @@
 package funcify.typedef.javastatement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import funcify.typedef.JavaAnnotation;
 import funcify.typedef.javaexpr.JavaExpression;
 import funcify.tool.container.SyncList;
 import lombok.AccessLevel;
@@ -21,6 +22,10 @@ import lombok.Setter;
 @Builder
 @Getter
 public class SimpleStatement implements JavaStatement {
+
+    @JsonProperty("annotations")
+    @Default
+    private SyncList<JavaAnnotation> annotations = SyncList.empty();
 
     @Default
     @JsonProperty("expressions")

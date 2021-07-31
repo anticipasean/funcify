@@ -1,6 +1,7 @@
 package funcify.base.session;
 
 import funcify.tool.container.SyncList;
+import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.javaexpr.JavaExpression;
 import funcify.typedef.javastatement.JavaStatement;
@@ -11,7 +12,7 @@ import java.util.Optional;
  * @author smccarron
  * @created 2021-05-29
  */
-public interface StatementGenerationSession<SWT> extends ExpressionGenerationSession<SWT> {
+public interface StatementGenerationSession<SWT> extends AnnotationGenerationSession<SWT> {
 
     SyncList<JavaStatement> getStatementsForCodeBlock(final JavaCodeBlock codeBlockDef);
 
@@ -23,7 +24,8 @@ public interface StatementGenerationSession<SWT> extends ExpressionGenerationSes
         return getStatementsForCodeBlock(codeBlockDef).last();
     }
 
-    JavaStatement assignmentStatement(final JavaType assigneeType,
+    JavaStatement assignmentStatement(final SyncList<JavaAnnotation> annotations,
+                                      final JavaType assigneeType,
                                       final String assigneeName,
                                       final SyncList<JavaExpression> expressions);
 

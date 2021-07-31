@@ -1,7 +1,6 @@
 package funcify.base.session;
 
 import funcify.tool.container.SyncList;
-import funcify.tool.container.SyncMap;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaField;
 import funcify.typedef.JavaImport;
@@ -11,8 +10,6 @@ import funcify.typedef.JavaPackage;
 import funcify.typedef.JavaTypeDefinition;
 import funcify.typedef.JavaTypeKind;
 import funcify.typedef.javatype.JavaType;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * The session tracks what types are being generated and how these typeDefs can be updated
@@ -55,6 +52,12 @@ public interface TypeGenerationSession<SWT> extends MethodGenerationSession<SWT>
 
     JavaTypeDefinition fields(final JavaTypeDefinition typeDef,
                               final SyncList<JavaField> fields);
+
+    JavaTypeDefinition field(final JavaTypeDefinition typeDef,
+                             final SyncList<JavaAnnotation> annotations,
+                             final SyncList<JavaModifier> modifiers,
+                             final JavaType fieldType,
+                             final String fieldName);
 
     JavaTypeDefinition methods(final JavaTypeDefinition typeDef,
                                final SyncList<JavaMethod> methods);

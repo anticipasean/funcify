@@ -46,6 +46,12 @@ public interface MethodGenerationSession<SWT> extends CodeBlockGenerationSession
     JavaMethod parameters(final JavaMethod methodDef,
                           final SyncList<JavaParameter> parameters);
 
+    JavaMethod parameter(final JavaMethod methodDef,
+                         final SyncList<JavaAnnotation> annotations,
+                         final SyncList<JavaModifier> modifiers,
+                         final JavaType parameterType,
+                         final String parameterName);
+
     JavaMethod codeBlock(final JavaMethod methodDef,
                          final JavaCodeBlock codeBlock);
 }

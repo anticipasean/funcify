@@ -1,6 +1,7 @@
 package funcify.typedef.javastatement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import funcify.typedef.JavaAnnotation;
 import funcify.typedef.javaexpr.JavaExpression;
 import funcify.tool.container.SyncList;
 import lombok.AccessLevel;
@@ -21,6 +22,12 @@ import lombok.Setter;
 @Builder
 @Getter
 public class ReturnStatement implements JavaStatement {
+
+    /**
+     * Always empty since return statements can't have annotations
+     */
+    @JsonProperty("annotations")
+    private final SyncList<JavaAnnotation> annotations = SyncList.empty();
 
     @JsonProperty("is_return")
     private final boolean returnStatement = true;

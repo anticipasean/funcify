@@ -178,6 +178,19 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
 
     default JavaTypeDefinition field(final TypeGenerationSession<SWT> session,
                                      final JavaTypeDefinition typeDef,
+                                     final SyncList<JavaAnnotation> fieldAnnotations,
+                                     final SyncList<JavaModifier> fieldModifiers,
+                                     final JavaType fieldType,
+                                     final String fieldName) {
+        return session.field(typeDef,
+                             fieldAnnotations,
+                             fieldModifiers,
+                             fieldType,
+                             fieldName);
+    }
+
+    default JavaTypeDefinition field(final TypeGenerationSession<SWT> session,
+                                     final JavaTypeDefinition typeDef,
                                      final JavaField... field) {
         return fields(session,
                       typeDef,

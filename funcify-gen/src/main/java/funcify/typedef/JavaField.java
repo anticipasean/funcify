@@ -24,6 +24,10 @@ import lombok.ToString;
 @ToString
 public class JavaField {
 
+    @JsonProperty("annotations")
+    @Default
+    private SyncList<JavaAnnotation> annotations = SyncList.empty();
+
     @JsonProperty("modifiers")
     @Default
     private SyncList<JavaModifier> modifiers = SyncList.empty();

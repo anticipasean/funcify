@@ -96,6 +96,21 @@ public abstract class AbstractTypeGenerationSession<SWT> implements TypeGenerati
     }
 
     @Override
+    public JavaTypeDefinition field(final JavaTypeDefinition typeDef,
+                                    final SyncList<JavaAnnotation> fieldAnnotations,
+                                    final SyncList<JavaModifier> fieldModifiers,
+                                    final JavaType fieldType,
+                                    final String fieldName) {
+        return typeDef.withFields(typeDef.getFields()
+                                         .append(JavaField.builder()
+                                                          .annotations(fieldAnnotations)
+                                                          .modifiers(fieldModifiers)
+                                                          .type(fieldType)
+                                                          .name(fieldName)
+                                                          .build()));
+    }
+
+    @Override
     public JavaTypeDefinition methods(final JavaTypeDefinition typeDef,
                                       final SyncList<JavaMethod> methods) {
         return typeDef.withMethods(typeDef.getMethods()
@@ -162,6 +177,21 @@ public abstract class AbstractTypeGenerationSession<SWT> implements TypeGenerati
     }
 
     @Override
+    public JavaMethod parameter(final JavaMethod methodDef,
+                                final SyncList<JavaAnnotation> annotations,
+                                final SyncList<JavaModifier> modifiers,
+                                final JavaType parameterType,
+                                final String parameterName) {
+        return methodDef.withParameters(methodDef.getParameters()
+                                                 .append(JavaParameter.builder()
+                                                                      .annotations(annotations)
+                                                                      .modifiers(modifiers)
+                                                                      .type(parameterType)
+                                                                      .name(parameterName)
+                                                                      .build()));
+    }
+
+    @Override
     public JavaMethod codeBlock(final JavaMethod methodDef,
                                 final JavaCodeBlock codeBlock) {
         return methodDef.withCodeBlock(codeBlock);
@@ -191,10 +221,12 @@ public abstract class AbstractTypeGenerationSession<SWT> implements TypeGenerati
     }
 
     @Override
-    public JavaStatement assignmentStatement(final JavaType assigneeType,
+    public JavaStatement assignmentStatement(final SyncList<JavaAnnotation> annotations,
+                                             final JavaType assigneeType,
                                              final String assigneeName,
                                              final SyncList<JavaExpression> expressions) {
         return AssignmentStatement.builder()
+                                  .annotations(annotations)
                                   .assigneeName(assigneeName)
                                   .assigneeType(assigneeType)
                                   .expressions(expressions)
@@ -211,6 +243,15 @@ public abstract class AbstractTypeGenerationSession<SWT> implements TypeGenerati
     @Override
     public SyncList<JavaExpression> getExpressionsInStatement(final JavaStatement statementDef) {
         return statementDef.getExpressions();
+    }
+
+    @Override
+    public JavaAnnotation annotation(final String name,
+                                     final SyncMap<String, Object> parameters) {
+        return JavaAnnotation.builder()
+                             .name(name)
+                             .parameters(parameters)
+                             .build();
     }
 
     @Override
