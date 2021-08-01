@@ -64,6 +64,22 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
                                   v2);
     }
 
+    static <K, V> SyncMap<K, V> of(final K k1,
+                                   final V v1,
+                                   final K k2,
+                                   final V v2,
+                                   final K k3,
+                                   final V v3) {
+        return SyncMapFactory.of()
+                             .<K, V>empty()
+                             .put(k1,
+                                  v1)
+                             .put(k2,
+                                  v2)
+                             .put(k3,
+                                  v3);
+    }
+
 
     static <K, V> SyncMap<K, V> of(final Tuple2<? extends K, ? extends V> tuple) {
         return SyncMapFactory.of()
@@ -219,7 +235,8 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
 
     Map<K, V> asJavaMap();
 
-    @AllArgsConstructor(access = AccessLevel.PUBLIC, staticName = "of")
+    @AllArgsConstructor(access = AccessLevel.PUBLIC,
+                        staticName = "of")
     @EqualsAndHashCode
     @ToString
     @JsonFormat(shape = Shape.ARRAY)
@@ -268,7 +285,8 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
 
     }
 
-    @AllArgsConstructor(staticName = "of", access = AccessLevel.PACKAGE)
+    @AllArgsConstructor(staticName = "of",
+                        access = AccessLevel.PACKAGE)
     class SyncMapFactory {
 
         public <K, V> SyncMap<K, V> empty() {
@@ -345,7 +363,8 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
         public <K, V> SyncMap<K, V> putAll(final SyncMap<K, V> syncMap,
                                            final SyncMap<? extends K, ? extends V> map) {
             if (syncMap.isEmpty() && !map.isEmpty()) {
-                @SuppressWarnings("unchecked") final SyncMap<K, V> narrowedMap = (SyncMap<K, V>) map;
+                @SuppressWarnings("unchecked")
+                final SyncMap<K, V> narrowedMap = (SyncMap<K, V>) map;
                 return narrowedMap;
             }
             return requireNonNull(map,
@@ -506,7 +525,8 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
 
     }
 
-    @AllArgsConstructor(access = AccessLevel.PACKAGE, staticName = "of")
+    @AllArgsConstructor(access = AccessLevel.PACKAGE,
+                        staticName = "of")
     @EqualsAndHashCode
     @ToString
     class DefaultSyncMap<K, V> implements SyncMap<K, V> {

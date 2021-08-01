@@ -9,8 +9,6 @@ import funcify.st.template.STExpressionGenerationTemplate;
 import funcify.tool.CharacterOps;
 import funcify.tool.TypeGenerationExecutor;
 import funcify.tool.container.SyncList;
-import funcify.tool.container.SyncMap;
-import funcify.typedef.JavaAnnotation;
 import funcify.typedef.JavaCodeBlock;
 import funcify.typedef.JavaModifier;
 import funcify.typedef.JavaParameter;
@@ -108,8 +106,8 @@ public interface EnsembleTypeGenerationTemplate extends TypeGenerationTemplate<E
     default BinaryOperator<JavaType> createNestedSoloTypeVariable() {
         return (jt1, jt2) -> parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
                                                    jt1.getName(),
-                                                   jt1,
-                                                   jt2);
+                                                   SyncList.of(jt1,
+                                                               jt2));
     }
 
     default JavaTypeDefinition addNarrowMethodIfSoloEnsembleInterfaceTypeDefinition(final TypeGenerationSession<ETSWT> session,
@@ -124,10 +122,10 @@ public interface EnsembleTypeGenerationTemplate extends TypeGenerationTemplate<E
                                                                                                                                                                               .orElseThrow(IllegalStateException::new));
         final JavaType returnTypeBaseVariableSuperType = parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
                                                                                ensembleKind.getSimpleClassName(),
-                                                                               WITNESS_TYPE_VARIABLE,
-                                                                               lowerBoundWildcardValueTypeParameter);
-        final JavaType returnTypeVariable = javaTypeVariableWithUpperBounds(returnTypeBaseVariable,
-                                                                            returnTypeBaseVariableSuperType);
+                                                                               SyncList.of(WITNESS_TYPE_VARIABLE,
+                                                                                           lowerBoundWildcardValueTypeParameter));
+        final JavaType returnTypeVariable = javaTypeVariableWithUpperBound(returnTypeBaseVariable,
+                                                                           returnTypeBaseVariableSuperType);
         return TypeGenerationExecutor.of(this,
                                          session,
                                          typeDef)
@@ -137,12 +135,10 @@ public interface EnsembleTypeGenerationTemplate extends TypeGenerationTemplate<E
                                                                                  emptyMethodDefinition(session))
                                                                              .updateDefinition(TypeGenerationTemplate::methodName,
                                                                                                "narrow")
-                                                                             .updateDefinition(TypeGenerationTemplate::methodAnnotation,
-                                                                                               JavaAnnotation.builder()
-                                                                                                             .name("SuppressWarnings")
-                                                                                                             .parameters(SyncMap.of("value",
-                                                                                                                                    "unchecked"))
-                                                                                                             .build())
+                                                                             .addChildDefinition(TypeGenerationTemplate::methodAnnotation,
+                                                                                                 EnsembleTypeGenerationTemplate::valueAnnotation,
+                                                                                                 "SuppressWarnings",
+                                                                                                 "unchecked")
                                                                              .updateDefinition(TypeGenerationTemplate::methodModifier,
                                                                                                JavaModifier.DEFAULT)
                                                                              .updateDefinition(TypeGenerationTemplate::methodTypeVariable,
@@ -217,14 +213,14 @@ public interface EnsembleTypeGenerationTemplate extends TypeGenerationTemplate<E
                                                           final JavaType returnTypeVariable) {
         if (ensembleKind == EnsembleKind.SOLO) {
             return covariantParameterizedFunctionJavaType(Function.class,
-                                                          createSoloEnsembleInterfaceJavaType(),
-                                                          returnTypeVariable);
+                                                          SyncList.of(createSoloEnsembleInterfaceJavaType(),
+                                                                      returnTypeVariable));
         } else {
             return covariantParameterizedFunctionJavaType(Function.class,
-                                                          parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
-                                                                                ensembleKind.getSimpleClassName(),
-                                                                                alphabeticTypeVariablesWithLimit(ensembleKind.getNumberOfValueParameters())),
-                                                          returnTypeVariable);
+                                                          SyncList.of(parameterizedJavaType(FUNCIFY_ENSEMBLE_PACKAGE_NAME,
+                                                                                            ensembleKind.getSimpleClassName(),
+                                                                                            alphabeticTypeVariablesWithLimit(ensembleKind.getNumberOfValueParameters())),
+                                                                      returnTypeVariable));
         }
     }
 
@@ -251,15 +247,10 @@ public interface EnsembleTypeGenerationTemplate extends TypeGenerationTemplate<E
                                          emptyCodeBlockDefinition(session))
                                      .addChildDefinition(TypeGenerationTemplate::statement,
                                                          TypeGenerationTemplate::returnStatement,
-                                                         templateExpression(session,
-                                                                            "function_call",
-                                                                            "expression",
-                                                                            templateExpression(session,
-                                                                                               "null_check",
-                                                                                               SyncMap.of("name",
-                                                                                                          "converter")),
-                                                                            "function_parameters",
-                                                                            "this"))
+                                                         EnsembleTypeGenerationTemplate::functionCallExpression,
+                                                         nullCheckExpression(session,
+                                                                             "converter"),
+                                                         SyncList.<String>of("this"))
                                      .getDefinition();
     }
 

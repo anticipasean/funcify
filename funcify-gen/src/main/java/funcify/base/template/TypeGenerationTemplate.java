@@ -42,7 +42,7 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
 
     default JavaTypeDefinition typeDefinitionTypeVariable(final TypeGenerationSession<SWT> session,
                                                           final JavaTypeDefinition typeDef,
-                                                          final JavaType... typeVariable) {
+                                                          final JavaType typeVariable) {
         return session.typeDefinitionTypeVariables(typeDef,
                                                    SyncList.of(typeVariable));
     }
@@ -104,7 +104,7 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
 
     default JavaTypeDefinition javaImport(final TypeGenerationSession<SWT> session,
                                           final JavaTypeDefinition typeDef,
-                                          final JavaImport... javaImport) {
+                                          final JavaImport javaImport) {
         return javaImports(session,
                            typeDef,
                            SyncList.of(javaImport));
@@ -126,7 +126,7 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
 
     default JavaTypeDefinition typeAnnotation(final TypeGenerationSession<SWT> session,
                                               final JavaTypeDefinition typeDef,
-                                              final JavaAnnotation... annotation) {
+                                              final JavaAnnotation annotation) {
         return typeAnnotations(session,
                                typeDef,
                                SyncList.of(annotation));
@@ -141,7 +141,7 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
 
     default JavaTypeDefinition typeModifier(final TypeGenerationSession<SWT> session,
                                             final JavaTypeDefinition typeDef,
-                                            final JavaModifier... modifier) {
+                                            final JavaModifier modifier) {
         return typeModifiers(session,
                              typeDef,
                              SyncList.of(modifier));
@@ -163,7 +163,7 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
 
     default JavaTypeDefinition implementedInterfaceType(final TypeGenerationSession<SWT> session,
                                                         final JavaTypeDefinition typeDef,
-                                                        final JavaType... implementedInterfaceType) {
+                                                        final JavaType implementedInterfaceType) {
         return implementedInterfaceTypes(session,
                                          typeDef,
                                          SyncList.of(implementedInterfaceType));
@@ -191,7 +191,7 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
 
     default JavaTypeDefinition field(final TypeGenerationSession<SWT> session,
                                      final JavaTypeDefinition typeDef,
-                                     final JavaField... field) {
+                                     final JavaField field) {
         return fields(session,
                       typeDef,
                       SyncList.of(field));
@@ -221,7 +221,7 @@ public interface TypeGenerationTemplate<SWT> extends MethodGenerationTemplate<SW
 
     default JavaTypeDefinition subTypeDefinition(final TypeGenerationSession<SWT> session,
                                                  final JavaTypeDefinition typeDef,
-                                                 final JavaTypeDefinition... subTypeDefinitions) {
+                                                 final JavaTypeDefinition subTypeDefinitions) {
         return subTypeDefinitions(session,
                                   typeDef,
                                   SyncList.of(subTypeDefinitions));

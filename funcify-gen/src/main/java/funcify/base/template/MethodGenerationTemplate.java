@@ -28,7 +28,7 @@ public interface MethodGenerationTemplate<SWT> extends CodeBlockGenerationTempla
 
     default JavaMethod methodAnnotation(final TypeGenerationSession<SWT> session,
                                         final JavaMethod methodDef,
-                                        final JavaAnnotation... annotation) {
+                                        final JavaAnnotation annotation) {
         return methodAnnotations(session,
                                  methodDef,
                                  SyncList.of(annotation));
@@ -43,7 +43,7 @@ public interface MethodGenerationTemplate<SWT> extends CodeBlockGenerationTempla
 
     default JavaMethod methodModifier(final TypeGenerationSession<SWT> session,
                                       final JavaMethod methodDef,
-                                      final JavaModifier... modifier) {
+                                      final JavaModifier modifier) {
         return methodModifiers(session,
                                methodDef,
                                SyncList.of(modifier));
@@ -51,7 +51,7 @@ public interface MethodGenerationTemplate<SWT> extends CodeBlockGenerationTempla
 
     default JavaMethod methodTypeVariable(final TypeGenerationSession<SWT> session,
                                           final JavaMethod methodDef,
-                                          final JavaType... typeVariable) {
+                                          final JavaType typeVariable) {
         return methodTypeVariables(session,
                                    methodDef,
                                    SyncList.of(typeVariable));
@@ -80,7 +80,7 @@ public interface MethodGenerationTemplate<SWT> extends CodeBlockGenerationTempla
 
     default JavaMethod parameter(final TypeGenerationSession<SWT> session,
                                  final JavaMethod methodDef,
-                                 final JavaParameter... parameter) {
+                                 final JavaParameter parameter) {
         return parameters(session,
                           methodDef,
                           SyncList.of(parameter));

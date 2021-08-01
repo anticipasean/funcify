@@ -69,11 +69,31 @@ public interface STExpressionGenerationTemplate<SWT> extends ExpressionGeneratio
                                                      parameter));
     }
 
-    default JavaExpression nullCheckExpression(final TypeGenerationSession<SWT> session,
+    default JavaExpression  nullCheckExpression(final TypeGenerationSession<SWT> session,
                                                final String variableName) {
         return session.templateExpression("null_check",
                                           SyncMap.of("name",
                                                      variableName));
+    }
+
+    default JavaExpression functionCallExpression(final TypeGenerationSession<SWT> session,
+                                                  final String functionName,
+                                                  final SyncList<String> parameterNames) {
+        return session.templateExpression("function_call",
+                                          SyncMap.of("function_name",
+                                                     functionName,
+                                                     "function_parameters",
+                                                     parameterNames));
+    }
+
+    default JavaExpression functionCallExpression(final TypeGenerationSession<SWT> session,
+                                                  final JavaExpression functionNameExpression,
+                                                  final SyncList<String> parameterNames) {
+        return session.templateExpression("function_call",
+                                          SyncMap.of("expression",
+                                                     functionNameExpression,
+                                                     "function_parameters",
+                                                     parameterNames));
     }
 
 

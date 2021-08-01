@@ -12,7 +12,7 @@ import funcify.typedef.javaexpr.JavaExpression;
 public interface ExpressionGenerationTemplate<SWT> extends JavaTypeGenerationTemplate {
 
     default JavaExpression simpleExpression(final TypeGenerationSession<SWT> session,
-                                            final String... text) {
+                                            final String text) {
         return simpleExpression(session,
                                 SyncList.of(text));
     }
@@ -44,6 +44,25 @@ public interface ExpressionGenerationTemplate<SWT> extends JavaTypeGenerationTem
                                              inputValue1,
                                              inputKey2,
                                              inputValue2));
+    }
+
+
+    default JavaExpression templateExpression(final TypeGenerationSession<SWT> session,
+                                              final String templateName,
+                                              final String inputKey1,
+                                              final Object inputValue1,
+                                              final String inputKey2,
+                                              final Object inputValue2,
+                                              final String inputKey3,
+                                              final Object inputValue3) {
+        return templateExpression(session,
+                                  templateName,
+                                  SyncMap.of(inputKey1,
+                                             inputValue1,
+                                             inputKey2,
+                                             inputValue2,
+                                             inputKey3,
+                                             inputValue3));
     }
 
     default JavaExpression templateExpression(final TypeGenerationSession<SWT> session,

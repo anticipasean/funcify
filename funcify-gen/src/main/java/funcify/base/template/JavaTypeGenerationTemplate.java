@@ -4,9 +4,9 @@ import funcify.tool.container.SyncList;
 import funcify.typedef.JavaPackage;
 import funcify.typedef.javatype.BoundedJavaTypeVariable;
 import funcify.typedef.javatype.JavaType;
+import funcify.typedef.javatype.ParametricJavaType;
 import funcify.typedef.javatype.SimpleJavaType;
 import funcify.typedef.javatype.SimpleJavaTypeVariable;
-import funcify.typedef.javatype.ParametricJavaType;
 import funcify.typedef.javatype.WildcardJavaTypeBound;
 
 /**
@@ -16,8 +16,7 @@ import funcify.typedef.javatype.WildcardJavaTypeBound;
 public interface JavaTypeGenerationTemplate {
 
     default SyncList<JavaType> typeVariablesForJavaType(final JavaType javaType) {
-        return javaType instanceof ParametricJavaType ? ((ParametricJavaType) javaType).getTypeVariables()
-            : SyncList.empty();
+        return javaType instanceof ParametricJavaType ? ((ParametricJavaType) javaType).getTypeVariables() : SyncList.empty();
     }
 
     default JavaType javaType(final Class<?> cls) {
@@ -50,7 +49,7 @@ public interface JavaTypeGenerationTemplate {
 
     default JavaType simpleParameterizedJavaType(final String javaPackage,
                                                  final String name,
-                                                 final String... typeVariable) {
+                                                 final String typeVariable) {
         return parameterizedJavaType(JavaPackage.builder()
                                                 .name(javaPackage)
                                                 .build(),
@@ -62,7 +61,7 @@ public interface JavaTypeGenerationTemplate {
 
     default JavaType simpleParameterizedJavaType(final JavaPackage javaPackage,
                                                  final String name,
-                                                 final String... typeVariable) {
+                                                 final String typeVariable) {
         return parameterizedJavaType(javaPackage,
                                      name,
                                      SyncList.of(typeVariable)
@@ -71,7 +70,7 @@ public interface JavaTypeGenerationTemplate {
 
     default JavaType parameterizedJavaType(final String javaPackage,
                                            final String name,
-                                           final JavaType... typeVariable) {
+                                           final JavaType typeVariable) {
         return parameterizedJavaType(JavaPackage.builder()
                                                 .name(javaPackage)
                                                 .build(),
@@ -81,7 +80,7 @@ public interface JavaTypeGenerationTemplate {
 
     default JavaType parameterizedJavaType(final JavaPackage javaPackage,
                                            final String name,
-                                           final JavaType... typeVariable) {
+                                           final JavaType typeVariable) {
         return parameterizedJavaType(javaPackage,
                                      name,
                                      SyncList.of(typeVariable));
@@ -92,8 +91,8 @@ public interface JavaTypeGenerationTemplate {
                                            final SyncList<JavaType> typeVariableList) {
         return ParametricJavaType.builder()
                                  .javaPackage(JavaPackage.builder()
-                                                                .name(javaPackage)
-                                                                .build())
+                                                         .name(javaPackage)
+                                                         .build())
                                  .name(name)
                                  .typeVariables(typeVariableList)
                                  .build();
@@ -117,15 +116,31 @@ public interface JavaTypeGenerationTemplate {
     }
 
     default JavaType javaTypeVariableWithLowerBounds(final JavaType baseTypeVariable,
-                                                     final JavaType... lowerBound) {
+                                                     final SyncList<JavaType> lowerBounds) {
+        return BoundedJavaTypeVariable.builder()
+                                      .baseType(baseTypeVariable)
+                                      .lowerBoundTypes(lowerBounds)
+                                      .build();
+    }
+
+    default JavaType javaTypeVariableWithUpperBounds(final JavaType baseTypeVariable,
+                                                     final SyncList<JavaType> upperBounds) {
+        return BoundedJavaTypeVariable.builder()
+                                      .baseType(baseTypeVariable)
+                                      .upperBoundTypes(upperBounds)
+                                      .build();
+    }
+
+    default JavaType javaTypeVariableWithLowerBound(final JavaType baseTypeVariable,
+                                                    final JavaType lowerBound) {
         return BoundedJavaTypeVariable.builder()
                                       .baseType(baseTypeVariable)
                                       .lowerBoundTypes(SyncList.of(lowerBound))
                                       .build();
     }
 
-    default JavaType javaTypeVariableWithUpperBounds(final JavaType baseTypeVariable,
-                                                     final JavaType... upperBound) {
+    default JavaType javaTypeVariableWithUpperBound(final JavaType baseTypeVariable,
+                                                    final JavaType upperBound) {
         return BoundedJavaTypeVariable.builder()
                                       .baseType(baseTypeVariable)
                                       .upperBoundTypes(SyncList.of(upperBound))
@@ -142,52 +157,62 @@ public interface JavaTypeGenerationTemplate {
                                       .build();
     }
 
-    default JavaType javaTypeVariableWithWildcardLowerBounds(final JavaType... lowerBounds) {
+    default JavaType javaTypeVariableWithWildcardLowerBounds(final JavaType lowerBound) {
+        return javaTypeVariableWithLowerBounds(WildcardJavaTypeBound.getInstance(),
+                                               SyncList.of(lowerBound));
+    }
+
+    default JavaType javaTypeVariableWithWildcardUpperBounds(final JavaType upperBound) {
+        return javaTypeVariableWithUpperBounds(WildcardJavaTypeBound.getInstance(),
+                                               SyncList.of(upperBound));
+    }
+
+    default JavaType javaTypeVariableWithWildcardLowerBounds(final SyncList<JavaType> lowerBounds) {
         return javaTypeVariableWithLowerBounds(WildcardJavaTypeBound.getInstance(),
                                                lowerBounds);
     }
 
-    default JavaType javaTypeVariableWithWildcardUpperBounds(final JavaType... upperBounds) {
+    default JavaType javaTypeVariableWithWildcardUpperBounds(final SyncList<JavaType> upperBounds) {
         return javaTypeVariableWithUpperBounds(WildcardJavaTypeBound.getInstance(),
                                                upperBounds);
     }
 
     default JavaType covariantParameterizedFunctionJavaType(final Class<?> cls,
-                                                            final JavaType... typeVariable) {
+                                                            final SyncList<JavaType> typeVariables) {
         return covariantParameterizedFunctionJavaType(JavaPackage.builder()
                                                                  .name(cls.getPackage()
                                                                           .getName())
                                                                  .build(),
                                                       cls.getSimpleName(),
-                                                      typeVariable);
+                                                      typeVariables);
     }
 
     default JavaType covariantParameterizedFunctionJavaType(final String javaPackage,
                                                             final String name,
-                                                            final JavaType... typeVariable) {
+                                                            final SyncList<JavaType> typeVariables) {
         return covariantParameterizedFunctionJavaType(JavaPackage.builder()
                                                                  .name(javaPackage)
                                                                  .build(),
                                                       name,
-                                                      typeVariable);
+                                                      typeVariables);
     }
 
     default JavaType covariantParameterizedFunctionJavaType(final JavaPackage javaPackage,
                                                             final String name,
-                                                            final JavaType... typeVariable) {
-        final int size = typeVariable.length;
+                                                            final SyncList<JavaType> typeVariables) {
+        final int size = typeVariables.size();
         final SyncList<JavaType> javaTypeVariablesList = SyncList.empty();
         if (size == 0) {
             return javaType(javaPackage,
                             name);
-        } else if (size == 1) {
-            javaTypeVariablesList.append(javaTypeVariableWithLowerBounds(typeVariable[0]));
         } else {
             for (int i = 0; i < size; i++) {
                 if (i != (size - 1)) {
-                    javaTypeVariablesList.append(javaTypeVariableWithWildcardLowerBounds(typeVariable[i]));
+                    javaTypeVariablesList.append(javaTypeVariableWithWildcardLowerBounds(typeVariables.getOrElse(i,
+                                                                                                                 null)));
                 } else {
-                    javaTypeVariablesList.append(javaTypeVariableWithWildcardUpperBounds(typeVariable[i]));
+                    javaTypeVariablesList.append(javaTypeVariableWithWildcardUpperBounds(typeVariables.getOrElse(i,
+                                                                                                                 null)));
                 }
             }
         }

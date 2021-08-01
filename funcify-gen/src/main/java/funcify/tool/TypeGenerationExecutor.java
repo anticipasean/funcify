@@ -32,8 +32,8 @@ public interface TypeGenerationExecutor<T, S, D> {
                                                 getSession(),
                                                 requireNonNull(definitionUpdater,
                                                                () -> "definitionUpdater").apply(getTemplate(),
-                                                                                                    getSession(),
-                                                                                                    getDefinition()));
+                                                                                                getSession(),
+                                                                                                getDefinition()));
     }
 
     default <I> TypeGenerationExecutor<T, S, D> updateDefinition(final Fn4<? super T, ? super S, ? super D, ? super I, ? extends D> definitionUpdater,
@@ -42,9 +42,9 @@ public interface TypeGenerationExecutor<T, S, D> {
                                                 getSession(),
                                                 requireNonNull(definitionUpdater,
                                                                () -> "definitionUpdater").apply(getTemplate(),
-                                                                                                    getSession(),
-                                                                                                    getDefinition(),
-                                                                                                    input));
+                                                                                                getSession(),
+                                                                                                getDefinition(),
+                                                                                                input));
     }
     //    default <I> TemplateExecutor<T, S, D> definitionUpdate(final Fn4<? super T, ? super S, ? super D, ? super SyncList<I>, ? extends D> definitionUpdaterFunc,
     //                                                           final SyncList<I> inputs) {
@@ -65,10 +65,10 @@ public interface TypeGenerationExecutor<T, S, D> {
                                                 getSession(),
                                                 requireNonNull(definitionUpdater,
                                                                () -> "definitionUpdater").apply(getTemplate(),
-                                                                                                    getSession(),
-                                                                                                    getDefinition(),
-                                                                                                    input1,
-                                                                                                    input2));
+                                                                                                getSession(),
+                                                                                                getDefinition(),
+                                                                                                input1,
+                                                                                                input2));
     }
 
     default <I1, I2, I3> TypeGenerationExecutor<T, S, D> updateDefinition(final Fn6<? super T, ? super S, ? super D, ? super I1, ? super I2, ? super I3, ? extends D> definitionUpdater,
@@ -79,11 +79,11 @@ public interface TypeGenerationExecutor<T, S, D> {
                                                 getSession(),
                                                 requireNonNull(definitionUpdater,
                                                                () -> "definitionUpdater").apply(getTemplate(),
-                                                                                                    getSession(),
-                                                                                                    getDefinition(),
-                                                                                                    input1,
-                                                                                                    input2,
-                                                                                                    input3));
+                                                                                                getSession(),
+                                                                                                getDefinition(),
+                                                                                                input1,
+                                                                                                input2,
+                                                                                                input3));
     }
 
     default <CD, I> TypeGenerationExecutor<T, S, D> addChildDefinition(final Fn4<? super T, ? super S, ? super D, ? super CD, ? extends D> definitionUpdaterFunc,
@@ -99,6 +99,42 @@ public interface TypeGenerationExecutor<T, S, D> {
                                                                                                                    () -> "childDefGenerator").apply(getTemplate(),
                                                                                                                                                     getSession(),
                                                                                                                                                     input)));
+    }
+
+    default <CD, I1, I2> TypeGenerationExecutor<T, S, D> addChildDefinition(final Fn4<? super T, ? super S, ? super D, ? super CD, ? extends D> definitionUpdaterFunc,
+                                                                            final Fn4<? super T, ? super S, ? super I1, ? super I2, ? extends CD> childDefGenerator,
+                                                                            final I1 input1,
+                                                                            final I2 input2) {
+        return DefaultTypeGenerationExecutor.of(getTemplate(),
+                                                getSession(),
+                                                requireNonNull(definitionUpdaterFunc,
+                                                               () -> "definitionUpdaterFunc").apply(getTemplate(),
+                                                                                                    getSession(),
+                                                                                                    getDefinition(),
+                                                                                                    requireNonNull(childDefGenerator,
+                                                                                                                   () -> "childDefGenerator").apply(getTemplate(),
+                                                                                                                                                    getSession(),
+                                                                                                                                                    input1,
+                                                                                                                                                    input2)));
+    }
+
+    default <CD, I1, I2, I3> TypeGenerationExecutor<T, S, D> addChildDefinition(final Fn4<? super T, ? super S, ? super D, ? super CD, ? extends D> definitionUpdaterFunc,
+                                                                                final Fn5<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? extends CD> childDefGenerator,
+                                                                                final I1 input1,
+                                                                                final I2 input2,
+                                                                                final I3 input3) {
+        return DefaultTypeGenerationExecutor.of(getTemplate(),
+                                                getSession(),
+                                                requireNonNull(definitionUpdaterFunc,
+                                                               () -> "definitionUpdaterFunc").apply(getTemplate(),
+                                                                                                    getSession(),
+                                                                                                    getDefinition(),
+                                                                                                    requireNonNull(childDefGenerator,
+                                                                                                                   () -> "childDefGenerator").apply(getTemplate(),
+                                                                                                                                                    getSession(),
+                                                                                                                                                    input1,
+                                                                                                                                                    input2,
+                                                                                                                                                    input3)));
     }
 
     default <CD1, CD2, I> TypeGenerationExecutor<T, S, D> addChildDefinition(final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> definitionUpdaterFunc,
@@ -127,6 +163,111 @@ public interface TypeGenerationExecutor<T, S, D> {
                                                                                                     updatedChildDef));
     }
 
+    default <CD1, CD2, I> TypeGenerationExecutor<T, S, D> addChildDefinition(final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> definitionUpdaterFunc,
+                                                                             final Fn2<? super T, ? super S, ? extends CD1> childDef1Generator,
+                                                                             final Fn4<? super T, ? super S, ? super CD1, ? super CD2, ? extends CD1> childDef1Updater,
+                                                                             final Fn2<? super T, ? super S, ? extends CD2> emptyChildDef2Generator,
+                                                                             final Fn4<? super T, ? super S, ? super CD2, ? super I, ? extends CD2> childDef2Updater,
+                                                                             final I input) {
+        final CD2 childDef2 = requireNonNull(emptyChildDef2Generator,
+                                             () -> "emptyChildDef2Generator").apply(getTemplate(),
+                                                                                    getSession());
+        final CD2 updatedChildDef2 = requireNonNull(childDef2Updater,
+                                                    () -> "childDef2Updater").apply(getTemplate(),
+                                                                                    getSession(),
+                                                                                    childDef2,
+                                                                                    input);
+        final CD1 childDef1 = requireNonNull(childDef1Generator,
+                                             () -> "childDef1Generator").apply(getTemplate(),
+                                                                               getSession());
+        final CD1 updatedChildDef1 = requireNonNull(childDef1Updater,
+                                                    () -> "childDef1Updater").apply(getTemplate(),
+                                                                                    getSession(),
+                                                                                    childDef1,
+                                                                                    updatedChildDef2);
+        return DefaultTypeGenerationExecutor.of(getTemplate(),
+                                                getSession(),
+                                                requireNonNull(definitionUpdaterFunc,
+                                                               () -> "definitionUpdaterFunc").apply(getTemplate(),
+                                                                                                    getSession(),
+                                                                                                    getDefinition(),
+                                                                                                    updatedChildDef1));
+    }
+
+    default <CD1, CD2, I> TypeGenerationExecutor<T, S, D> addChildDefinition(final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> definitionUpdaterFunc,
+                                                                             final Fn3<? super T, ? super S, ? super CD2, ? extends CD1> childDef1Generator,
+                                                                             final Fn3<? super T, ? super S, ? super I, ? extends CD2> childDef2Generator,
+                                                                             final I input) {
+
+        final CD2 childDef2 = requireNonNull(childDef2Generator,
+                                             () -> "childDef2Generator").apply(getTemplate(),
+                                                                               getSession(),
+                                                                               input);
+        final CD1 childDef1 = requireNonNull(childDef1Generator,
+                                             () -> "childDef1Generator").apply(getTemplate(),
+                                                                               getSession(),
+                                                                               childDef2);
+        return DefaultTypeGenerationExecutor.of(getTemplate(),
+                                                getSession(),
+                                                requireNonNull(definitionUpdaterFunc,
+                                                               () -> "definitionUpdaterFunc").apply(getTemplate(),
+                                                                                                    getSession(),
+                                                                                                    getDefinition(),
+                                                                                                    childDef1));
+    }
+
+    default <CD1, CD2, I1, I2> TypeGenerationExecutor<T, S, D> addChildDefinition(final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> definitionUpdaterFunc,
+                                                                                  final Fn3<? super T, ? super S, ? super CD2, ? extends CD1> childDef1Generator,
+                                                                                  final Fn4<? super T, ? super S, ? super I1, ? super I2, ? extends CD2> childDef2Generator,
+                                                                                  final I1 input1,
+                                                                                  final I2 input2) {
+
+        final CD2 childDef2 = requireNonNull(childDef2Generator,
+                                             () -> "childDef2Generator").apply(getTemplate(),
+                                                                               getSession(),
+                                                                               input1,
+                                                                               input2);
+        final CD1 childDef1 = requireNonNull(childDef1Generator,
+                                             () -> "childDef1Generator").apply(getTemplate(),
+                                                                               getSession(),
+                                                                               childDef2);
+        return DefaultTypeGenerationExecutor.of(getTemplate(),
+                                                getSession(),
+                                                requireNonNull(definitionUpdaterFunc,
+                                                               () -> "definitionUpdaterFunc").apply(getTemplate(),
+                                                                                                    getSession(),
+                                                                                                    getDefinition(),
+                                                                                                    childDef1));
+    }
+
+    default <CD1, CD2, CD3, I> TypeGenerationExecutor<T, S, D> addChildDefinition(final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> definitionUpdaterFunc,
+                                                                                  final Fn3<? super T, ? super S, ? super CD2, ? extends CD1> childDef1Generator,
+                                                                                  final Fn3<? super T, ? super S, ? super CD3, ? extends CD2> childDef2Generator,
+                                                                                  final Fn3<? super T, ? super S, ? super I, ? extends CD3> childDef3Generator,
+                                                                                  final I input) {
+        final CD3 childDef3 = requireNonNull(childDef3Generator,
+                                             () -> "childDef3Generator").apply(getTemplate(),
+                                                                               getSession(),
+                                                                               input);
+
+        final CD2 childDef2 = requireNonNull(childDef2Generator,
+                                             () -> "childDef2Generator").apply(getTemplate(),
+                                                                               getSession(),
+                                                                               childDef3);
+        final CD1 childDef1 = requireNonNull(childDef1Generator,
+                                             () -> "childDef1Generator").apply(getTemplate(),
+                                                                               getSession(),
+                                                                               childDef2);
+        return DefaultTypeGenerationExecutor.of(getTemplate(),
+                                                getSession(),
+                                                requireNonNull(definitionUpdaterFunc,
+                                                               () -> "definitionUpdaterFunc").apply(getTemplate(),
+                                                                                                    getSession(),
+                                                                                                    getDefinition(),
+                                                                                                    childDef1));
+    }
+
+
     default TypeGenerationExecutor<T, S, D> updateSession(final Fn3<? super T, ? super S, ? super D, ? extends S> sessionUpdater) {
         return DefaultTypeGenerationExecutor.of(getTemplate(),
                                                 requireNonNull(sessionUpdater).apply(getTemplate(),
@@ -146,7 +287,8 @@ public interface TypeGenerationExecutor<T, S, D> {
     }
 
 
-    @AllArgsConstructor(access = AccessLevel.PACKAGE, staticName = "of")
+    @AllArgsConstructor(access = AccessLevel.PACKAGE,
+                        staticName = "of")
     @Getter
     static class DefaultTypeGenerationExecutor<T, S, D> implements TypeGenerationExecutor<T, S, D> {
 

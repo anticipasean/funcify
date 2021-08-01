@@ -53,7 +53,7 @@ public interface StatementGenerationTemplate<SWT> extends AnnotationGenerationTe
 
 
     default JavaStatement returnStatement(final TypeGenerationSession<SWT> session,
-                                          final JavaExpression... expression) {
+                                          final JavaExpression expression) {
         return returnStatement(session,
                                SyncList.of(expression));
     }
