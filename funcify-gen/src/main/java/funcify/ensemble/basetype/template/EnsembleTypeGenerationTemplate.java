@@ -7,6 +7,7 @@ import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession;
 import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession.ETSWT;
 import funcify.st.template.STExpressionGenerationTemplate;
 import funcify.tool.CharacterOps;
+import funcify.tool.DefinitionTreeWalker;
 import funcify.tool.TypeGenerationExecutor;
 import funcify.tool.container.SyncList;
 import funcify.typedef.JavaCodeBlock;
@@ -126,6 +127,12 @@ public interface EnsembleTypeGenerationTemplate extends TypeGenerationTemplate<E
                                                                                            lowerBoundWildcardValueTypeParameter));
         final JavaType returnTypeVariable = javaTypeVariableWithUpperBound(returnTypeBaseVariable,
                                                                            returnTypeBaseVariableSuperType);
+        DefinitionTreeWalker.builder()
+                            .template(this)
+                            .session(session)
+                            .definition(typeDef)
+                            .createDefaultChildDef1(TypeGenerationTemplate::emptyMethodDefinition)
+                            .updateChildDef1WithChildDef0(TypeGenerationTemplate::method);
         return TypeGenerationExecutor.of(this,
                                          session,
                                          typeDef)
