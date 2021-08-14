@@ -674,7 +674,7 @@ class DefinitionTreeWalkerImpl {
         private final Fn3<? super T, ? super S, ? super I1, ? extends CD6> childDef6Creator;
 
         /**
-         *<pre>
+         * <pre>
          *     var arity: Int = 3
          * List.range(0, 7).map(i => s"""
          * else if(${if(i == 0) "definition" else s"childDef${i}"} == null && ${if(i == 0) "defCreator" else s"childDef${i}Creator"} != null && ${List.range(1, arity + 1).map(idx => s"input${idx} != null").mkString(" && ")}){
@@ -695,12 +695,12 @@ class DefinitionTreeWalkerImpl {
          *             .build();
          * }
          * """).foreach(println)
-         *</pre>
+         * </pre>
          */
 
         @Override
         public <I2, I3, I4, I5> ApplyStep<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> input(final I1 input1) {
-            if (definition == null && defCreator != null && input1 != null) {
+            if (definition == null && defCreator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -717,7 +717,7 @@ class DefinitionTreeWalkerImpl {
                                                                  definition,
                                                                  input1))
                                     .build();
-            } else if (childDef1 == null && childDef1Creator != null && input1 != null) {
+            } else if (childDef1 == null && childDef1Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -746,7 +746,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef2 == null && childDef2Creator != null && input1 != null) {
+            } else if (childDef2 == null && childDef2Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -775,7 +775,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef3 == null && childDef3Creator != null && input1 != null) {
+            } else if (childDef3 == null && childDef3Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -804,7 +804,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef4 == null && childDef4Creator != null && input1 != null) {
+            } else if (childDef4 == null && childDef4Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -833,7 +833,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef5 == null && childDef5Creator != null && input1 != null) {
+            } else if (childDef5 == null && childDef5Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -862,7 +862,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef6 == null && childDef6Creator != null && input1 != null) {
+            } else if (childDef6 == null && childDef6Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -892,8 +892,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .build();
             } else {
-                throw new RuntimeException("none of the input functions could be applied");
-
+                throw new IllegalArgumentException("none of the definition or child definition input functions are non-null");
             }
 
         }
@@ -930,7 +929,7 @@ class DefinitionTreeWalkerImpl {
         @Override
         public <I3, I4, I5> ApplyStep<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> input(final I1 input1,
                                                                                                        final I2 input2) {
-            if (definition == null && defCreator != null && input1 != null && input2 != null) {
+            if (definition == null && defCreator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -963,7 +962,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef1 == null && childDef1Creator != null && input1 != null && input2 != null) {
+            } else if (childDef1 == null && childDef1Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -994,7 +993,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef2 == null && childDef2Creator != null && input1 != null && input2 != null) {
+            } else if (childDef2 == null && childDef2Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1025,7 +1024,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef3 == null && childDef3Creator != null && input1 != null && input2 != null) {
+            } else if (childDef3 == null && childDef3Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1056,7 +1055,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef4 == null && childDef4Creator != null && input1 != null && input2 != null) {
+            } else if (childDef4 == null && childDef4Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1087,7 +1086,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef5 == null && childDef5Creator != null && input1 != null && input2 != null) {
+            } else if (childDef5 == null && childDef5Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1118,7 +1117,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef6 == null && childDef6Creator != null && input1 != null && input2 != null) {
+            } else if (childDef6 == null && childDef6Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1151,7 +1150,7 @@ class DefinitionTreeWalkerImpl {
                                     .build();
             } else {
 
-                return null;
+                throw new IllegalArgumentException("none of the definition or child definition input functions are non-null");
             }
         }
     }
@@ -1188,7 +1187,7 @@ class DefinitionTreeWalkerImpl {
         public <I4, I5> ApplyStep<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> input(final I1 input1,
                                                                                                    final I2 input2,
                                                                                                    final I3 input3) {
-            if (definition == null && defCreator != null && input1 != null && input2 != null && input3 != null) {
+            if (definition == null && defCreator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1223,7 +1222,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef1 == null && childDef1Creator != null && input1 != null && input2 != null && input3 != null) {
+            } else if (childDef1 == null && childDef1Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1256,7 +1255,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef2 == null && childDef2Creator != null && input1 != null && input2 != null && input3 != null) {
+            } else if (childDef2 == null && childDef2Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1289,7 +1288,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef3 == null && childDef3Creator != null && input1 != null && input2 != null && input3 != null) {
+            } else if (childDef3 == null && childDef3Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1322,7 +1321,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef4 == null && childDef4Creator != null && input1 != null && input2 != null && input3 != null) {
+            } else if (childDef4 == null && childDef4Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1355,7 +1354,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef5 == null && childDef5Creator != null && input1 != null && input2 != null && input3 != null) {
+            } else if (childDef5 == null && childDef5Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1388,7 +1387,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef6 == null && childDef6Creator != null && input1 != null && input2 != null && input3 != null) {
+            } else if (childDef6 == null && childDef6Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1422,7 +1421,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .build();
             } else {
-                return null;
+                throw new IllegalArgumentException("none of the definition or child definition input functions are non-null");
             }
         }
     }
@@ -1460,8 +1459,7 @@ class DefinitionTreeWalkerImpl {
                                                                                                final I2 input2,
                                                                                                final I3 input3,
                                                                                                final I4 input4) {
-            if (definition == null && defCreator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null) {
+            if (definition == null && defCreator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1498,8 +1496,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef1 == null && childDef1Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null) {
+            } else if (childDef1 == null && childDef1Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1534,8 +1531,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef2 == null && childDef2Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null) {
+            } else if (childDef2 == null && childDef2Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1570,8 +1566,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef3 == null && childDef3Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null) {
+            } else if (childDef3 == null && childDef3Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1606,8 +1601,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef4 == null && childDef4Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null) {
+            } else if (childDef4 == null && childDef4Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1642,8 +1636,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef5 == null && childDef5Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null) {
+            } else if (childDef5 == null && childDef5Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1678,8 +1671,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef6 == null && childDef6Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null) {
+            } else if (childDef6 == null && childDef6Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1715,7 +1707,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .build();
             } else {
-                return null;
+                throw new IllegalArgumentException("none of the definition or child definition input functions are non-null");
             }
         }
     }
@@ -1754,8 +1746,7 @@ class DefinitionTreeWalkerImpl {
                                                                                           final I3 input3,
                                                                                           final I4 input4,
                                                                                           final I5 input5) {
-            if (definition == null && defCreator != null && input1 != null && input2 != null && input3 != null && input4 != null
-                && input5 != null) {
+            if (definition == null && defCreator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1794,8 +1785,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef1 == null && childDef1Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null && input5 != null) {
+            } else if (childDef1 == null && childDef1Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1832,8 +1822,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef2 == null && childDef2Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null && input5 != null) {
+            } else if (childDef2 == null && childDef2Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1870,8 +1859,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef3 == null && childDef3Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null && input5 != null) {
+            } else if (childDef3 == null && childDef3Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1908,8 +1896,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef4 == null && childDef4Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null && input5 != null) {
+            } else if (childDef4 == null && childDef4Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1946,8 +1933,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef5 == null && childDef5Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null && input5 != null) {
+            } else if (childDef5 == null && childDef5Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -1984,8 +1970,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4)
                                     .childDef6(childDef6)
                                     .build();
-            } else if (childDef6 == null && childDef6Creator != null && input1 != null && input2 != null && input3 != null
-                && input4 != null && input5 != null) {
+            } else if (childDef6 == null && childDef6Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
                                     .template(template)
                                     .session(session)
@@ -2023,7 +2008,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5)
                                     .build();
             } else {
-                return null;
+                throw new IllegalArgumentException("none of the definition or child definition input functions are non-null");
             }
         }
     }
