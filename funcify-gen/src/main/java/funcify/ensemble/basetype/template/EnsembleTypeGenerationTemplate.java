@@ -132,7 +132,7 @@ public interface EnsembleTypeGenerationTemplate extends TypeGenerationTemplate<E
                             .session(session)
                             .definition(typeDef)
                             .createDefaultChildDef1(TypeGenerationTemplate::emptyMethodDefinition)
-                            .updateChildDef1WithChildDef0(TypeGenerationTemplate::method);
+                            .updateDefWithChildDef1(TypeGenerationTemplate::method);
         return TypeGenerationExecutor.of(this,
                                          session,
                                          typeDef)

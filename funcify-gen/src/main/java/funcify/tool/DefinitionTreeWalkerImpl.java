@@ -29,6 +29,7 @@ import funcify.tool.DefinitionTreeWalker.Input4Step;
 import funcify.tool.DefinitionTreeWalker.Input5Step;
 import funcify.tool.DefinitionTreeWalker.SessionStep;
 import funcify.tool.DefinitionTreeWalker.TemplateStep;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
@@ -85,22 +86,40 @@ class DefinitionTreeWalkerImpl {
 
         @Override
         public <D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2> Input2Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2> createDef(final Fn4<? super T, ? super S, ? super I1, ? super I2, ? extends D> defCreator) {
-            return null;
+
+            return Input2StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2>builder()
+                                 .template(template)
+                                 .session(session)
+                                 .defCreator(defCreator)
+                                 .build();
         }
 
         @Override
         public <D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3> Input3Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3> createDef(final Fn5<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? extends D> defCreator) {
-            return null;
+            return Input3StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3>builder()
+                                 .template(template)
+                                 .session(session)
+                                 .defCreator(defCreator)
+                                 .build();
         }
 
         @Override
         public <D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> Input4Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> createDef(final Fn6<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? extends D> defCreator) {
-            return null;
+            return Input4StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4>builder()
+                                 .template(template)
+                                 .session(session)
+                                 .defCreator(defCreator)
+                                 .build();
+
         }
 
         @Override
         public <D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> Input5Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> createDef(final Fn7<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends D> defCreator) {
-            return null;
+            return Input5StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
+                                 .template(template)
+                                 .session(session)
+                                 .defCreator(defCreator)
+                                 .build();
         }
     }
 
@@ -117,7 +136,7 @@ class DefinitionTreeWalkerImpl {
             return ApplyStepImpl.of(template,
                                     session,
                                     definition,
-                                    null,
+                                    childDef1,
                                     null,
                                     null,
                                     null,
@@ -127,32 +146,149 @@ class DefinitionTreeWalkerImpl {
 
         @Override
         public <CD1> ChildDefinition2UpdateStep<T, S, D, CD1> createDefaultChildDef1(final Fn2<? super T, ? super S, ? extends CD1> childDef1Creator) {
-            return null;
+            return ChildDefinition2UpdateStepImpl.of(template,
+                                                     session,
+                                                     definition,
+                                                     Objects.requireNonNull(childDef1Creator,
+                                                                            () -> "childDef1Creator")
+                                                            .apply(template,
+                                                                   session));
         }
 
         @Override
         public <CD1, CD2, CD3, CD4, CD5, CD6, I1> Input1Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1> updateDef(final Fn4<? super T, ? super S, ? super D, ? super I1, ? extends D> defUpdate) {
-            return null;
+            return Input1StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1>of(template,
+                                                                                session,
+                                                                                definition,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null);
         }
 
         @Override
         public <CD1, CD2, CD3, CD4, CD5, CD6, I1, I2> Input2Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2> updateDef(final Fn5<? super T, ? super S, ? super D, ? super I1, ? super I2, ? extends D> defUpdate) {
-            return null;
+            return Input2StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2>of(template,
+                                                                                    session,
+                                                                                    definition,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null);
+
         }
 
         @Override
         public <CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3> Input3Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3> updateDef(final Fn6<? super T, ? super S, ? super D, ? super I1, ? super I2, ? super I3, ? extends D> defUpdate) {
-            return null;
+
+            return Input3StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3>of(template,
+                                                                                        session,
+                                                                                        definition,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null);
+
         }
 
         @Override
         public <CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> Input4Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> updateDef(final Fn7<? super T, ? super S, ? super D, ? super I1, ? super I2, ? super I3, ? super I4, ? extends D> defUpdate) {
-            return null;
+
+            return Input4StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4>of(template,
+                                                                                            session,
+                                                                                            definition,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null);
+
         }
 
         @Override
         public <CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> Input5Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> updateDef(final Fn8<? super T, ? super S, ? super D, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends D> defUpdate) {
-            return null;
+            return Input5StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>of(template,
+                                                                                                session,
+                                                                                                definition,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null);
+
         }
     }
 
@@ -163,10 +299,15 @@ class DefinitionTreeWalkerImpl {
         private final T template;
         private final S session;
         private final D definition;
+        private final CD1 childDef1;
 
         @Override
         public ChildDefinition2CreateStep<T, S, D, CD1> updateDefWithChildDef1(final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> definitionUpdater) {
-            return null;
+            return ChildDefinition2CreateStepImpl.of(template,
+                                                     session,
+                                                     definition,
+                                                     childDef1,
+                                                     definitionUpdater);
         }
     }
 
@@ -177,6 +318,8 @@ class DefinitionTreeWalkerImpl {
         private final T template;
         private final S session;
         private final D definition;
+        private final CD1 childDef1;
+        private final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> definitionUpdater;
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5, I6> ApplyStep<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> childDef2(final CD2 childDef2) {
@@ -185,57 +328,283 @@ class DefinitionTreeWalkerImpl {
 
         @Override
         public <CD2> ChildDefinition3UpdateStep<T, S, D, CD1, CD2> createDefaultChildDef2(final Fn2<? super T, ? super S, ? extends CD2> childDef2Creator) {
-            return null;
+            return ChildDefinition3UpdateStepImpl.of(template,
+                                                     session,
+                                                     definition,
+                                                     childDef1,
+                                                     Objects.requireNonNull(childDef2Creator,
+                                                                            () -> "childDef2Creator")
+                                                            .apply(template,
+                                                                   session),
+                                                     definitionUpdater);
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1> Input1Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1> updateChildDef1(final Fn4<? super T, ? super S, ? super CD1, ? super I1, ? extends CD1> childDef1UpdateInput) {
-            return null;
+
+            return Input1StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1>of(template,
+                                                                                session,
+                                                                                definition,
+                                                                                childDef1,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null);
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1, I2> Input2Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2> updateChildDef1(final Fn5<? super T, ? super S, ? super CD1, ? super I1, ? super I2, ? extends CD1> childDef1UpdateInput) {
-            return null;
+            return Input2StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2>of(template,
+                                                                                    session,
+                                                                                    definition,
+                                                                                    childDef1,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null);
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1, I2, I3> Input3Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3> updateChildDef1(final Fn6<? super T, ? super S, ? super CD1, ? super I1, ? super I2, ? super I3, ? extends CD1> childDef1UpdateInput) {
-            return null;
+
+            return Input3StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3>of(template,
+                                                                                        session,
+                                                                                        definition,
+                                                                                        childDef1,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null);
+
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> Input4Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> updateChildDef1(final Fn7<? super T, ? super S, ? super CD1, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD1> childDef1UpdateInput) {
-            return null;
+
+            return Input4StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4>of(template,
+                                                                                            session,
+                                                                                            definition,
+                                                                                            childDef1,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null);
+
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> Input5Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> updateChildDef1(final Fn8<? super T, ? super S, ? super CD1, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD1> childDef1UpdateInput) {
-            return null;
+
+            return Input5StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>of(template,
+                                                                                                session,
+                                                                                                definition,
+                                                                                                childDef1,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null);
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1> Input1Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1> createChildDef1(final Fn3<? super T, ? super S, ? super I1, ? extends CD1> childDef1Input) {
-            return null;
+            return Input1StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1>of(template,
+                                                                                session,
+                                                                                definition,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                childDef1Input,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null,
+                                                                                null);
+
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1, I2> Input2Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2> createChildDef1(final Fn4<? super T, ? super S, ? super I1, ? super I2, ? extends CD1> childDef1Input) {
-            return null;
+            return Input2StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2>of(template,
+                                                                                    session,
+                                                                                    definition,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    childDef1Input,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null);
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1, I2, I3> Input3Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3> createChildDef1(final Fn5<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? extends CD1> childDef1Input) {
-            return null;
+
+            return Input3StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3>of(template,
+                                                                                        session,
+                                                                                        definition,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        childDef1Input,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null,
+                                                                                        null);
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> Input4Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> createChildDef1(final Fn6<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD1> childDef1Input) {
-            return null;
+            return Input4StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4>of(template,
+                                                                                            session,
+                                                                                            definition,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            childDef1Input,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null);
         }
 
         @Override
         public <CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> Input5Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> createChildDef1(final Fn7<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD1> childDef1Input) {
-            return null;
+            return Input5StepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>of(template,
+                                                                                                session,
+                                                                                                definition,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                childDef1Input,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null,
+                                                                                                null);
         }
     }
 
@@ -246,6 +615,9 @@ class DefinitionTreeWalkerImpl {
         private final T template;
         private final S session;
         private final D definition;
+        private final CD1 childDef1;
+        private final CD2 childDef2;
+        private final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> definitionUpdater;
 
         @Override
         public ChildDefinition3CreateStep<T, S, D, CD1, CD2> childDef1Updater(final Fn4<? super T, ? super S, ? super CD1, ? super CD2, ? extends CD1> childDef1Updater) {
@@ -658,13 +1030,12 @@ class DefinitionTreeWalkerImpl {
         private final CD4 childDef4;
         private final CD5 childDef5;
         private final CD6 childDef6;
-        private final Fn4<? super T, ? super S, ? super D, ? super I1, ? extends D> defUpdater;
-        private final Fn4<? super T, ? super S, ? super CD1, ? super I1, ? extends CD1> childDef1Updater;
-        private final Fn4<? super T, ? super S, ? super CD2, ? super I1, ? extends CD2> childDef2Updater;
-        private final Fn4<? super T, ? super S, ? super CD3, ? super I1, ? extends CD3> childDef3Updater;
-        private final Fn4<? super T, ? super S, ? super CD4, ? super I1, ? extends CD4> childDef4Updater;
-        private final Fn4<? super T, ? super S, ? super CD5, ? super I1, ? extends CD5> childDef5Updater;
-        private final Fn4<? super T, ? super S, ? super CD6, ? super I1, ? extends CD6> childDef6Updater;
+        private final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> defUpdater;
+        private final Fn4<? super T, ? super S, ? super CD1, ? super CD2, ? extends CD1> childDef1Updater;
+        private final Fn4<? super T, ? super S, ? super CD2, ? super CD3, ? extends CD2> childDef2Updater;
+        private final Fn4<? super T, ? super S, ? super CD3, ? super CD4, ? extends CD3> childDef3Updater;
+        private final Fn4<? super T, ? super S, ? super CD4, ? super CD5, ? extends CD4> childDef4Updater;
+        private final Fn4<? super T, ? super S, ? super CD5, ? super CD6, ? extends CD5> childDef5Updater;
         private final Fn3<? super T, ? super S, ? super I1, ? extends D> defCreator;
         private final Fn3<? super T, ? super S, ? super I1, ? extends CD1> childDef1Creator;
         private final Fn3<? super T, ? super S, ? super I1, ? extends CD2> childDef2Creator;
@@ -715,7 +1086,7 @@ class DefinitionTreeWalkerImpl {
                                     .definition(defUpdater.apply(template,
                                                                  session,
                                                                  definition,
-                                                                 input1))
+                                                                 childDef1))
                                     .build();
             } else if (childDef1 == null && childDef1Creator != null) {
                 return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
@@ -739,7 +1110,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef1(childDef1Updater.apply(template,
                                                                       session,
                                                                       childDef1,
-                                                                      input1))
+                                                                      childDef2))
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -768,7 +1139,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef2(childDef2Updater.apply(template,
                                                                       session,
                                                                       childDef2,
-                                                                      input1))
+                                                                      childDef3))
                                     .childDef1(childDef1)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -797,7 +1168,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef3(childDef3Updater.apply(template,
                                                                       session,
                                                                       childDef3,
-                                                                      input1))
+                                                                      childDef4))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef4(childDef4)
@@ -826,7 +1197,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4Updater.apply(template,
                                                                       session,
                                                                       childDef4,
-                                                                      input1))
+                                                                      childDef5))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -855,7 +1226,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5Updater.apply(template,
                                                                       session,
                                                                       childDef5,
-                                                                      input1))
+                                                                      childDef6))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -876,21 +1247,6 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4)
                                     .childDef5(childDef5)
                                     .build();
-            } else if (childDef6 != null && childDef6Updater != null) {
-                return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
-                                    .template(template)
-                                    .session(session)
-                                    .definition(definition)
-                                    .childDef6(childDef6Updater.apply(template,
-                                                                      session,
-                                                                      childDef6,
-                                                                      input1))
-                                    .childDef1(childDef1)
-                                    .childDef2(childDef2)
-                                    .childDef3(childDef3)
-                                    .childDef4(childDef4)
-                                    .childDef5(childDef5)
-                                    .build();
             } else {
                 throw new IllegalArgumentException("none of the definition or child definition input functions are non-null");
             }
@@ -899,6 +1255,7 @@ class DefinitionTreeWalkerImpl {
     }
 
     @AllArgsConstructor(staticName = "of")
+    @Builder
     static class Input2StepImpl<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2> implements
                                                                                Input2Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2> {
 
@@ -911,13 +1268,12 @@ class DefinitionTreeWalkerImpl {
         private final CD4 childDef4;
         private final CD5 childDef5;
         private final CD6 childDef6;
-        private final Fn5<? super T, ? super S, ? super D, ? super I1, ? super I2, ? extends D> defUpdater;
-        private final Fn5<? super T, ? super S, ? super CD1, ? super I1, ? super I2, ? extends CD1> childDef1Updater;
-        private final Fn5<? super T, ? super S, ? super CD2, ? super I1, ? super I2, ? extends CD2> childDef2Updater;
-        private final Fn5<? super T, ? super S, ? super CD3, ? super I1, ? super I2, ? extends CD3> childDef3Updater;
-        private final Fn5<? super T, ? super S, ? super CD4, ? super I1, ? super I2, ? extends CD4> childDef4Updater;
-        private final Fn5<? super T, ? super S, ? super CD5, ? super I1, ? super I2, ? extends CD5> childDef5Updater;
-        private final Fn5<? super T, ? super S, ? super CD6, ? super I1, ? super I2, ? extends CD6> childDef6Updater;
+        private final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> defUpdater;
+        private final Fn4<? super T, ? super S, ? super CD1, ? super CD2, ? extends CD1> childDef1Updater;
+        private final Fn4<? super T, ? super S, ? super CD2, ? super CD3, ? extends CD2> childDef2Updater;
+        private final Fn4<? super T, ? super S, ? super CD3, ? super CD4, ? extends CD3> childDef3Updater;
+        private final Fn4<? super T, ? super S, ? super CD4, ? super CD5, ? extends CD4> childDef4Updater;
+        private final Fn4<? super T, ? super S, ? super CD5, ? super CD6, ? extends CD5> childDef5Updater;
         private final Fn4<? super T, ? super S, ? super I1, ? super I2, ? extends D> defCreator;
         private final Fn4<? super T, ? super S, ? super I1, ? super I2, ? extends CD1> childDef1Creator;
         private final Fn4<? super T, ? super S, ? super I1, ? super I2, ? extends CD2> childDef2Creator;
@@ -952,8 +1308,7 @@ class DefinitionTreeWalkerImpl {
                                     .definition(defUpdater.apply(template,
                                                                  session,
                                                                  definition,
-                                                                 input1,
-                                                                 input2))
+                                                                 childDef1))
 
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
@@ -985,8 +1340,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef1(childDef1Updater.apply(template,
                                                                       session,
                                                                       childDef1,
-                                                                      input1,
-                                                                      input2))
+                                                                      childDef2))
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -1016,8 +1370,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef2(childDef2Updater.apply(template,
                                                                       session,
                                                                       childDef2,
-                                                                      input1,
-                                                                      input2))
+                                                                      childDef3))
                                     .childDef1(childDef1)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -1047,8 +1400,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef3(childDef3Updater.apply(template,
                                                                       session,
                                                                       childDef3,
-                                                                      input1,
-                                                                      input2))
+                                                                      childDef4))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef4(childDef4)
@@ -1078,8 +1430,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4Updater.apply(template,
                                                                       session,
                                                                       childDef4,
-                                                                      input1,
-                                                                      input2))
+                                                                      childDef5))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -1109,8 +1460,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5Updater.apply(template,
                                                                       session,
                                                                       childDef5,
-                                                                      input1,
-                                                                      input2))
+                                                                      childDef6))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -1132,22 +1482,6 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4)
                                     .childDef5(childDef5)
                                     .build();
-            } else if (childDef6 != null && childDef6Updater != null) {
-                return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
-                                    .template(template)
-                                    .session(session)
-                                    .definition(definition)
-                                    .childDef6(childDef6Updater.apply(template,
-                                                                      session,
-                                                                      childDef6,
-                                                                      input1,
-                                                                      input2))
-                                    .childDef1(childDef1)
-                                    .childDef2(childDef2)
-                                    .childDef3(childDef3)
-                                    .childDef4(childDef4)
-                                    .childDef5(childDef5)
-                                    .build();
             } else {
 
                 throw new IllegalArgumentException("none of the definition or child definition input functions are non-null");
@@ -1156,6 +1490,7 @@ class DefinitionTreeWalkerImpl {
     }
 
     @AllArgsConstructor(staticName = "of")
+    @Builder
     static class Input3StepImpl<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3> implements
                                                                                    Input3Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3> {
 
@@ -1168,13 +1503,12 @@ class DefinitionTreeWalkerImpl {
         private final CD4 childDef4;
         private final CD5 childDef5;
         private final CD6 childDef6;
-        private final Fn6<? super T, ? super S, ? super D, ? super I1, ? super I2, ? super I3, ? extends D> defUpdater;
-        private final Fn6<? super T, ? super S, ? super CD1, ? super I1, ? super I2, ? super I3, ? extends CD1> childDef1Updater;
-        private final Fn6<? super T, ? super S, ? super CD2, ? super I1, ? super I2, ? super I3, ? extends CD2> childDef2Updater;
-        private final Fn6<? super T, ? super S, ? super CD3, ? super I1, ? super I2, ? super I3, ? extends CD3> childDef3Updater;
-        private final Fn6<? super T, ? super S, ? super CD4, ? super I1, ? super I2, ? super I3, ? extends CD4> childDef4Updater;
-        private final Fn6<? super T, ? super S, ? super CD5, ? super I1, ? super I2, ? super I3, ? extends CD5> childDef5Updater;
-        private final Fn6<? super T, ? super S, ? super CD6, ? super I1, ? super I2, ? super I3, ? extends CD6> childDef6Updater;
+        private final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> defUpdater;
+        private final Fn4<? super T, ? super S, ? super CD1, ? super CD2, ? extends CD1> childDef1Updater;
+        private final Fn4<? super T, ? super S, ? super CD2, ? super CD3, ? extends CD2> childDef2Updater;
+        private final Fn4<? super T, ? super S, ? super CD3, ? super CD4, ? extends CD3> childDef3Updater;
+        private final Fn4<? super T, ? super S, ? super CD4, ? super CD5, ? extends CD4> childDef4Updater;
+        private final Fn4<? super T, ? super S, ? super CD5, ? super CD6, ? extends CD5> childDef5Updater;
         private final Fn5<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? extends D> defCreator;
         private final Fn5<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? extends CD1> childDef1Creator;
         private final Fn5<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? extends CD2> childDef2Creator;
@@ -1211,9 +1545,7 @@ class DefinitionTreeWalkerImpl {
                                     .definition(defUpdater.apply(template,
                                                                  session,
                                                                  definition,
-                                                                 input1,
-                                                                 input2,
-                                                                 input3))
+                                                                 childDef1))
 
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
@@ -1246,9 +1578,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef1(childDef1Updater.apply(template,
                                                                       session,
                                                                       childDef1,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3))
+                                                                      childDef2))
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -1279,9 +1609,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef2(childDef2Updater.apply(template,
                                                                       session,
                                                                       childDef2,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3))
+                                                                      childDef3))
                                     .childDef1(childDef1)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -1312,9 +1640,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef3(childDef3Updater.apply(template,
                                                                       session,
                                                                       childDef3,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3))
+                                                                      childDef4))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef4(childDef4)
@@ -1345,9 +1671,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4Updater.apply(template,
                                                                       session,
                                                                       childDef4,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3))
+                                                                      childDef5))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -1378,9 +1702,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5Updater.apply(template,
                                                                       session,
                                                                       childDef5,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3))
+                                                                      childDef6))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -1403,23 +1725,6 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4)
                                     .childDef5(childDef5)
                                     .build();
-            } else if (childDef6 != null && childDef6Updater != null) {
-                return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
-                                    .template(template)
-                                    .session(session)
-                                    .definition(definition)
-                                    .childDef6(childDef6Updater.apply(template,
-                                                                      session,
-                                                                      childDef6,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3))
-                                    .childDef1(childDef1)
-                                    .childDef2(childDef2)
-                                    .childDef3(childDef3)
-                                    .childDef4(childDef4)
-                                    .childDef5(childDef5)
-                                    .build();
             } else {
                 throw new IllegalArgumentException("none of the definition or child definition input functions are non-null");
             }
@@ -1427,6 +1732,7 @@ class DefinitionTreeWalkerImpl {
     }
 
     @AllArgsConstructor(staticName = "of")
+    @Builder
     static class Input4StepImpl<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> implements
                                                                                        Input4Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4> {
 
@@ -1439,13 +1745,12 @@ class DefinitionTreeWalkerImpl {
         private final CD4 childDef4;
         private final CD5 childDef5;
         private final CD6 childDef6;
-        private final Fn7<? super T, ? super S, ? super D, ? super I1, ? super I2, ? super I3, ? super I4, ? extends D> defUpdater;
-        private final Fn7<? super T, ? super S, ? super CD1, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD1> childDef1Updater;
-        private final Fn7<? super T, ? super S, ? super CD2, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD2> childDef2Updater;
-        private final Fn7<? super T, ? super S, ? super CD3, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD3> childDef3Updater;
-        private final Fn7<? super T, ? super S, ? super CD4, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD4> childDef4Updater;
-        private final Fn7<? super T, ? super S, ? super CD5, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD5> childDef5Updater;
-        private final Fn7<? super T, ? super S, ? super CD6, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD6> childDef6Updater;
+        private final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> defUpdater;
+        private final Fn4<? super T, ? super S, ? super CD1, ? super CD2, ? extends CD1> childDef1Updater;
+        private final Fn4<? super T, ? super S, ? super CD2, ? super CD3, ? extends CD2> childDef2Updater;
+        private final Fn4<? super T, ? super S, ? super CD3, ? super CD4, ? extends CD3> childDef3Updater;
+        private final Fn4<? super T, ? super S, ? super CD4, ? super CD5, ? extends CD4> childDef4Updater;
+        private final Fn4<? super T, ? super S, ? super CD5, ? super CD6, ? extends CD5> childDef5Updater;
         private final Fn6<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? extends D> defCreator;
         private final Fn6<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD1> childDef1Creator;
         private final Fn6<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? extends CD2> childDef2Creator;
@@ -1484,10 +1789,7 @@ class DefinitionTreeWalkerImpl {
                                     .definition(defUpdater.apply(template,
                                                                  session,
                                                                  definition,
-                                                                 input1,
-                                                                 input2,
-                                                                 input3,
-                                                                 input4))
+                                                                 childDef1))
 
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
@@ -1521,10 +1823,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef1(childDef1Updater.apply(template,
                                                                       session,
                                                                       childDef1,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4))
+                                                                      childDef2))
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -1556,10 +1855,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef2(childDef2Updater.apply(template,
                                                                       session,
                                                                       childDef2,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4))
+                                                                      childDef3))
                                     .childDef1(childDef1)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -1591,10 +1887,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef3(childDef3Updater.apply(template,
                                                                       session,
                                                                       childDef3,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4))
+                                                                      childDef4))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef4(childDef4)
@@ -1626,10 +1919,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4Updater.apply(template,
                                                                       session,
                                                                       childDef4,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4))
+                                                                      childDef5))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -1661,10 +1951,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5Updater.apply(template,
                                                                       session,
                                                                       childDef5,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4))
+                                                                      childDef6))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -1688,24 +1975,6 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4)
                                     .childDef5(childDef5)
                                     .build();
-            } else if (childDef6 != null && childDef6Updater != null) {
-                return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
-                                    .template(template)
-                                    .session(session)
-                                    .definition(definition)
-                                    .childDef6(childDef6Updater.apply(template,
-                                                                      session,
-                                                                      childDef6,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4))
-                                    .childDef1(childDef1)
-                                    .childDef2(childDef2)
-                                    .childDef3(childDef3)
-                                    .childDef4(childDef4)
-                                    .childDef5(childDef5)
-                                    .build();
             } else {
                 throw new IllegalArgumentException("none of the definition or child definition input functions are non-null");
             }
@@ -1713,6 +1982,7 @@ class DefinitionTreeWalkerImpl {
     }
 
     @AllArgsConstructor(staticName = "of")
+    @Builder
     static class Input5StepImpl<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> implements
                                                                                            Input5Step<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5> {
 
@@ -1725,13 +1995,12 @@ class DefinitionTreeWalkerImpl {
         private final CD4 childDef4;
         private final CD5 childDef5;
         private final CD6 childDef6;
-        private final Fn8<? super T, ? super S, ? super D, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends D> defUpdater;
-        private final Fn8<? super T, ? super S, ? super CD1, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD1> childDef1Updater;
-        private final Fn8<? super T, ? super S, ? super CD2, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD2> childDef2Updater;
-        private final Fn8<? super T, ? super S, ? super CD3, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD3> childDef3Updater;
-        private final Fn8<? super T, ? super S, ? super CD4, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD4> childDef4Updater;
-        private final Fn8<? super T, ? super S, ? super CD5, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD5> childDef5Updater;
-        private final Fn8<? super T, ? super S, ? super CD6, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD6> childDef6Updater;
+        private final Fn4<? super T, ? super S, ? super D, ? super CD1, ? extends D> defUpdater;
+        private final Fn4<? super T, ? super S, ? super CD1, ? super CD2, ? extends CD1> childDef1Updater;
+        private final Fn4<? super T, ? super S, ? super CD2, ? super CD3, ? extends CD2> childDef2Updater;
+        private final Fn4<? super T, ? super S, ? super CD3, ? super CD4, ? extends CD3> childDef3Updater;
+        private final Fn4<? super T, ? super S, ? super CD4, ? super CD5, ? extends CD4> childDef4Updater;
+        private final Fn4<? super T, ? super S, ? super CD5, ? super CD6, ? extends CD5> childDef5Updater;
         private final Fn7<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends D> defCreator;
         private final Fn7<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD1> childDef1Creator;
         private final Fn7<? super T, ? super S, ? super I1, ? super I2, ? super I3, ? super I4, ? super I5, ? extends CD2> childDef2Creator;
@@ -1772,11 +2041,7 @@ class DefinitionTreeWalkerImpl {
                                     .definition(defUpdater.apply(template,
                                                                  session,
                                                                  definition,
-                                                                 input1,
-                                                                 input2,
-                                                                 input3,
-                                                                 input4,
-                                                                 input5))
+                                                                 childDef1))
 
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
@@ -1811,11 +2076,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef1(childDef1Updater.apply(template,
                                                                       session,
                                                                       childDef1,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4,
-                                                                      input5))
+                                                                      childDef2))
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -1848,11 +2109,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef2(childDef2Updater.apply(template,
                                                                       session,
                                                                       childDef2,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4,
-                                                                      input5))
+                                                                      childDef3))
                                     .childDef1(childDef1)
                                     .childDef3(childDef3)
                                     .childDef4(childDef4)
@@ -1885,11 +2142,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef3(childDef3Updater.apply(template,
                                                                       session,
                                                                       childDef3,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4,
-                                                                      input5))
+                                                                      childDef4))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef4(childDef4)
@@ -1922,11 +2175,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef4(childDef4Updater.apply(template,
                                                                       session,
                                                                       childDef4,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4,
-                                                                      input5))
+                                                                      childDef5))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -1959,11 +2208,7 @@ class DefinitionTreeWalkerImpl {
                                     .childDef5(childDef5Updater.apply(template,
                                                                       session,
                                                                       childDef5,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4,
-                                                                      input5))
+                                                                      childDef6))
                                     .childDef1(childDef1)
                                     .childDef2(childDef2)
                                     .childDef3(childDef3)
@@ -1977,25 +2222,6 @@ class DefinitionTreeWalkerImpl {
                                     .definition(definition)
                                     .childDef6(childDef6Creator.apply(template,
                                                                       session,
-                                                                      input1,
-                                                                      input2,
-                                                                      input3,
-                                                                      input4,
-                                                                      input5))
-                                    .childDef1(childDef1)
-                                    .childDef2(childDef2)
-                                    .childDef3(childDef3)
-                                    .childDef4(childDef4)
-                                    .childDef5(childDef5)
-                                    .build();
-            } else if (childDef6 != null && childDef6Updater != null) {
-                return ApplyStepImpl.<T, S, D, CD1, CD2, CD3, CD4, CD5, CD6, I1, I2, I3, I4, I5>builder()
-                                    .template(template)
-                                    .session(session)
-                                    .definition(definition)
-                                    .childDef6(childDef6Updater.apply(template,
-                                                                      session,
-                                                                      childDef6,
                                                                       input1,
                                                                       input2,
                                                                       input3,
