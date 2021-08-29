@@ -11,13 +11,34 @@ import java.util.stream.Stream;
  */
 public interface CharacterOps {
 
-    static Stream<String> firstNAlphabetLettersAsStrings(int n) {
+    static Stream<String> firstNUppercaseLettersAsStrings(int n) {
         if (n <= 0) {
             return Stream.empty();
         }
         return streamRangeOfCharactersAsStringsFrom('A',
                                                     (char) (((int) 'A') + Math.min(26,
                                                                                    n)));
+    }
+
+    static Stream<String> firstNUppercaseLettersWithNumericIndexExtension(int n) {
+        if (n <= 0) {
+            return Stream.empty();
+        }
+        final int aToZSize = 'Z' - 'A' + 1;
+        return IntStream.range(0,
+                               n)
+                        .mapToObj(i -> {
+                            return uppercaseLetterByIndex(i % aToZSize).map(String::valueOf)
+                                                                       .map(s -> Optional.of(s)
+                                                                                         .filter(s1 -> i >= aToZSize)
+                                                                                         .map(s1 -> new StringBuilder().append(s1)
+                                                                                                                       .append((int) (
+                                                                                                                           i
+                                                                                                                               / aToZSize))
+                                                                                                                       .toString())
+                                                                                         .orElse(s))
+                                                                       .orElse("");
+                        });
     }
 
     static Stream<String> streamRangeOfCharactersAsStringsFrom(char start,
@@ -41,6 +62,20 @@ public interface CharacterOps {
 
     static Optional<Character> uppercaseLetterByIndex(final int index) {
         return uppercaseLetterByIndexMapper().apply(index);
+    }
+
+    static Optional<String> uppercaseLetterByIndexWithNumericExtension(final int index) {
+        if (index < 0) {
+            return Optional.empty();
+        }
+        final int aToZSize = 'Z' - 'A' + 1;
+        return uppercaseLetterByIndex(index % aToZSize).map(c -> Optional.of(index)
+                                                                         .filter(i -> i >= aToZSize)
+                                                                         .map(i -> new StringBuilder().append(c)
+                                                                                                      .append((int) (i
+                                                                                                          / aToZSize))
+                                                                                                      .toString())
+                                                                         .orElse(String.valueOf(c)));
     }
 
     static IntFunction<Optional<Character>> uppercaseLetterByIndexMapper() {

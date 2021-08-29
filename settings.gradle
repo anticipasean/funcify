@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        mavenLocal()
         gradlePluginPortal()
     }
 }
@@ -7,4 +8,3 @@ pluginManagement {
 rootProject.name = 'funcify'
 include ':funcify'
 include ':funcify-gen'
-include ':funcify-swagger-codegen'

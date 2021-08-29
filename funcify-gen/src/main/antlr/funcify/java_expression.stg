@@ -1,9 +1,15 @@
 import "java_type_definition.stg"
 
-null_check(input) ::= <<
-<if(input.expression)>Objects.requireNonNull(<expression(input.expression)>, () -> "<expression(input.expression)>")<\\>
-<elseif(input.parameter.name)>Objects.requireNonNull(<input.parameter.name>, () -> "<input.parameter.name>")<\\>
-<elseif(input.name)>Objects.requireNonNull(<input.name>, () -> "<input.name>")<endif>
+null_check_import() ::= <<
+import java.util.Objects;
+>>
+
+null_check(parameter="defaultParameterName") ::= <<
+Objects.requireNonNull(<parameter>, () -> "<parameter>")
+>>
+
+java_util_func_import() ::= <<
+import java.util.function.Function;
 >>
 
 function_call(input) ::= <<

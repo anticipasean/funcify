@@ -2,8 +2,8 @@ package funcify;
 
 import funcify.commandline.PathConverter;
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.basetype.session.DefaultEnsembleTypeGenerationSession;
-import funcify.ensemble.basetype.session.EnsembleTypeGenerationSession;
+import funcify.ensemble.basetype.session.DefaultTypeGenerationSession;
+import funcify.ensemble.basetype.session.TypeGenerationSession;
 import funcify.tool.container.SyncList;
 import java.io.File;
 import java.nio.file.Path;
@@ -34,18 +34,19 @@ public class FuncifyClassGenerator implements Callable<File> {
 
     @Override
     public File call() throws Exception {
-        final EnsembleTypeGenerationSession generationSession = buildInitialGenerationSession();
+        final TypeGenerationSession generationSession = buildInitialGenerationSession();
         return null;
     }
 
-    private EnsembleTypeGenerationSession buildInitialGenerationSession() {
-        return DefaultEnsembleTypeGenerationSession.builder()
-                                                   .destinationDirectoryPath(destinationDirectory)
-                                                   .ensembleKinds(SyncList.of(EnsembleKind.values())
+    private TypeGenerationSession buildInitialGenerationSession() {
+        return DefaultTypeGenerationSession.builder()
+                                           .destinationDirectoryPath(destinationDirectory)
+                                           .ensembleKinds(SyncList.of(EnsembleKind.values())
                                                                           .filter(ek -> (valueParameterLimit >= 1
                                                                               && ek.getNumberOfValueParameters()
                                                                               <= valueParameterLimit)
                                                                               || valueParameterLimit <= 0))
-                                                   .build();
+                                           .build();
     }
+
 }

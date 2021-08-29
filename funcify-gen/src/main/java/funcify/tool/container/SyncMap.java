@@ -80,6 +80,50 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
                                   v3);
     }
 
+    static <K, V> SyncMap<K, V> of(final K k1,
+                                   final V v1,
+                                   final K k2,
+                                   final V v2,
+                                   final K k3,
+                                   final V v3,
+                                   final K k4,
+                                   final V v4) {
+        return SyncMapFactory.of()
+                             .<K, V>empty()
+                             .put(k1,
+                                  v1)
+                             .put(k2,
+                                  v2)
+                             .put(k3,
+                                  v3)
+                             .put(k4,
+                                  v4);
+    }
+
+    static <K, V> SyncMap<K, V> of(final K k1,
+                                   final V v1,
+                                   final K k2,
+                                   final V v2,
+                                   final K k3,
+                                   final V v3,
+                                   final K k4,
+                                   final V v4,
+                                   final K k5,
+                                   final V v5) {
+        return SyncMapFactory.of()
+                             .<K, V>empty()
+                             .put(k1,
+                                  v1)
+                             .put(k2,
+                                  v2)
+                             .put(k3,
+                                  v3)
+                             .put(k4,
+                                  v4)
+                             .put(k5,
+                                  v5);
+    }
+
 
     static <K, V> SyncMap<K, V> of(final Tuple2<? extends K, ? extends V> tuple) {
         return SyncMapFactory.of()
