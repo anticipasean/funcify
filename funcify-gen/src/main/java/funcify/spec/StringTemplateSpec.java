@@ -1,0 +1,106 @@
+package funcify.spec;
+
+import funcify.error.FuncifyCodeGenException;
+import funcify.tool.LiftOps;
+import funcify.tool.container.SyncMap;
+import java.io.File;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroupFile;
+
+/**
+ * @author smccarron
+ * @created 2021-08-29
+ */
+public interface StringTemplateSpec {
+
+    default Charset getCharacterEncoding() {
+        return StandardCharsets.UTF_8;
+    }
+
+    List<String> getTypePackagePathSegments();
+
+    String getTypeName();
+
+    String getFileTypeExtension();
+
+    default Optional<Path> getTypePackageAsFilePath() {
+        return Optional.ofNullable(getTypePackagePathSegments())
+                       .filter(l -> l.size() > 0)
+                       .flatMap(l -> {
+                           try {
+                               return l.size() == 1 ? Optional.of(Paths.get(l.get(0))) : Optional.of(Paths.get(l.get(0),
+                                                                                                               l.stream()
+                                                                                                                .skip(1)
+                                                                                                                .toArray(String[]::new)));
+                           } catch (final Throwable t) {
+                               return Optional.empty();
+                           }
+                       });
+    }
+
+    String getStringTemplateGroupFileName();
+
+    String getStringTemplateGroupFilePathString();
+
+    default STGroupFile getStringTemplateGroupFile() {
+        try {
+            return new STGroupFile(getStringTemplateGroupFilePathString(),
+                                   getCharacterEncoding().displayName());
+        } catch (final Throwable t) {
+            throw new FuncifyCodeGenException(t.getMessage(),
+                                              t);
+
+        }
+    }
+
+    Path getDestinationParentDirectoryPath();
+
+    default Path getDestinationPackageDirectoryPath() {
+        return getDestinationParentDirectoryPath().resolve(getTypePackageAsFilePath().orElseThrow(() -> new IllegalArgumentException("path is empty or invalid")));
+    }
+
+    default Path getDestinationFilePath() {
+        return getDestinationPackageDirectoryPath().resolve(getTypeName() + getFileTypeExtension());
+    }
+
+    default Path getStringTemplateGroupFilePath() {
+        return LiftOps.tryCatchLift(() -> URI.create("file://" + System.getProperty("user.dir")))
+                      .flatMap(LiftOps.<URI, Path>tryCatchLift(Paths::get))
+                      .flatMap(LiftOps.<Path, Path>tryCatchLift(p -> p.resolve(getStringTemplateGroupFilePathString())))
+                      .flatMap(p -> LiftOps.tryCatchLift(Path::toFile)
+                                           .andThen(opt -> opt.filter(LiftOps.tryCatchLift(File::exists))
+                                                              .map(f -> p))
+                                           .apply(p))
+                      .orElseThrow(() -> new FuncifyCodeGenException(String.format("unable to find or get string template group file path instance at [ %s ]",
+                                                                                   LiftOps.tryCatchLift(() -> Paths.get(URI.create(
+                                                                                       "file://"
+                                                                                           + System.getProperty("user.dir")))
+                                                                                                                   .resolve(getStringTemplateGroupFilePathString())
+                                                                                                                   .toString())
+                                                                                          .orElse("null"))));
+    }
+
+    default boolean stringTemplateGroupFileExists() {
+        return LiftOps.tryCatchLift(this::getStringTemplateGroupFilePath)
+                      .isPresent();
+    }
+
+    String getTemplateFunctionName();
+
+    SyncMap<String, Object> getTemplateFunctionParameterInput();
+
+    default ST getStringTemplate() {
+        getStringTemplateGroupFilePath();
+        return getTemplateFunctionParameterInput().foldLeft(getStringTemplateGroupFile().getInstanceOf(getTemplateFunctionName()),
+                                                            (st, entry) -> st.add(entry._1(),
+                                                                                  entry._2()));
+    }
+
+}

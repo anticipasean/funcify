@@ -1,6 +1,12 @@
 import "funcify.stg"
 
-base_ensemble_type(witness_type="WT") ::= <<
+ensemble_type_import(class_name, package=[]) ::= <<
+import <package; separator=".">.<class_name>;
+>>
+
+ensemble_type_declaration(ensemble_type_name, witness_type="WT", type_variables=[]) ::= "<ensemble_type_name>\<<witness_type>, <type_variables; separator={, }>>"
+
+base_ensemble_type(package=[], witness_type="WT") ::= <<
 package <package; separator=".">;
 
 public interface Ensemble\<<witness_type>\> {
@@ -15,9 +21,9 @@ import java.util.function.Function;
 import java.util.Objects;
 
 <if(is_solo)>
-public interface <class_name>\<<witness_type>, <type_variables; separator=", ">\> extends Ensemble\<<witness_type>\> {
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends Ensemble\<<witness_type>\> {
 <else>
-public interface <class_name>\<<witness_type>, <type_variables; separator=", ">\> extends <type_variables:{ tv | Solo\<}><witness_type>, <type_variables:{ tv | <tv>\>};separator=", "> {
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <type_variables:{ tv | Solo\<}><witness_type>, <type_variables:{ tv | <tv>\>};separator=", "> {
 <endif>
 
 <if(is_solo)>

@@ -1,0 +1,29 @@
+import "ensemble_type.stg"
+
+conjunct_wrappable_type(class_name, ensemble_type_name, package=[], witness_type="WT", type_variables=[], next_type_variable="", ensemble_type_package=[]) ::= <<
+package <package; separator=".">
+
+<ensemble_type_import(ensemble_type_name, ensemble_type_package)>
+<null_check_import()>
+<java_util_func_import()>
+
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
+
+<conjunct_wrap_method(class_name, witness_type, type_variables)>
+
+<conjunct_unwrap_method(next_type_variable, type_variables)>
+
+}
+>>
+
+conjunct_wrap_method(class_name, current_type_variable, type_variables=[], numeric_suffix="") ::= <<
+    default \<<type_variables;separator=", ">\> <ensemble_type_declaration(class_name, witness_type, type_variables)> wrap(<type_variables:{tv | final <tv> input<i>};anchor,separator=",\n">);
+>>
+
+conjunct_unwrap_method(next_type_variable, type_variables=[]) ::=  <<
+    default \<<next_type_variable>\> <next_type_variable> unwrap(<conjunct_unwrap_method_parameter(next_type_variable, type_variables)>);
+>>
+
+conjunct_unwrap_method_parameter(next_type_variable, type_variables=[]) ::= <<
+final Fn<length(type_variables)>\<<type_variables:{tv | ? super <tv>};separator=", ">, ? extends <next_type_variable>\> unwrapper
+>>

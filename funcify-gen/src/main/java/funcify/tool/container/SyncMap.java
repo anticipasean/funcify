@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import funcify.tool.container.SyncMap.Tuple2;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -122,6 +123,14 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
                                   v4)
                              .put(k5,
                                   v5);
+    }
+
+    @SafeVarargs
+    static <K, V> SyncMap<K, V> ofTuples(final Tuple2<? extends K, ? extends V>... tuples) {
+        return Arrays.stream(tuples)
+                     .reduce(SyncMap.empty(),
+                             SyncMap::put,
+                             SyncMap::putAll);
     }
 
 
