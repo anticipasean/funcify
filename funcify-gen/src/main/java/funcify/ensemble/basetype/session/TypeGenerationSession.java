@@ -39,4 +39,7 @@ public class TypeGenerationSession<V, R> {
     @Default
     private final SyncMap<EnsembleKind, R> conjunctWrappableEnsembleTypeResults = SyncMap.empty();
 
+    @Default
+    private final SyncMap<EnsembleKind, R> functionTypeResults = SyncMap.empty();
+
 }

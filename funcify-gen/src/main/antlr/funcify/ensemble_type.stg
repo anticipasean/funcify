@@ -6,6 +6,8 @@ import <package; separator=".">.<class_name>;
 
 ensemble_type_declaration(ensemble_type_name, witness_type="WT", type_variables=[]) ::= "<ensemble_type_name>\<<witness_type>, <type_variables; separator={, }>>"
 
+recursive_solo_type_declaration(witness_type="WT", type_variables=[]) ::= "<type_variables:{ tv | Solo\<}><witness_type>, <type_variables:{ tv | <tv>>};separator={, }>"
+
 base_ensemble_type(package=[], witness_type="WT") ::= <<
 package <package; separator=".">;
 
@@ -37,7 +39,7 @@ public interface <ensemble_type_declaration(class_name, witness_type, type_varia
     /**
      * Convert this ensemble type into another value
      */
-    default \<<next_type_variable>\> <next_type_variable> convert(final Function\<? super <type_variables:{ tv | Solo\<}><witness_type>, <type_variables:{ tv | <tv>\>};separator=", ">, ? extends <next_type_variable>\> converter){
+    default \<<next_type_variable>\> <next_type_variable> convert(final Function\<? super <recursive_solo_type_declaration(witness_type, type_variables)>, ? extends <next_type_variable>\> converter){
         return <null_check("converter")>.apply(this);
     }
 <endif>

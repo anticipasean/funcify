@@ -4,6 +4,7 @@ import funcify.commandline.PathConverter;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.session.TypeGenerationSession;
 import funcify.ensemble.basetype.template.EnsembleTypesTemplate;
+import funcify.ensemble.function.FunctionTypeTemplate;
 import funcify.ensemble.trait.template.ConjunctWrappableTypeTemplate;
 import funcify.ensemble.trait.template.DisjunctWrappableTypeTemplate;
 import funcify.file.JavaSourceFile;
@@ -72,7 +73,8 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
     private static <V, R> SyncList<TypeGenerationTemplate<V, R>> typeGenerationTemplateSequence() {
         return SyncList.of(EnsembleTypesTemplate.of(),
                            DisjunctWrappableTypeTemplate.of(),
-                           ConjunctWrappableTypeTemplate.of());
+                           ConjunctWrappableTypeTemplate.of(),
+                           FunctionTypeTemplate.of());
     }
 
     private static <V, R> TypeGenerationSession<V, R> applyEachTemplateToSession(final TypeGenerationSession<V, R> session) {
