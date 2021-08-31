@@ -1,4 +1,4 @@
-package funcify.ensemble.trait.template;
+package funcify.ensemble.trait.wrappable;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.session.TypeGenerationSession;
@@ -19,22 +19,24 @@ import lombok.AllArgsConstructor;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class ConjunctWrappableTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> {
+public class DisjunctWrappableTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> {
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
         return Arrays.asList("funcify",
-                             "trait");
+                             "trait",
+                             "wrappable",
+                             "disjunct");
     }
 
     @Override
     public String getStringTemplateGroupFileName() {
-        return "conjunct_wrappable_type.stg";
+        return "disjunct_wrappable_type.stg";
     }
 
     @Override
     public String getStringTemplateGroupFilePathString() {
-        return "src/main/antlr/funcify/conjunct_wrappable_type.stg";
+        return "src/main/antlr/funcify/disjunct_wrappable_type.stg";
     }
 
     @Override
@@ -43,7 +45,7 @@ public class ConjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, R> results = session.getDisjunctWrappableEnsembleTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
-                final String className = "ConjunctWrappable" + ek.getSimpleClassName();
+                final String className = "DisjunctWrappable" + ek.getSimpleClassName();
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
                                                                   "class_name",
@@ -61,7 +63,7 @@ public class ConjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
                                                                                  "ensemble"));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
-                                                                         .templateFunctionName("conjunct_wrappable_type")
+                                                                         .templateFunctionName("disjunct_wrappable_type")
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFileName(getStringTemplateGroupFileName())
                                                                          .stringTemplateGroupFilePathString(getStringTemplateGroupFilePathString())

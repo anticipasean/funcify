@@ -5,8 +5,9 @@ import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.session.TypeGenerationSession;
 import funcify.ensemble.basetype.template.EnsembleTypesTemplate;
 import funcify.ensemble.function.FunctionTypeTemplate;
-import funcify.ensemble.trait.template.ConjunctWrappableTypeTemplate;
-import funcify.ensemble.trait.template.DisjunctWrappableTypeTemplate;
+import funcify.ensemble.trait.mappable.ConjunctMappableTypeTemplate;
+import funcify.ensemble.trait.wrappable.ConjunctWrappableTypeTemplate;
+import funcify.ensemble.trait.wrappable.DisjunctWrappableTypeTemplate;
 import funcify.file.JavaSourceFile;
 import funcify.template.TypeGenerationTemplate;
 import funcify.tool.container.SyncList;
@@ -74,6 +75,7 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
         return SyncList.of(EnsembleTypesTemplate.of(),
                            DisjunctWrappableTypeTemplate.of(),
                            ConjunctWrappableTypeTemplate.of(),
+                           ConjunctMappableTypeTemplate.of(),
                            FunctionTypeTemplate.of());
     }
 

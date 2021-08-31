@@ -1,4 +1,4 @@
-package funcify.ensemble.trait.template;
+package funcify.ensemble.trait.mappable;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.session.TypeGenerationSession;
@@ -12,6 +12,8 @@ import funcify.writer.StringTemplateWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 
 /**
@@ -19,22 +21,24 @@ import lombok.AllArgsConstructor;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class DisjunctWrappableTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> {
+public class ConjunctMappableTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> {
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
         return Arrays.asList("funcify",
-                             "trait");
+                             "trait",
+                             "mappable",
+                             "conjunct");
     }
 
     @Override
     public String getStringTemplateGroupFileName() {
-        return "disjunct_wrappable_type.stg";
+        return "conjunct_mappable_type.stg";
     }
 
     @Override
     public String getStringTemplateGroupFilePathString() {
-        return "src/main/antlr/funcify/disjunct_wrappable_type.stg";
+        return "src/main/antlr/funcify/conjunct_mappable_type.stg";
     }
 
     @Override
@@ -43,7 +47,7 @@ public class DisjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, R> results = session.getDisjunctWrappableEnsembleTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
-                final String className = "DisjunctWrappable" + ek.getSimpleClassName();
+                final String className = "ConjunctMappable" + ek.getSimpleClassName();
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
                                                                   "class_name",
@@ -55,13 +59,17 @@ public class DisjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
                                                                               .orElse(null),
                                                                   "ensemble_type_name",
-                                                                  ek.getSimpleClassName())
+                                                                  "ConjunctWrappable" + ek.getSimpleClassName())
                                                               .put("ensemble_type_package",
                                                                    Arrays.asList("funcify",
-                                                                                 "ensemble"));
+                                                                                 "trait",
+                                                                                 "wrappable",
+                                                                                 "conjunct"))
+                                                              .put("next_type_variable_sequences",
+                                                                   nextTypeVariableSequences(ek.getNumberOfValueParameters()));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
-                                                                         .templateFunctionName("disjunct_wrappable_type")
+                                                                         .templateFunctionName("conjunct_mappable_type")
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFileName(getStringTemplateGroupFileName())
                                                                          .stringTemplateGroupFilePathString(getStringTemplateGroupFilePathString())
@@ -81,5 +89,26 @@ public class DisjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
                                                   t);
             }
         }
+    }
+
+    private List<List<String>> nextTypeVariableSequences(final int numberOfValueParameters) {
+        final String nextTypeVariable = CharacterOps.uppercaseLetterByIndexWithNumericExtension(numberOfValueParameters)
+                                                    .orElse("");
+        final String[] array = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(numberOfValueParameters)
+                                           .toArray(String[]::new);
+        return IntStream.range(0,
+                               numberOfValueParameters)
+                        .mapToObj(i -> {
+                            return Stream.concat(Stream.concat(Arrays.stream(array,
+                                                                             0,
+                                                                             i),
+                                                               Stream.of(nextTypeVariable)),
+                                                 Arrays.stream(array,
+                                                               i + 1,
+                                                               numberOfValueParameters))
+                                         .collect(Collectors.toList());
+                        })
+                        .collect(Collectors.toList());
+
     }
 }

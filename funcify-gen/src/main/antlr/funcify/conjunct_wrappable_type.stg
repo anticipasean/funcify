@@ -17,11 +17,11 @@ public interface <ensemble_type_declaration(class_name, witness_type, type_varia
 >>
 
 conjunct_wrap_method(class_name, current_type_variable, type_variables=[], numeric_suffix="") ::= <<
-    default \<<type_variables;separator=", ">\> <ensemble_type_declaration(class_name, witness_type, type_variables)> wrap(<type_variables:{tv | final <tv> input<i>};anchor,separator=",\n">);
+    \<<type_variables;separator=", ">\> <ensemble_type_declaration(class_name, witness_type, type_variables)> wrap(<type_variables:{tv | final <tv> input<i>};anchor,separator=",\n">);
 >>
 
 conjunct_unwrap_method(next_type_variable, type_variables=[]) ::=  <<
-    default \<<next_type_variable>\> <next_type_variable> unwrap(<conjunct_unwrap_method_parameter(next_type_variable, type_variables)>);
+    \<<next_type_variable>\> <next_type_variable> unwrap(<conjunct_unwrap_method_parameter(next_type_variable, type_variables)>);
 >>
 
 conjunct_unwrap_method_parameter(next_type_variable, type_variables=[]) ::= <<

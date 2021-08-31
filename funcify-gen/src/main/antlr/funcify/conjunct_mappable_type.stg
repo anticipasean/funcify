@@ -1,0 +1,31 @@
+import "conjunct_wrappable_type.stg"
+
+
+conjunct_mappable_type(class_name,
+                       ensemble_type_name,
+                       package=[],
+                       witness_type="WT",
+                       type_variables=[],
+                       next_type_variable="",
+                       next_type_variable_sequences=[],
+                       ensemble_type_package=[]) ::= <<
+package <package; separator=".">
+
+<ensemble_type_import(ensemble_type_name, ensemble_type_package)>
+<null_check_import()>
+<java_util_func_import()>
+
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
+
+<type_variables,next_type_variable_sequences:{tv, ntvs | <conjunct_map_method(class_name, tv, next_type_variable, i, witness_type, ntvs)>};separator="\n\n">
+
+}
+>>
+
+conjunct_map_method(class_name, current_type_variable, next_type_variable, numeric_suffix="", witness_type="WT", next_type_variable_sequence=[]) ::= <<
+    \<<next_type_variable>\> <ensemble_type_declaration(class_name, witness_type, next_type_variable_sequence)> map<numeric_suffix>(<conjunct_map_method_parameter(current_type_variable, next_type_variable)>);
+>>
+
+conjunct_map_method_parameter(current_type_variable, next_type_variable) ::= <<
+final Function\<? super <current_type_variable>, ? extends <next_type_variable>\> mapper
+>>
