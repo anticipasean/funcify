@@ -37,27 +37,6 @@ public class JavaAnnotation {
     @Default
     private SyncMap<String, Object> parameters = SyncMap.empty();
 
-    @JsonProperty("parameters_as_string")
-    public String getParametersAsString() {
-        if (getParameters().isEmpty()) {
-            return null;
-        }
-        final SyncList<String> outputList = SyncList.empty();
-        for (Tuple2<String, Object> tuple : getParameters()) {
-            outputList.append(String.join(" = ",
-                                          tuple._1(),
-                                          convertObjectToTextualRepresentation(tuple._2())));
-        }
-        if (outputList.size() == 1 && outputList.stream()
-                                                .anyMatch(k -> k.startsWith("value = "))) {
-            return outputList.get(0)
-                             .map(s -> s.replace("value = ",
-                                                 ""))
-                             .orElse(null);
-        }
-        return outputList.join(", ");
-    }
-
     private static String convertObjectToTextualRepresentation(final Object v) {
         if (v instanceof String) {
             return String.format("\"%s\"",
@@ -99,5 +78,26 @@ public class JavaAnnotation {
                                                                   v == null ? "null" : v.getClass()
                                                                                         .getName()));
         }
+    }
+
+    @JsonProperty("parameters_as_string")
+    public String getParametersAsString() {
+        if (getParameters().isEmpty()) {
+            return null;
+        }
+        final SyncList<String> outputList = SyncList.empty();
+        for (Tuple2<String, Object> tuple : getParameters()) {
+            outputList.append(String.join(" = ",
+                                          tuple._1(),
+                                          convertObjectToTextualRepresentation(tuple._2())));
+        }
+        if (outputList.size() == 1 && outputList.stream()
+                                                .anyMatch(k -> k.startsWith("value = "))) {
+            return outputList.get(0)
+                             .map(s -> s.replace("value = ",
+                                                 ""))
+                             .orElse(null);
+        }
+        return outputList.join(", ");
     }
 }

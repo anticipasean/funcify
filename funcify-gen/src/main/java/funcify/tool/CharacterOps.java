@@ -32,9 +32,8 @@ public interface CharacterOps {
                                                                        .map(s -> Optional.of(s)
                                                                                          .filter(s1 -> i >= aToZSize)
                                                                                          .map(s1 -> new StringBuilder().append(s1)
-                                                                                                                       .append((int) (
-                                                                                                                           i
-                                                                                                                               / aToZSize))
+                                                                                                                       .append(i
+                                                                                                                           / aToZSize)
                                                                                                                        .toString())
                                                                                          .orElse(s))
                                                                        .orElse("");
@@ -72,8 +71,8 @@ public interface CharacterOps {
         return uppercaseLetterByIndex(index % aToZSize).map(c -> Optional.of(index)
                                                                          .filter(i -> i >= aToZSize)
                                                                          .map(i -> new StringBuilder().append(c)
-                                                                                                      .append((int) (i
-                                                                                                          / aToZSize))
+                                                                                                      .append(i
+                                                                                                          / aToZSize)
                                                                                                       .toString())
                                                                          .orElse(String.valueOf(c)));
     }
@@ -82,7 +81,7 @@ public interface CharacterOps {
         return CharacterOpsMapHolder.INSTANCE.uppercaseLetterByIndexMapper();
     }
 
-    static enum CharacterOpsMapHolder {
+    enum CharacterOpsMapHolder {
         INSTANCE(streamRangeOfCharactersFrom('A',
                                              'Z').toArray(Character[]::new));
 

@@ -19,6 +19,34 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
 
     }
 
+    private static <T> BiPredicate<JsonNode, T> propertyFoundAndNotContainerPropertyValue(Class<T> propertyNameType) {
+        return (jsonNode, propName) -> {
+            if (String.class.isAssignableFrom(propertyNameType)) {
+                return jsonNode.hasNonNull(((String) propName)) && !jsonNode.get(((String) propName))
+                                                                            .isContainerNode();
+            } else if (Integer.class.isAssignableFrom(propertyNameType)) {
+                return jsonNode.hasNonNull(((Integer) propName)) && !jsonNode.get(((Integer) propName))
+                                                                             .isContainerNode();
+            } else {
+                return false;
+            }
+        };
+    }
+
+    private static <T> BiPredicate<JsonNode, T> propertyFoundAndContainerPropertyValue(Class<T> propertyNameType) {
+        return (jsonNode, propName) -> {
+            if (String.class.isAssignableFrom(propertyNameType)) {
+                return jsonNode.hasNonNull(((String) propName)) && jsonNode.get(((String) propName))
+                                                                           .isContainerNode();
+            } else if (Integer.class.isAssignableFrom(propertyNameType)) {
+                return jsonNode.hasNonNull(((Integer) propName)) && jsonNode.get(((Integer) propName))
+                                                                            .isContainerNode();
+            } else {
+                return false;
+            }
+        };
+    }
+
     @Override
     public Object getProperty(final Interpreter interp,
                               final ST self,
@@ -94,34 +122,6 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
                                            propertyName,
                                            null);
         }
-    }
-
-    private static <T> BiPredicate<JsonNode, T> propertyFoundAndNotContainerPropertyValue(Class<T> propertyNameType) {
-        return (jsonNode, propName) -> {
-            if (String.class.isAssignableFrom(propertyNameType)) {
-                return jsonNode.hasNonNull(((String) propName)) && !jsonNode.get(((String) propName))
-                                                                            .isContainerNode();
-            } else if (Integer.class.isAssignableFrom(propertyNameType)) {
-                return jsonNode.hasNonNull(((Integer) propName)) && !jsonNode.get(((Integer) propName))
-                                                                             .isContainerNode();
-            } else {
-                return false;
-            }
-        };
-    }
-
-    private static <T> BiPredicate<JsonNode, T> propertyFoundAndContainerPropertyValue(Class<T> propertyNameType) {
-        return (jsonNode, propName) -> {
-            if (String.class.isAssignableFrom(propertyNameType)) {
-                return jsonNode.hasNonNull(((String) propName)) && jsonNode.get(((String) propName))
-                                                                           .isContainerNode();
-            } else if (Integer.class.isAssignableFrom(propertyNameType)) {
-                return jsonNode.hasNonNull(((Integer) propName)) && jsonNode.get(((Integer) propName))
-                                                                            .isContainerNode();
-            } else {
-                return false;
-            }
-        };
     }
 
     private <T> T throwNoSuchProperty(Class<T> cls,

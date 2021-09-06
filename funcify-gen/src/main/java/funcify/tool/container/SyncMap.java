@@ -342,10 +342,6 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
                         access = AccessLevel.PACKAGE)
     class SyncMapFactory {
 
-        public <K, V> SyncMap<K, V> empty() {
-            return DefaultSyncMap.of(new ConcurrentHashMap<>());
-        }
-
         private static <K, V> DefaultSyncMap<K, V> narrow(final SyncMap<K, V> syncMap) {
             return Optional.ofNullable(syncMap)
                            .flatMap(im -> {
@@ -357,6 +353,10 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
                            })
                            .orElseThrow(() -> new IllegalArgumentException(
                                SyncMap.class.getSimpleName() + " is not instance of DefaultImmutMap"));
+        }
+
+        public <K, V> SyncMap<K, V> empty() {
+            return DefaultSyncMap.of(new ConcurrentHashMap<>());
         }
 
         public <K, V> SyncMap<K, V> fromMap(final Map<? extends K, ? extends V> javaMap) {

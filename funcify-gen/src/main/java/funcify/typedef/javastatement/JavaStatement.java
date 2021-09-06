@@ -1,9 +1,9 @@
 package funcify.typedef.javastatement;
 
+import funcify.tool.container.SyncList;
 import funcify.typedef.Definition;
 import funcify.typedef.JavaAnnotation;
 import funcify.typedef.javaexpr.JavaExpression;
-import funcify.tool.container.SyncList;
 
 /**
  * @author smccarron

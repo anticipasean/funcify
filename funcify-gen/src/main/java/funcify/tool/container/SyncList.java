@@ -234,8 +234,28 @@ public interface SyncList<E> extends Iterable<E> {
     }
 
 
-    @AllArgsConstructor(staticName = "of", access = AccessLevel.PACKAGE)
-    static class SyncListFactory {
+    @AllArgsConstructor(staticName = "of",
+                        access = AccessLevel.PACKAGE)
+    class SyncListFactory {
+
+        private static <E> DefaultSyncList<E> narrow(final SyncList<E> syncList) {
+            return Optional.ofNullable(syncList)
+                           .flatMap(sl -> {
+                               if (sl instanceof DefaultSyncList) {
+                                   return Optional.of((DefaultSyncList<E>) sl);
+                               } else {
+                                   return Optional.empty();
+                               }
+                           })
+                           .orElseThrow(() -> new IllegalArgumentException(
+                               SyncList.class.getSimpleName() + " is not an instance of "
+                                   + DefaultSyncList.class.getSimpleName()));
+        }
+
+        @SuppressWarnings("unchecked")
+        private static <A extends B, B, O extends Optional<A>> Optional<B> narrowOptional(final O opt) {
+            return (Optional<B>) opt;
+        }
 
         @SafeVarargs
         @SuppressWarnings("varargs")
@@ -254,25 +274,27 @@ public interface SyncList<E> extends Iterable<E> {
                 @SuppressWarnings("unchecked")
                 final List<? extends E> baseList = ((DefaultSyncList<? extends E>) iterable).baseList;
                 if (baseList instanceof CopyOnWriteArrayList) {
-                    @SuppressWarnings("unchecked") final SyncList<E> syncList = (SyncList<E>) iterable;
+                    @SuppressWarnings("unchecked")
+                    final SyncList<E> syncList = (SyncList<E>) iterable;
                     return syncList;
                 } else {
                     return DefaultSyncList.of(new CopyOnWriteArrayList<>(baseList));
                 }
             } else if (iterable instanceof CopyOnWriteArrayList) {
-                @SuppressWarnings("unchecked") final List<E> baseList = (List<E>) iterable;
+                @SuppressWarnings("unchecked")
+                final List<E> baseList = (List<E>) iterable;
                 return DefaultSyncList.of(baseList);
             } else if (iterable instanceof Collection) {
                 @SuppressWarnings("unchecked")
-                final List<E> baseList = (List<E>) new CopyOnWriteArrayList<>(((Collection<? extends E>) iterable));
-                return DefaultSyncList.<E>of(baseList);
+                final List<E> baseList = new CopyOnWriteArrayList<>(((Collection<? extends E>) iterable));
+                return DefaultSyncList.of(baseList);
             } else {
                 @SuppressWarnings("unchecked")
                 final List<E> baseList = (List<E>) new CopyOnWriteArrayList<>(StreamSupport.stream(requireNonNull(iterable,
                                                                                                                   () -> "iterable").spliterator(),
                                                                                                    false)
                                                                                            .toArray());
-                return DefaultSyncList.<E>of(baseList);
+                return DefaultSyncList.of(baseList);
             }
         }
 
@@ -285,36 +307,41 @@ public interface SyncList<E> extends Iterable<E> {
                 if (baseList instanceof CopyOnWriteArrayList) {
                     return DefaultSyncList.of(new ArrayList<>(baseList));
                 } else {
-                    @SuppressWarnings("unchecked") final SyncList<E> syncList = (SyncList<E>) iterable;
+                    @SuppressWarnings("unchecked")
+                    final SyncList<E> syncList = (SyncList<E>) iterable;
                     return syncList;
                 }
             } else if (iterable instanceof List && !(iterable instanceof CopyOnWriteArrayList)) {
-                @SuppressWarnings("unchecked") final List<E> baseList = (List<E>) iterable;
+                @SuppressWarnings("unchecked")
+                final List<E> baseList = (List<E>) iterable;
                 return DefaultSyncList.of(baseList);
             } else if (iterable instanceof Collection && !(iterable instanceof CopyOnWriteArrayList)) {
-                @SuppressWarnings("unchecked") final List<E> baseList = new ArrayList<>((Collection<? extends E>) iterable);
-                return DefaultSyncList.<E>of(baseList);
+                @SuppressWarnings("unchecked")
+                final List<E> baseList = new ArrayList<>((Collection<? extends E>) iterable);
+                return DefaultSyncList.of(baseList);
             } else if (iterable instanceof CopyOnWriteArrayList) {
                 @SuppressWarnings("unchecked")
                 final List<E> baseList = new ArrayList<>(((CopyOnWriteArrayList<? extends E>) iterable));
-                return DefaultSyncList.<E>of(baseList);
+                return DefaultSyncList.of(baseList);
             } else {
                 final List<E> baseList = StreamSupport.stream(iterable.spliterator(),
                                                               false)
                                                       .collect(Collectors.toList());
-                return DefaultSyncList.<E>of(baseList);
+                return DefaultSyncList.of(baseList);
             }
         }
 
         public <E> SyncList<E> concurrentFromStream(final Stream<? extends E> stream) {
-            @SuppressWarnings("unchecked") final E[] elements = (E[]) requireNonNull(stream,
-                                                                                     () -> "stream").toArray();
+            @SuppressWarnings("unchecked")
+            final E[] elements = (E[]) requireNonNull(stream,
+                                                      () -> "stream").toArray();
             return ofConcurrent(elements);
         }
 
         public <E> SyncList<E> nonConcurrentFromStream(final Stream<? extends E> stream) {
-            @SuppressWarnings("unchecked") final E[] elements = (E[]) requireNonNull(stream,
-                                                                                     () -> "stream").toArray();
+            @SuppressWarnings("unchecked")
+            final E[] elements = (E[]) requireNonNull(stream,
+                                                      () -> "stream").toArray();
             return ofNonConcurrent(elements);
         }
 
@@ -324,20 +351,6 @@ public interface SyncList<E> extends Iterable<E> {
 
         public <E> SyncList<E> emptyConcurrent() {
             return DefaultSyncList.of(new CopyOnWriteArrayList<>());
-        }
-
-        private static <E> DefaultSyncList<E> narrow(final SyncList<E> syncList) {
-            return Optional.ofNullable(syncList)
-                           .flatMap(sl -> {
-                               if (sl instanceof DefaultSyncList) {
-                                   return Optional.of((DefaultSyncList<E>) sl);
-                               } else {
-                                   return Optional.empty();
-                               }
-                           })
-                           .orElseThrow(() -> new IllegalArgumentException(
-                               SyncList.class.getSimpleName() + " is not an instance of "
-                                   + DefaultSyncList.class.getSimpleName()));
         }
 
         public <E> SyncList<E> prepend(final SyncList<E> syncList,
@@ -418,8 +431,9 @@ public interface SyncList<E> extends Iterable<E> {
             return narrow(syncList).mapInternal(l -> {
                 if (i >= 0 && iterable instanceof Collection<?>) {
                     tryCatchLift(() -> {
-                        @SuppressWarnings("unchecked") final boolean result = l.addAll(i,
-                                                                                       (Collection<? extends E>) iterable);
+                        @SuppressWarnings("unchecked")
+                        final boolean result = l.addAll(i,
+                                                        (Collection<? extends E>) iterable);
                         return result;
                     });
                     return l;
@@ -514,11 +528,6 @@ public interface SyncList<E> extends Iterable<E> {
             });
         }
 
-        @SuppressWarnings("unchecked")
-        private static <A extends B, B, O extends Optional<A>> Optional<B> narrowOptional(final O opt) {
-            return (Optional<B>) opt;
-        }
-
         public <E> Iterator<E> iterator(final SyncList<E> syncList) {
             return Spliterators.iterator(spliterator(syncList));
         }
@@ -590,10 +599,11 @@ public interface SyncList<E> extends Iterable<E> {
     }
 
 
-    @AllArgsConstructor(staticName = "of", access = AccessLevel.PACKAGE)
+    @AllArgsConstructor(staticName = "of",
+                        access = AccessLevel.PACKAGE)
     @EqualsAndHashCode
     @ToString
-    static class DefaultSyncList<E> implements SyncList<E> {
+    class DefaultSyncList<E> implements SyncList<E> {
 
         @JsonValue
         private final List<E> baseList;

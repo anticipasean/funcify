@@ -29,8 +29,8 @@ public interface StringTemplateWriterFactory {
                                () -> "successHandler");
         Objects.requireNonNull(failureHandler,
                                () -> "failureHandler");
-        return StringTemplateFileWriter.<R>of(successHandler::apply,
-                                              failureHandler::apply);
+        return StringTemplateFileWriter.of(successHandler::apply,
+                                           failureHandler::apply);
     }
 
     static <R> StringTemplateWriter<String, R> createStringTemplateStringWriter(final BiFunction<? super StringTemplateSpec, ? super String, ? extends R> successHandler,
@@ -39,8 +39,8 @@ public interface StringTemplateWriterFactory {
                                () -> "successHandler");
         Objects.requireNonNull(failureHandler,
                                () -> "failureHandler");
-        return StringTemplateStringWriter.<R>of(successHandler::apply,
-                                                failureHandler::apply);
+        return StringTemplateStringWriter.of(successHandler::apply,
+                                             failureHandler::apply);
     }
 
     static StringTemplateWriter<String, Void> createStringTemplateConsoleWriter() {
@@ -81,8 +81,7 @@ public interface StringTemplateWriterFactory {
                                                                                                                 == null ? "null"
                                                                                                                 : throwable.getCause()
                                                                                                                            .getMessage()))
-                                                                                        .append("\" ]")
-                                                                                        .toString());
+                                                                                        .append("\" ]"));
                                                   System.out.println(boundaryLine);
                                                   return null;
                                               });

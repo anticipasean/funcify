@@ -10,11 +10,11 @@ import java.util.function.Function;
 public interface WriteResult<V> {
 
     static <V> WriteResult<V> success(final V success) {
-        return WriteResultFactory.SuccessWriteResult.<V>of(success);
+        return WriteResultFactory.SuccessWriteResult.of(success);
     }
 
     static <V> WriteResult<V> failure(final Throwable failure) {
-        return WriteResultFactory.FailureWriteResult.<V>of(failure);
+        return WriteResultFactory.FailureWriteResult.of(failure);
     }
 
     default Optional<V> getSuccessValue() {

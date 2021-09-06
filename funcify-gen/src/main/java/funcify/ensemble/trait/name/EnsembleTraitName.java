@@ -2,8 +2,6 @@ package funcify.ensemble.trait.name;
 
 import static funcify.tool.StringOps.firstLetterCapitalizer;
 
-import java.util.Optional;
-
 /**
  * @author smccarron
  * @created 2021-07-25

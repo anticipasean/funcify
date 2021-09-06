@@ -29,10 +29,7 @@ public class DefaultStringTemplateSpec implements StringTemplateSpec {
     private final String fileTypeExtension;
 
 
-    private final String stringTemplateGroupFileName;
-
-
-    private final String stringTemplateGroupFilePathString;
+    private final Path stringTemplateGroupFilePath;
 
 
     private final Path destinationParentDirectoryPath;

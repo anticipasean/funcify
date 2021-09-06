@@ -46,6 +46,22 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
         System.exit(exitCode);
     }
 
+    private static <V, R> SyncList<TypeGenerationTemplate<V, R>> typeGenerationTemplateSequence() {
+        return SyncList.of(EnsembleTypesTemplate.of(),
+                           DisjunctWrappableTypeTemplate.of(),
+                           ConjunctWrappableTypeTemplate.of(),
+                           ConjunctMappableTypeTemplate.of(),
+                           FunctionTypeTemplate.of());
+    }
+
+    private static <V, R> TypeGenerationSession<V, R> applyEachTemplateToSession(final TypeGenerationSession<V, R> session) {
+        return FuncifyClassGenerator.<V, R>typeGenerationTemplateSequence()
+                                    .foldLeft(session,
+                                              (s, template) -> {
+                                                  return template.createTypesForSession(s);
+                                              });
+    }
+
     @Override
     public TypeGenerationSession<?, ?> call() throws Exception {
         if (printToConsole) {
@@ -69,22 +85,6 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
                                                                || valueParameterLimit <= 0))
                                     .templateWriter(templateWriter)
                                     .build();
-    }
-
-    private static <V, R> SyncList<TypeGenerationTemplate<V, R>> typeGenerationTemplateSequence() {
-        return SyncList.of(EnsembleTypesTemplate.of(),
-                           DisjunctWrappableTypeTemplate.of(),
-                           ConjunctWrappableTypeTemplate.of(),
-                           ConjunctMappableTypeTemplate.of(),
-                           FunctionTypeTemplate.of());
-    }
-
-    private static <V, R> TypeGenerationSession<V, R> applyEachTemplateToSession(final TypeGenerationSession<V, R> session) {
-        return FuncifyClassGenerator.<V, R>typeGenerationTemplateSequence()
-                                    .foldLeft(session,
-                                              (s, template) -> {
-                                                  return template.createTypesForSession(s);
-                                              });
     }
 
 

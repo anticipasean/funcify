@@ -1,6 +1,7 @@
 package funcify.template;
 
 import funcify.ensemble.basetype.session.TypeGenerationSession;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -11,9 +12,12 @@ public interface TypeGenerationTemplate<V, R> {
 
     List<String> getDestinationTypePackagePathSegments();
 
-    String getStringTemplateGroupFileName();
+    default String getStringTemplateGroupFileName() {
+        return getStringTemplateGroupFilePath().getFileName()
+                                               .toString();
+    }
 
-    String getStringTemplateGroupFilePathString();
+    Path getStringTemplateGroupFilePath();
 
     TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session);
 

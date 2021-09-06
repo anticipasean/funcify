@@ -20,7 +20,7 @@ public interface TemplateErrorFeedbackHandler {
 
     TemplateErrorFeedbackListener createErrorListener();
 
-    static enum Holder {
+    enum Holder {
         INSTANCE(DefaultTemplateErrorFeedbackHandler.of());
 
         private final TemplateErrorFeedbackHandler feedbackHandler;
@@ -30,19 +30,7 @@ public interface TemplateErrorFeedbackHandler {
         }
     }
 
-    @AllArgsConstructor(access = AccessLevel.PACKAGE,
-                        staticName = "of")
-    static class DefaultTemplateErrorFeedbackHandler implements TemplateErrorFeedbackHandler {
-
-        private final StringTemplateErrorListener stringTemplateErrorListener = StringTemplateErrorListener.of();
-
-        @Override
-        public TemplateErrorFeedbackListener createErrorListener() {
-            return stringTemplateErrorListener;
-        }
-    }
-
-    static interface TemplateErrorFeedbackListener extends STErrorListener {
+    interface TemplateErrorFeedbackListener extends STErrorListener {
 
         boolean hasFeedback();
 
@@ -54,9 +42,31 @@ public interface TemplateErrorFeedbackHandler {
 
     @AllArgsConstructor(access = AccessLevel.PACKAGE,
                         staticName = "of")
-    static class StringTemplateErrorListener implements TemplateErrorFeedbackListener {
+    class DefaultTemplateErrorFeedbackHandler implements TemplateErrorFeedbackHandler {
+
+        private final StringTemplateErrorListener stringTemplateErrorListener = StringTemplateErrorListener.of();
+
+        @Override
+        public TemplateErrorFeedbackListener createErrorListener() {
+            return stringTemplateErrorListener;
+        }
+    }
+
+    @AllArgsConstructor(access = AccessLevel.PACKAGE,
+                        staticName = "of")
+    class StringTemplateErrorListener implements TemplateErrorFeedbackListener {
 
         final AtomicReference<STMessage> messageHolder = new AtomicReference<>();
+
+        private static Function<STMessage, String> formatSTMessageAsString() {
+            return stMessage -> new StringBuilder().append("[ message: \"")
+                                                   .append(stMessage.error.message)
+                                                   .append("\", ")
+                                                   .append("cause: ")
+                                                   .append(stMessage.cause)
+                                                   .append(" ]")
+                                                   .toString();
+        }
 
         @Override
         public void compileTimeError(final STMessage msg) {
@@ -94,16 +104,6 @@ public interface TemplateErrorFeedbackHandler {
         public String getFeedback() {
             return getSTMessageFeedback().map(formatSTMessageAsString())
                                          .orElse("");
-        }
-
-        private static Function<STMessage, String> formatSTMessageAsString() {
-            return stMessage -> new StringBuilder().append("[ message: \"")
-                                                   .append(stMessage.error.message)
-                                                   .append("\", ")
-                                                   .append("cause: ")
-                                                   .append(stMessage.cause)
-                                                   .append(" ]")
-                                                   .toString();
         }
 
         @Override

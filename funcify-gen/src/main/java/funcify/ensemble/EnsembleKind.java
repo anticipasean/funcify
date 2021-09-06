@@ -55,8 +55,8 @@ public enum EnsembleKind {
     private final int numberOfValueParameters;
     private final String simpleClassName;
 
-    private EnsembleKind(final int numberOfValueParameters,
-                         final String simpleClassName) {
+    EnsembleKind(final int numberOfValueParameters,
+                 final String simpleClassName) {
         this.numberOfValueParameters = numberOfValueParameters;
         this.simpleClassName = simpleClassName;
     }

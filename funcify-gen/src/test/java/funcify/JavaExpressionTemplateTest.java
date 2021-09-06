@@ -27,7 +27,7 @@ import org.stringtemplate.v4.STGroupFile;
  */
 public class JavaExpressionTemplateTest {
 
-    private static final Path funcifyStringTemplateGroupFilePath = Paths.get("src/main/antlr/funcify/funcify.stg")
+    private static final Path funcifyStringTemplateGroupFilePath = Paths.get("antlr/funcify/funcify.stg")
                                                                         .toAbsolutePath();
     private static ObjectMapper objectMapper;
 

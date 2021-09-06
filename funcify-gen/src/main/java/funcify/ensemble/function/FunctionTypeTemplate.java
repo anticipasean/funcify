@@ -9,6 +9,8 @@ import funcify.template.TypeGenerationTemplate;
 import funcify.tool.CharacterOps;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,13 +30,10 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
     }
 
     @Override
-    public String getStringTemplateGroupFileName() {
-        return "function_type.stg";
-    }
-
-    @Override
-    public String getStringTemplateGroupFilePathString() {
-        return "src/main/antlr/funcify/function_type.stg";
+    public Path getStringTemplateGroupFilePath() {
+        return Paths.get("antlr",
+                         "funcify",
+                         "function_type.stg");
     }
 
     @Override
@@ -75,8 +74,7 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
                                                                          .typeName(className)
                                                                          .templateFunctionName("function_type")
                                                                          .fileTypeExtension(".java")
-                                                                         .stringTemplateGroupFileName(getStringTemplateGroupFileName())
-                                                                         .stringTemplateGroupFilePathString(getStringTemplateGroupFilePathString())
+                                                                         .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();

@@ -21,10 +21,10 @@ public class FuncifyTemplateDrivenGeneratorTest {
 
     @Test
     public void generateEnsembleInterfaceTypesTest() {
-        //        final URI uri = URI.create("file:///" + Paths.get("src/main/antlr/funcify/java_type_definition.stg")
+        //        final URI uri = URI.create("file:///" + Paths.get("antlr/funcify/java_type_definition.stg")
         //                                                     .toAbsolutePath());
 
-        final Path path = Paths.get("src/main/antlr/funcify/ensemble_type.stg")
+        final Path path = Paths.get("antlr/funcify/ensemble_type.stg")
                                .toAbsolutePath();
         //        System.out.println("path: " + path);
         //        System.out.println("exists: " + new File(path.toString()).exists());

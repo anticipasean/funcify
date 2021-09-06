@@ -27,7 +27,7 @@ public interface JavaSourceFile {
                                () -> "className");
         return JavaSourceFileImpl.of(packagePathSegments,
                                      className,
-                                     Optional.<File>empty());
+                                     Optional.empty());
     }
 
     static JavaSourceFile of(final List<String> packagePathSegments,
@@ -114,7 +114,7 @@ public interface JavaSourceFile {
     }
 
     default boolean exists() {
-        return getFile().filter(LiftOps.<File>tryCatchLift(File::exists))
+        return getFile().filter(LiftOps.tryCatchLift(File::exists))
                         .isPresent();
     }
 

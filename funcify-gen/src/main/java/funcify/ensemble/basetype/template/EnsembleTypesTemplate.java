@@ -9,6 +9,8 @@ import funcify.template.TypeGenerationTemplate;
 import funcify.tool.CharacterOps;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,13 +30,10 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
     }
 
     @Override
-    public String getStringTemplateGroupFileName() {
-        return "ensemble_type.stg";
-    }
-
-    @Override
-    public String getStringTemplateGroupFilePathString() {
-        return "src/main/antlr/funcify/ensemble_type.stg";
+    public Path getStringTemplateGroupFilePath() {
+        return Paths.get("antlr",
+                         "funcify",
+                         "ensemble_type.stg");
     }
 
     @Override
@@ -42,8 +41,7 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final StringTemplateSpec ensembleBaseTypeSpec = DefaultStringTemplateSpec.builder()
-                                                                                     .stringTemplateGroupFilePathString(getStringTemplateGroupFilePathString())
-                                                                                     .stringTemplateGroupFileName(getStringTemplateGroupFileName())
+                                                                                     .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
                                                                                      .typeName("Ensemble")
                                                                                      .fileTypeExtension(".java")
                                                                                      .templateFunctionName("base_ensemble_type")
@@ -69,8 +67,7 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
                                                                               .orElse(null));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
-                                                                         .stringTemplateGroupFilePathString(getStringTemplateGroupFilePathString())
-                                                                         .stringTemplateGroupFileName(getStringTemplateGroupFileName())
+                                                                         .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
                                                                          .typeName(ek.getSimpleClassName())
                                                                          .fileTypeExtension(".java")
                                                                          .templateFunctionName("ensemble_type")

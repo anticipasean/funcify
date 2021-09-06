@@ -15,7 +15,7 @@ public interface StringTemplateWriter<V, R> {
 
     R write(StringTemplateSpec templateSpec);
 
-    static interface WriteResultHandler<V, R> {
+    interface WriteResultHandler<V, R> {
 
         R transform(final StringTemplateSpec spec,
                     final V resultValue);
@@ -23,22 +23,22 @@ public interface StringTemplateWriter<V, R> {
     }
 
     @FunctionalInterface
-    static interface FileWriteResultHandler<R> extends WriteResultHandler<File, R> {
+    interface FileWriteResultHandler<R> extends WriteResultHandler<File, R> {
 
     }
 
     @FunctionalInterface
-    static interface StringWriteResultHandler<R> extends WriteResultHandler<String, R> {
+    interface StringWriteResultHandler<R> extends WriteResultHandler<String, R> {
 
     }
 
     @FunctionalInterface
-    static interface ConsoleWriteResultHandler extends WriteResultHandler<String, Void> {
+    interface ConsoleWriteResultHandler extends WriteResultHandler<String, Void> {
 
     }
 
     @FunctionalInterface
-    static interface ErrorWriteResultHandler<R> extends WriteResultHandler<Throwable, R> {
+    interface ErrorWriteResultHandler<R> extends WriteResultHandler<Throwable, R> {
 
     }
 

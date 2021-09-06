@@ -9,6 +9,8 @@ import funcify.template.TypeGenerationTemplate;
 import funcify.tool.CharacterOps;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,13 +32,10 @@ public class DisjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
     }
 
     @Override
-    public String getStringTemplateGroupFileName() {
-        return "disjunct_wrappable_type.stg";
-    }
-
-    @Override
-    public String getStringTemplateGroupFilePathString() {
-        return "src/main/antlr/funcify/disjunct_wrappable_type.stg";
+    public Path getStringTemplateGroupFilePath() {
+        return Paths.get("antlr",
+                         "funcify",
+                         "disjunct_wrappable_type.stg");
     }
 
     @Override
@@ -65,8 +64,7 @@ public class DisjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
                                                                          .typeName(className)
                                                                          .templateFunctionName("disjunct_wrappable_type")
                                                                          .fileTypeExtension(".java")
-                                                                         .stringTemplateGroupFileName(getStringTemplateGroupFileName())
-                                                                         .stringTemplateGroupFilePathString(getStringTemplateGroupFilePathString())
+                                                                         .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();

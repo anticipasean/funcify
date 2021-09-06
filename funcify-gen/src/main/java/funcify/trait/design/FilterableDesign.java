@@ -7,7 +7,7 @@ package funcify.trait.design;
 public interface FilterableDesign extends TraitDesign {
 
     @Override
-    default String getTraitMethodName(){
+    default String getTraitMethodName() {
         return "filter";
     }
 }

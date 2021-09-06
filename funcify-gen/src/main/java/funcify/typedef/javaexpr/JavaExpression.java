@@ -9,5 +9,4 @@ import funcify.typedef.Definition;
 public interface JavaExpression extends Definition<JavaExpression> {
 
 
-
 }
