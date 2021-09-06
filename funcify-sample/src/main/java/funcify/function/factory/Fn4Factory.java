@@ -73,7 +73,7 @@ public class Fn4Factory {
                                   () -> "before").apply(paramW,
                                                         paramX,
                                                         paramY,
-                                                        paramZ).<W1, X, Y, Z,>fold(requireNonNull(container,
+                                                        paramZ).<W1, X, Y, Z>fold(requireNonNull(container,
                                                                                                   () -> "container").convert(Fn4::narrowK));
         });
     }

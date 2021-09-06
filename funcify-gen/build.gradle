@@ -1,9 +1,21 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+}
+
+mainClassName = 'funcify.FuncifyClassGenerator'
+
+shadow {
+
+}
+
+shadowJar {
+    mainClassName = 'funcify.FuncifyClassGenerator'
+    classifier = ''
 }
 
 dependencies {
-
     implementation("org.antlr:ST4:${stringTemplateVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     compileClasspath("org.projectlombok:lombok:${lombokVersion}")
@@ -23,6 +35,10 @@ dependencies {
     testImplementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
 }
 
+jar {
+    manifest.attributes("Main-Class": application.mainClassName)
+    enabled = false
+}
 
 test {
     useJUnitPlatform()
