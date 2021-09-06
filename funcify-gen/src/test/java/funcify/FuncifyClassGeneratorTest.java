@@ -1,6 +1,9 @@
 package funcify;
 
+import funcify.testing.NonZeroExitStatusCheckingTransaction;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 
 /**
  * @author smccarron
@@ -8,9 +11,16 @@ import org.junit.jupiter.api.Test;
  */
 public class FuncifyClassGeneratorTest {
 
+
     @Test
     public void generateTypesToConsoleTest() {
-        FuncifyClassGenerator.main(new String[]{"-p"});
+        try {
+            try (NonZeroExitStatusCheckingTransaction trans = NonZeroExitStatusCheckingTransaction.newInstance()) {
+                FuncifyClassGenerator.main(new String[]{"-p"});
+            }
+        } catch (final Throwable t) {
+            Assertions.fail(t);
+        }
     }
 
 }
