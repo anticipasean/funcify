@@ -1,10 +1,11 @@
 import "ensemble_type.stg"
 
 function_type(ensemble_type_name, arity="", ensemble_type_package=[], package=[], witness_type="WT", next_type_variable="", type_variables=[], implements_supplier=false, implements_function=false) ::= <<
-package <package; separator=".">
+package <package; separator=".">;
 
 <null_check_import()>
 <ensemble_type_import(ensemble_type_name, ensemble_type_package)>
+import <package; separator=".">.Fn<arity>.<witness_type>;
 <if(implements_supplier)>
 import java.util.function.Supplier;
 
@@ -60,24 +61,26 @@ apply_method(type_variables=[]) ::= <<
 map_method(arity="0", type_variables=[], next_type_variable="") ::= <<
     default \<<next_type_variable>\> <function_type_declaration(arity, [reverse(rest(reverse(type_variables))), next_type_variable])> map(<function_type_parameter_declaration(last(type_variables), next_type_variable)>) {
         <null_check("function")>;
-        return (<type_variables:{tv | <tv> input<i>};separator=", ">) -> {
-            return function.apply(this.apply(<type_variables:{tv | input<i>};anchor,separator=",\n">));
+        return (<reverse(rest(reverse(type_variables))):{tv | <tv> input<i>};separator=", ">) -> {
+            return function.apply(this.apply(<reverse(rest(reverse(type_variables))):{tv | input<i>};anchor,separator=",\n">));
         };
     }
 >>
 
 and_then_method(arity="0", type_variables=[], next_type_variable="", implements_function=false) ::= <<
-    <if(implements_function)>@Override<endif>
+    <if(implements_function)><\\>
+    <else><\\>
     default \<<next_type_variable>\> <function_type_declaration(arity, [reverse(rest(reverse(type_variables))), next_type_variable])> andThen(<function_type_parameter_declaration(last(type_variables), next_type_variable)>) {
         return map(function);
     }
+    <endif>
 >>
 
 flat_map_method(arity="0", type_variables=[], next_type_variable="") ::= <<
-    default \<<next_type_variable>\> <function_type_declaration(arity, [reverse(rest(reverse(type_variables))), next_type_variable])> flatMap(final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<<reverse(rest(reverse(type_variables))):{tv | ? super <tv>};separator=", ">, ? extends <next_type_variable>\> function) {
+    default \<<next_type_variable>\> <function_type_declaration(arity, [reverse(rest(reverse(type_variables))), next_type_variable])> flatMap(final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<<reverse(rest(reverse(type_variables))):{tv | ? super <tv>};separator=", ">, ? extends <next_type_variable>\>> function) {
         <null_check("function")>;
-        return (<type_variables:{tv | <tv> input<i>};separator=", ">) -> {
-            return function.apply(this.apply(<type_variables:{tv | input<i>};anchor,separator=",\n">)).apply(<type_variables:{tv | input<i>};anchor,separator=",\n">);
+        return (<reverse(rest(reverse(type_variables))):{tv | <tv> input<i>};separator=", ">) -> {
+            return function.apply(this.apply(<reverse(rest(reverse(type_variables))):{tv | input<i>};anchor,separator=",\n">)).apply(<reverse(rest(reverse(type_variables))):{tv | input<i>};anchor,separator=",\n">);
         };
     }
 >>

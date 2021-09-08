@@ -36,3 +36,5 @@ method_reference(input) ::= <<
 <if(input.type_name && input.method_name)><input.type_name>::<input.method_name><\\>
 <elseif(input.method && input.type_name)><input.type_name>::<input.method.name><endif>
 >>
+
+all_but_last(input=[]) ::= "<reverse(rest(reverse(input)))>"

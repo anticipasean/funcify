@@ -23,7 +23,7 @@ public class StringTemplateStringWriter<R> implements StringTemplateWriter<Strin
     private final ErrorWriteResultHandler<R> failureWriteResultHandler;
 
     @Override
-    public R write(final StringTemplateSpec templateSpec) {
+    public WriteResult<R> write(final StringTemplateSpec templateSpec) {
         try {
             final String output = templateSpec.getStringTemplate()
                                               .render();

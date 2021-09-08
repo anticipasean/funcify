@@ -7,6 +7,11 @@ import funcify.spec.StringTemplateSpec;
 import funcify.tool.container.SyncMap;
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.EnumSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,15 +39,31 @@ public class StringTemplateFileWriter<R> implements StringTemplateWriter<File, R
     private final TemplateErrorFeedbackHandler templateErrorFeedbackHandler = TemplateErrorFeedbackHandler.of();
 
     @Override
-    public R write(final StringTemplateSpec templateSpec) {
-        logger.debug("write: [ {} ]",
-                     SyncMap.empty()
-                            .put("string_template_group_file_path",
-                                 templateSpec.getStringTemplateGroupFilePath())
-                            .put("destination_file_path",
-                                 templateSpec.getDestinationFilePath()));
+    public WriteResult<R> write(final StringTemplateSpec templateSpec) {
         try {
-            final File destinationFile = Files.createFile(templateSpec.getDestinationFilePath())
+            logger.debug("write: [ {} ]",
+                         SyncMap.empty()
+                                .put("string_template_group_file_path",
+                                     templateSpec.getStringTemplateGroupFilePath())
+                                .put("destination_file_path",
+                                     templateSpec.getDestinationFilePath()));
+            final Set<PosixFilePermission> posixFilePermissionsDefaultSet = EnumSet.of(PosixFilePermission.OWNER_READ,
+                                                                                       PosixFilePermission.OWNER_WRITE,
+                                                                                       PosixFilePermission.OWNER_EXECUTE,
+                                                                                       PosixFilePermission.GROUP_READ,
+                                                                                       PosixFilePermission.GROUP_EXECUTE,
+                                                                                       PosixFilePermission.OTHERS_READ);
+            final FileAttribute<Set<PosixFilePermission>> fileAttribute = PosixFilePermissions.asFileAttribute(posixFilePermissionsDefaultSet);
+            if (!templateSpec.getDestinationFilePath()
+                             .getParent()
+                             .toFile()
+                             .exists()) {
+                Files.createDirectories(templateSpec.getDestinationFilePath()
+                                                    .getParent(),
+                                        fileAttribute);
+            }
+            final File destinationFile = Files.createFile(templateSpec.getDestinationFilePath(),
+                                                          fileAttribute)
                                               .toFile();
             final TemplateErrorFeedbackListener errorListener = templateErrorFeedbackHandler.createErrorListener();
             final int written = templateSpec.getStringTemplate()

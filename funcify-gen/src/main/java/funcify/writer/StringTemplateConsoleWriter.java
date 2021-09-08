@@ -5,6 +5,7 @@ import funcify.spec.StringTemplateSpec;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * @author smccarron
@@ -15,12 +16,14 @@ import lombok.Getter;
 @Getter
 public class StringTemplateConsoleWriter implements StringTemplateWriter<String, Void> {
 
+    @NonNull
     private final StringTemplateWriter.ConsoleWriteResultHandler successWriteResultHandler;
 
+    @NonNull
     private final StringTemplateWriter.ErrorWriteResultHandler<Void> failureWriteResultHandler;
 
     @Override
-    public Void write(final StringTemplateSpec templateSpec) {
+    public WriteResult<Void> write(final StringTemplateSpec templateSpec) {
         try {
             final String output = templateSpec.getStringTemplate()
                                               .render();

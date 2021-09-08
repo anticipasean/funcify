@@ -9,6 +9,7 @@ import funcify.template.TypeGenerationTemplate;
 import funcify.tool.CharacterOps;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
+import funcify.writer.WriteResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -52,6 +53,7 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final StringTemplateSpec ensembleBaseTypeSpec = DefaultStringTemplateSpec.builder()
+                                                                                     .typePackagePathSegments(getDestinationTypePackagePathSegments())
                                                                                      .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
                                                                                      .typeName("Ensemble")
                                                                                      .fileTypeExtension(".java")
@@ -61,9 +63,12 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
                                                                                                                                 getDestinationTypePackagePathSegments()))
                                                                                      .build();
 
-            final R baseEnsembleTypeResult = templateWriter.write(ensembleBaseTypeSpec);
+            final WriteResult<R> baseEnsembleTypeResult = templateWriter.write(ensembleBaseTypeSpec);
+            if (baseEnsembleTypeResult.isFailure()) {
+                throw baseEnsembleTypeResult.getFailureValue().orElseThrow(() -> new FuncifyCodeGenException("throwable missing"));
+            }
             final TypeGenerationSession<V, R> updatedSession = session.withBaseEnsembleTypeResult(baseEnsembleTypeResult);
-            final SyncMap<EnsembleKind, R> ensembleTypeResultsByEnsembleKind = session.getEnsembleTypeResultsByEnsembleKind();
+            final SyncMap<EnsembleKind, WriteResult<R>> ensembleTypeResultsByEnsembleKind = session.getEnsembleTypeResultsByEnsembleKind();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
@@ -86,7 +91,7 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
-                final R ensembleTypeResult = templateWriter.write(spec);
+                final WriteResult<R> ensembleTypeResult = templateWriter.write(spec);
                 ensembleTypeResultsByEnsembleKind.put(ek,
                                                       ensembleTypeResult);
             }

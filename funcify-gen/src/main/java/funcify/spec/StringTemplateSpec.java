@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
 
@@ -64,9 +65,13 @@ public interface StringTemplateSpec {
     Path getDestinationParentDirectoryPath();
 
     default Path getDestinationPackageDirectoryPath() {
-        final Path typePackagePath = getTypePackageAsFilePath().orElseThrow(() -> new IllegalArgumentException(String.format("type_package [ %s ] is empty or invalid and cannot be converted into a path",
-                                                                                                                             String.join(".",
-                                                                                                                                         getTypePackagePathSegments()))));
+        final Supplier<IllegalArgumentException> invalidTypePackageErrorSupplier = () -> {
+            final String message = String.format("type_package [ %s ] is empty or invalid and cannot be converted into a path",
+                                                 String.join(".",
+                                                             getTypePackagePathSegments()));
+            return new IllegalArgumentException(message);
+        };
+        final Path typePackagePath = getTypePackageAsFilePath().orElseThrow(invalidTypePackageErrorSupplier);
         return getDestinationParentDirectoryPath().resolve(typePackagePath);
     }
 

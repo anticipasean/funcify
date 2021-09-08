@@ -14,7 +14,6 @@ import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.StringTemplateWriterFactory;
-import funcify.writer.WriteResult;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -83,8 +82,8 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
             final TypeGenerationSession<String, Void> session = buildInitialGenerationSession(consoleWriter);
             return applyEachTemplateToSession(session);
         } else {
-            final StringTemplateWriter<File, WriteResult<JavaSourceFile>> javaSourceFileWriter = StringTemplateWriterFactory.createStringTemplateJavaSourceFileWriter();
-            final TypeGenerationSession<File, WriteResult<JavaSourceFile>> session = buildInitialGenerationSession(javaSourceFileWriter);
+            final StringTemplateWriter<File, JavaSourceFile> javaSourceFileWriter = StringTemplateWriterFactory.createStringTemplateJavaSourceFileWriter();
+            final TypeGenerationSession<File, JavaSourceFile> session = buildInitialGenerationSession(javaSourceFileWriter);
             return applyEachTemplateToSession(session);
         }
     }

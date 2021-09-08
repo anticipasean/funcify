@@ -9,6 +9,7 @@ import funcify.template.TypeGenerationTemplate;
 import funcify.tool.CharacterOps;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
+import funcify.writer.WriteResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -48,7 +49,7 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
                                  "Fn[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, R> results = session.getFunctionTypeResults();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getFunctionTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
                 final int arity = ek.getNumberOfValueParameters() - 1;
                 final String className = "Fn" + arity;
@@ -87,7 +88,7 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
-                final R writeResult = templateWriter.write(spec);
+                final WriteResult<R> writeResult = templateWriter.write(spec);
                 results.put(ek,
                             writeResult);
             }

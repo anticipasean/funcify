@@ -9,6 +9,7 @@ import funcify.template.TypeGenerationTemplate;
 import funcify.tool.CharacterOps;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
+import funcify.writer.WriteResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -52,7 +53,7 @@ public class ConjunctMappableTypeTemplate<V, R> implements TypeGenerationTemplat
                                  "ConjunctMappableEnsemble[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, R> results = session.getDisjunctWrappableEnsembleTypeResults();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctWrappableEnsembleTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
                 final String className = "ConjunctMappable" + ek.getSimpleClassName();
                 final SyncMap<String, Object> params = SyncMap.of("package",
@@ -83,7 +84,7 @@ public class ConjunctMappableTypeTemplate<V, R> implements TypeGenerationTemplat
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
-                final R writeResult = templateWriter.write(spec);
+                final WriteResult<R> writeResult = templateWriter.write(spec);
                 results.put(ek,
                             writeResult);
             }

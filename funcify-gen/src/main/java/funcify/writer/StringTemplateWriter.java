@@ -13,12 +13,12 @@ public interface StringTemplateWriter<V, R> {
 
     ErrorWriteResultHandler<R> getFailureWriteResultHandler();
 
-    R write(StringTemplateSpec templateSpec);
+    WriteResult<R> write(StringTemplateSpec templateSpec);
 
     interface WriteResultHandler<V, R> {
 
-        R transform(final StringTemplateSpec spec,
-                    final V resultValue);
+        WriteResult<R> transform(final StringTemplateSpec spec,
+                                 final V resultValue);
 
     }
 

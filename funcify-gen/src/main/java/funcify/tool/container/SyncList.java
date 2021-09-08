@@ -1,11 +1,10 @@
 package funcify.tool.container;
 
-import static funcify.tool.LiftOps.tryCatchLift;
+
 import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import funcify.tool.LiftOps;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -396,7 +395,7 @@ public interface SyncList<E> extends Iterable<E> {
                                                              if (i == idx) {
                                                                  return e;
                                                              } else {
-                                                                 return tryCatchLift(() -> l.get(idx)).orElse(e);
+                                                                 return l.get(idx);
                                                              }
                                                          })
                                                          .collect(Collectors.toList());
@@ -416,8 +415,8 @@ public interface SyncList<E> extends Iterable<E> {
                                         final E e) {
             return narrow(syncList).mapInternal(l -> {
                 if (i >= 0 && i <= l.size()) {
-                    tryCatchLift(() -> l.add(i,
-                                             e));
+                    l.add(i,
+                          e);
                 }
                 return l;
             });
@@ -430,18 +429,15 @@ public interface SyncList<E> extends Iterable<E> {
                            () -> "list");
             return narrow(syncList).mapInternal(l -> {
                 if (i >= 0 && iterable instanceof Collection<?>) {
-                    tryCatchLift(() -> {
-                        @SuppressWarnings("unchecked")
-                        final boolean result = l.addAll(i,
-                                                        (Collection<? extends E>) iterable);
-                        return result;
-                    });
+                    @SuppressWarnings("unchecked")
+                    final boolean result = l.addAll(i,
+                                                    (Collection<? extends E>) iterable);
                     return l;
                 } else if (i >= 0) {
-                    tryCatchLift(() -> l.addAll(i,
-                                                StreamSupport.stream(iterable.spliterator(),
-                                                                     false)
-                                                             .collect(Collectors.toList())));
+                    l.addAll(i,
+                             StreamSupport.stream(iterable.spliterator(),
+                                                  false)
+                                          .collect(Collectors.toList()));
                     return l;
                 } else {
                     return l;
@@ -452,7 +448,7 @@ public interface SyncList<E> extends Iterable<E> {
         public <E> SyncList<E> removeValue(final SyncList<E> syncList,
                                            final E e) {
             return narrow(syncList).mapInternal(l -> {
-                tryCatchLift(() -> l.remove(e));
+                l.remove(e);
                 return l;
             });
         }
@@ -461,7 +457,7 @@ public interface SyncList<E> extends Iterable<E> {
                                         final int i) {
             return narrow(syncList).mapInternal(l -> {
                 if (i >= 0 && i <= l.size()) {
-                    tryCatchLift(() -> l.remove(i));
+                    l.remove(i);
                 }
                 return l;
             });
@@ -481,7 +477,7 @@ public interface SyncList<E> extends Iterable<E> {
             final AtomicReference<E> valueHolder = new AtomicReference<>(null);
             narrow(syncList).mapInternal(l -> {
                 if (index >= 0 && index <= l.size()) {
-                    tryCatchLift(() -> valueHolder.set(l.get(index)));
+                    valueHolder.set(l.get(index));
                 }
                 return l;
             });
@@ -494,9 +490,7 @@ public interface SyncList<E> extends Iterable<E> {
                            () -> "mapper");
             return narrow(syncList).mapInternal(l -> {
                 final List<R> updatedList = l.stream()
-                                             .map(tryCatchLift(mapper))
-                                             .filter(Optional::isPresent)
-                                             .map(Optional::get)
+                                             .map(mapper)
                                              .collect(Collectors.toList());
                 if (l instanceof CopyOnWriteArrayList) {
                     // Create standard arraylist first and create copy-on-write-array list in one call to its constructor rather than
@@ -514,9 +508,8 @@ public interface SyncList<E> extends Iterable<E> {
                            () -> "flatMapper");
             return narrow(syncList).mapInternal(l -> {
                 final List<R> updatedList = l.stream()
-                                             .map(tryCatchLift(flatMapper))
-                                             .flatMap(opt -> opt.map(SyncList::stream)
-                                                                .orElseGet(Stream::empty))
+                                             .map(flatMapper)
+                                             .flatMap(SyncList::stream)
                                              .collect(Collectors.toList());
                 if (l instanceof CopyOnWriteArrayList) {
                     // Create standard arraylist first and create copy-on-write-array list in one call to its constructor rather than
@@ -550,9 +543,7 @@ public interface SyncList<E> extends Iterable<E> {
                                  final T initialValue,
                                  final BiFunction<T, ? super E, T> foldFunction) {
             return stream(syncList).reduce(initialValue,
-                                           (t, e) -> tryCatchLift(foldFunction).apply(t,
-                                                                                      e)
-                                                                               .orElse(t),
+                                           foldFunction::apply,
                                            (t1, t2) -> t2);
         }
 
@@ -560,7 +551,7 @@ public interface SyncList<E> extends Iterable<E> {
                                       final Predicate<? super E> condition) {
             return narrow(syncList).mapInternal(l -> {
                 final List<E> updatedList = l.stream()
-                                             .filter(tryCatchLift(condition))
+                                             .filter(condition)
                                              .collect(Collectors.toList());
                 if (l instanceof CopyOnWriteArrayList) {
                     return new CopyOnWriteArrayList<>(updatedList);
@@ -573,8 +564,7 @@ public interface SyncList<E> extends Iterable<E> {
                                final String delimiter,
                                final String prefix,
                                final String suffix) {
-            return stream(syncList).map(LiftOps.<E, String>tryCatchLift(Objects::toString))
-                                   .map(opt -> opt.orElse(""))
+            return stream(syncList).map(Objects::toString)
                                    .collect(Collectors.joining(requireNonNull(delimiter,
                                                                               () -> "delimiter"),
                                                                requireNonNull(prefix,

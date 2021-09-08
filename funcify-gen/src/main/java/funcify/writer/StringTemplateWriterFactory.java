@@ -1,5 +1,6 @@
 package funcify.writer;
 
+import funcify.error.FuncifyCodeGenException;
 import funcify.file.JavaSourceFile;
 import funcify.spec.StringTemplateSpec;
 import java.io.File;
@@ -29,8 +30,16 @@ public interface StringTemplateWriterFactory {
                                () -> "successHandler");
         Objects.requireNonNull(failureHandler,
                                () -> "failureHandler");
-        return StringTemplateFileWriter.of(successHandler::apply,
-                                           failureHandler::apply);
+        return StringTemplateFileWriter.of((spec, f) -> WriteResult.success(successHandler.apply(spec,
+                                                                                                 f)),
+                                           (spec, thr) -> {
+                                               try {
+                                                   return WriteResult.success(failureHandler.apply(spec,
+                                                                                                   thr));
+                                               } catch (final Throwable t) {
+                                                   return WriteResult.failure(t);
+                                               }
+                                           });
     }
 
     static <R> StringTemplateWriter<String, R> createStringTemplateStringWriter(final BiFunction<? super StringTemplateSpec, ? super String, ? extends R> successHandler,
@@ -39,8 +48,22 @@ public interface StringTemplateWriterFactory {
                                () -> "successHandler");
         Objects.requireNonNull(failureHandler,
                                () -> "failureHandler");
-        return StringTemplateStringWriter.of(successHandler::apply,
-                                             failureHandler::apply);
+        return StringTemplateStringWriter.of((spec, s) -> {
+                                                 try {
+                                                     return WriteResult.success(successHandler.apply(spec,
+                                                                                                     s));
+                                                 } catch (final Throwable t) {
+                                                     return WriteResult.failure(t);
+                                                 }
+                                             },
+                                             (spec, r) -> {
+                                                 try {
+                                                     return WriteResult.success(failureHandler.apply(spec,
+                                                                                                     r));
+                                                 } catch (final Throwable t) {
+                                                     return WriteResult.failure(t);
+                                                 }
+                                             });
     }
 
     static StringTemplateWriter<String, Void> createStringTemplateConsoleWriter() {
@@ -87,9 +110,16 @@ public interface StringTemplateWriterFactory {
                                               });
     }
 
-    static StringTemplateWriter<File, WriteResult<JavaSourceFile>> createStringTemplateJavaSourceFileWriter() {
-        return createStringTemplateFileWriter((spec, f) -> WriteResult.success(JavaSourceFile.of(spec.getTypePackagePathSegments(),
-                                                                                                 f)),
-                                              (spec, t) -> WriteResult.failure(t));
+    static StringTemplateWriter<File, JavaSourceFile> createStringTemplateJavaSourceFileWriter() {
+        return createStringTemplateFileWriter((spec, f) -> JavaSourceFile.of(spec.getTypePackagePathSegments(),
+                                                                             f),
+                                              (spec, t) -> {
+                                                  if (t instanceof RuntimeException) {
+                                                      throw ((RuntimeException) t);
+                                                  } else {
+                                                      throw new FuncifyCodeGenException(t.getMessage(),
+                                                                                        t);
+                                                  }
+                                              });
     }
 }
