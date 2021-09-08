@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author smccarron
@@ -22,6 +24,8 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor(staticName = "of")
 public class ConjunctWrappableTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ConjunctWrappableTypeTemplate.class);
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
@@ -40,6 +44,10 @@ public class ConjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
+        logger.debug("create_types_for_session: [ {} ]",
+                     SyncMap.empty()
+                            .put("types",
+                                 "ConjunctWrappableEnsemble[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, R> results = session.getDisjunctWrappableEnsembleTypeResults();
@@ -62,6 +70,7 @@ public class ConjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
                                                                                  "ensemble"));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
+                                                                         .typePackagePathSegments(getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName("conjunct_wrappable_type")
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
@@ -74,6 +83,10 @@ public class ConjunctWrappableTypeTemplate<V, R> implements TypeGenerationTempla
             }
             return session.withDisjunctWrappableEnsembleTypeResults(results);
         } catch (final Throwable t) {
+            logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
+                         t.getClass()
+                          .getSimpleName(),
+                         t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else {

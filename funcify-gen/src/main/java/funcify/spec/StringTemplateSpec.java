@@ -64,7 +64,10 @@ public interface StringTemplateSpec {
     Path getDestinationParentDirectoryPath();
 
     default Path getDestinationPackageDirectoryPath() {
-        return getDestinationParentDirectoryPath().resolve(getTypePackageAsFilePath().orElseThrow(() -> new IllegalArgumentException("path is empty or invalid")));
+        final Path typePackagePath = getTypePackageAsFilePath().orElseThrow(() -> new IllegalArgumentException(String.format("type_package [ %s ] is empty or invalid and cannot be converted into a path",
+                                                                                                                             String.join(".",
+                                                                                                                                         getTypePackagePathSegments()))));
+        return getDestinationParentDirectoryPath().resolve(typePackagePath);
     }
 
     default Path getDestinationFilePath() {

@@ -20,6 +20,7 @@ import lombok.Getter;
 public class DefaultStringTemplateSpec implements StringTemplateSpec {
 
 
+    @Default
     private final List<String> typePackagePathSegments = Collections.emptyList();
 
 

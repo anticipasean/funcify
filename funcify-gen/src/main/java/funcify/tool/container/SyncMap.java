@@ -14,10 +14,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -288,6 +290,18 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
 
     Map<K, V> asJavaMap();
 
+    default String mkString() {
+        return factory().mkString(this,
+                                  Objects::toString,
+                                  Objects::toString);
+    }
+
+    default String mkString(final Function<? super V, ? extends String> valueToString) {
+        return factory().mkString(this,
+                                  Objects::toString,
+                                  valueToString);
+    }
+
     @AllArgsConstructor(access = AccessLevel.PUBLIC,
                         staticName = "of")
     @EqualsAndHashCode
@@ -536,6 +550,27 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
 
         }
 
+        public <K, V, K1, V1> SyncMap<K1, V1> bimap(final SyncMap<K, V> syncMap,
+                                                    final Function<? super K, ? extends K1> keyMapper,
+                                                    final Function<? super V, ? extends V1> valueMapper) {
+            Objects.requireNonNull(keyMapper,
+                                   () -> "keyMapper");
+            Objects.requireNonNull(valueMapper,
+                                   () -> "valueMapper");
+
+            return stream(syncMap).map(t -> t.map1(tryCatchLift(keyMapper))
+                                             .map2(tryCatchLift(valueMapper)))
+                                  .filter(t -> t._1()
+                                                .isPresent() && t._2()
+                                                                 .isPresent())
+                                  .map(t -> t.map1(Optional::get)
+                                             .map2(Optional::get))
+                                  .reduce(empty(),
+                                          SyncMap::put,
+                                          SyncMap::putAll);
+
+        }
+
         public <K, V> SyncMap<K, V> filterKeys(final SyncMap<K, V> syncMap,
                                                final Predicate<? super K> condition) {
             return stream(syncMap).filter(t -> tryCatchLift(condition).test(t._1()))
@@ -576,12 +611,29 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
             return currentValue;
         }
 
+        public <K, V> String mkString(final SyncMap<K, V> syncMap,
+                                      final Function<? super K, ? extends String> keyToString,
+                                      final Function<? super V, ? extends String> valueToString) {
+            return bimap(syncMap,
+                         keyToString,
+                         valueToString).stream()
+                                       .map(t -> new StringJoiner(", ",
+                                                                  "{ ",
+                                                                  " }").add(String.join(": ",
+                                                                                        t._1(),
+                                                                                        t._2())))
+                                       .reduce(new StringJoiner(", ",
+                                                                "{ ",
+                                                                " }"),
+                                               StringJoiner::merge)
+                                       .toString();
+        }
+
     }
 
     @AllArgsConstructor(access = AccessLevel.PACKAGE,
                         staticName = "of")
     @EqualsAndHashCode
-    @ToString
     class DefaultSyncMap<K, V> implements SyncMap<K, V> {
 
         @JsonValue
@@ -595,6 +647,11 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
         DefaultSyncMap<K, V> mapInternal(final Function<? super ConcurrentMap<K, V>, ? extends ConcurrentMap<K, V>> mapper) {
             return DefaultSyncMap.of(requireNonNull(mapper,
                                                     () -> "mapper").apply(baseMap));
+        }
+
+        @Override
+        public String toString() {
+            return mkString();
         }
     }
 

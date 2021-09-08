@@ -11,12 +11,15 @@ import funcify.ensemble.trait.wrappable.DisjunctWrappableTypeTemplate;
 import funcify.file.JavaSourceFile;
 import funcify.template.TypeGenerationTemplate;
 import funcify.tool.container.SyncList;
+import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.StringTemplateWriterFactory;
 import funcify.writer.WriteResult;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
@@ -25,6 +28,8 @@ import picocli.CommandLine.Option;
  * @created 2021-05-19
  */
 public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, ?>> {
+
+    private static final Logger logger = LoggerFactory.getLogger(FuncifyClassGenerator.class);
 
     @Option(names = {"-d", "--destination-dir"},
             description = "directory where the generated funcify packages and classes should be placed",
@@ -64,6 +69,15 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
 
     @Override
     public TypeGenerationSession<?, ?> call() throws Exception {
+        logger.info("call: [ {} ]",
+                    SyncMap.empty()
+                           .put("destinationDirectory",
+                                destinationDirectory)
+                           .put("printToConsole",
+                                printToConsole)
+                           .put("valueParameterLimit",
+                                valueParameterLimit)
+                           .mkString());
         if (printToConsole) {
             final StringTemplateWriter<String, Void> consoleWriter = StringTemplateWriterFactory.createStringTemplateConsoleWriter();
             final TypeGenerationSession<String, Void> session = buildInitialGenerationSession(consoleWriter);

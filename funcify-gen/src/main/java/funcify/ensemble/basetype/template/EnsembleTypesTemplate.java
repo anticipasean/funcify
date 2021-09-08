@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author smccarron
@@ -22,6 +24,8 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor(staticName = "of")
 public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R> {
+
+    private static final Logger logger = LoggerFactory.getLogger(EnsembleTypesTemplate.class);
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
@@ -38,6 +42,13 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
+        logger.debug("create_types_for_session: [ {} ]",
+                     SyncMap.empty()
+                            .put("types",
+                                 "Ensemble")
+                            .put("ensemble_kinds.count",
+                                 session.getEnsembleKinds()
+                                        .size()));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final StringTemplateSpec ensembleBaseTypeSpec = DefaultStringTemplateSpec.builder()
@@ -67,6 +78,7 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
                                                                               .orElse(null));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
+                                                                         .typePackagePathSegments(getDestinationTypePackagePathSegments())
                                                                          .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
                                                                          .typeName(ek.getSimpleClassName())
                                                                          .fileTypeExtension(".java")
@@ -80,6 +92,10 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
             }
             return updatedSession.withEnsembleTypeResultsByEnsembleKind(ensembleTypeResultsByEnsembleKind);
         } catch (final Throwable t) {
+            logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
+                         t.getClass()
+                          .getSimpleName(),
+                         t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else {

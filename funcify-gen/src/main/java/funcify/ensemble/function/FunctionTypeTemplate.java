@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author smccarron
@@ -22,6 +24,8 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor(staticName = "of")
 public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> {
+
+    private static final Logger logger = LoggerFactory.getLogger(FunctionTypeTemplate.class);
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
@@ -38,6 +42,10 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
+        logger.debug("create_types_for_session: [ {} ]",
+                     SyncMap.empty()
+                            .put("types",
+                                 "Fn[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, R> results = session.getFunctionTypeResults();
@@ -72,6 +80,7 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
                 }
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
+                                                                         .typePackagePathSegments(getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName("function_type")
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
@@ -84,6 +93,10 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
             }
             return session.withDisjunctWrappableEnsembleTypeResults(results);
         } catch (final Throwable t) {
+            logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
+                         t.getClass()
+                          .getSimpleName(),
+                         t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else {

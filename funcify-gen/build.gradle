@@ -24,6 +24,7 @@ dependencies {
     compileClasspath("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
     compileClasspath("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
     implementation "info.picocli:picocli:${picoCliVersion}"
+    implementation("ch.qos.logback:logback-classic:${logbackVersion}")
 
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     testCompileClasspath("org.projectlombok:lombok:${lombokVersion}")
@@ -33,6 +34,7 @@ dependencies {
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}")
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
     testImplementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+    testImplementation("ch.qos.logback:logback-classic:${logbackVersion}")
 }
 
 jar {

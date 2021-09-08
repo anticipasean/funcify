@@ -4,12 +4,15 @@ import funcify.error.FuncifyCodeGenException;
 import funcify.error.TemplateErrorFeedbackHandler;
 import funcify.error.TemplateErrorFeedbackHandler.TemplateErrorFeedbackListener;
 import funcify.spec.StringTemplateSpec;
+import funcify.tool.container.SyncMap;
 import java.io.File;
 import java.nio.file.Files;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author smccarron
@@ -19,6 +22,8 @@ import lombok.NonNull;
                     staticName = "of")
 @Getter
 public class StringTemplateFileWriter<R> implements StringTemplateWriter<File, R> {
+
+    private static final Logger logger = LoggerFactory.getLogger(StringTemplateFileWriter.class);
 
     @NonNull
     private final FileWriteResultHandler<R> successWriteResultHandler;
@@ -30,6 +35,12 @@ public class StringTemplateFileWriter<R> implements StringTemplateWriter<File, R
 
     @Override
     public R write(final StringTemplateSpec templateSpec) {
+        logger.debug("write: [ {} ]",
+                     SyncMap.empty()
+                            .put("string_template_group_file_path",
+                                 templateSpec.getStringTemplateGroupFilePath())
+                            .put("destination_file_path",
+                                 templateSpec.getDestinationFilePath()));
         try {
             final File destinationFile = Files.createFile(templateSpec.getDestinationFilePath())
                                               .toFile();
@@ -45,9 +56,17 @@ public class StringTemplateFileWriter<R> implements StringTemplateWriter<File, R
             return successWriteResultHandler.transform(templateSpec,
                                                        destinationFile);
         } catch (final FuncifyCodeGenException e) {
+            logger.error("write: [ status: failed ] due to [ type: {}, message: {} ]",
+                         e.getClass()
+                          .getSimpleName(),
+                         e.getMessage());
             return failureWriteResultHandler.transform(templateSpec,
                                                        e);
         } catch (final Throwable t) {
+            logger.error("write: [ status: failed ] due to [ type: {}, message: {} ]",
+                         t.getClass()
+                          .getSimpleName(),
+                         t.getMessage());
             return failureWriteResultHandler.transform(templateSpec,
                                                        new FuncifyCodeGenException(t.getMessage(),
                                                                                    t));

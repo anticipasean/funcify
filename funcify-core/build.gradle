@@ -11,11 +11,12 @@ task generateSources(dependsOn: tasks.getByPath(":funcify-gen:shadowJar")) {
         File funcifyGenJar = tasks.getByPath(":funcify-gen:shadowJar").outputs.getFiles().filter({ File f -> f.getName().endsWith(".jar") }).singleFile
         if (funcifyGenJar) {
             File funcifyCoreMainJavaSourceSetDir = sourceSets.main.java.srcDirs.stream().findFirst().orElseThrow({ ->
-                new IllegalStateException("no destination directory found for main java source set") })
+                new IllegalStateException("no destination directory found for main java source set")
+            })
             javaexec {
                 main = "-jar"
-                args = [funcifyGenJar.getAbsolutePath(), "-p"]
-//                        "-d", funcifyCoreMainJavaSourceSetDir.getAbsolutePath()]
+                args = [funcifyGenJar.getAbsolutePath(),
+                        "-d", funcifyCoreMainJavaSourceSetDir.getAbsolutePath()]
                 println getCommandLine()
             }
         }
