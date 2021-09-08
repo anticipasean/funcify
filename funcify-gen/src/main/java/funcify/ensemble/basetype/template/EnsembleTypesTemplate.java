@@ -65,7 +65,8 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
 
             final WriteResult<R> baseEnsembleTypeResult = templateWriter.write(ensembleBaseTypeSpec);
             if (baseEnsembleTypeResult.isFailure()) {
-                throw baseEnsembleTypeResult.getFailureValue().orElseThrow(() -> new FuncifyCodeGenException("throwable missing"));
+                throw baseEnsembleTypeResult.getFailureValue()
+                                            .orElseThrow(() -> new FuncifyCodeGenException("throwable missing"));
             }
             final TypeGenerationSession<V, R> updatedSession = session.withBaseEnsembleTypeResult(baseEnsembleTypeResult);
             final SyncMap<EnsembleKind, WriteResult<R>> ensembleTypeResultsByEnsembleKind = session.getEnsembleTypeResultsByEnsembleKind();
@@ -92,6 +93,10 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> ensembleTypeResult = templateWriter.write(spec);
+                if (ensembleTypeResult.isFailure()) {
+                    throw ensembleTypeResult.getFailureValue()
+                                            .orElseThrow(() -> new FuncifyCodeGenException("throwable missing"));
+                }
                 ensembleTypeResultsByEnsembleKind.put(ek,
                                                       ensembleTypeResult);
             }

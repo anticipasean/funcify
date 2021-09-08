@@ -1,6 +1,5 @@
 package funcify.tool.container;
 
-import static funcify.tool.LiftOps.tryCatchLift;
 import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -16,7 +15,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.StringJoiner;
@@ -441,18 +439,18 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
 
         public <K, V> SyncMap<K, V> putAll(final SyncMap<K, V> syncMap,
                                            final Map<? extends K, ? extends V> map) {
-            return tryCatchLift(map::entrySet).map(Set::stream)
-                                              .orElseGet(Stream::empty)
-                                              .map(Tuple2::fromJavaMapEntry)
-                                              .reduce(syncMap,
-                                                      SyncMap::put,
-                                                      (m1, m2) -> m2);
+            return map.entrySet()
+                      .stream()
+                      .map(Tuple2::fromJavaMapEntry)
+                      .reduce(syncMap,
+                              SyncMap::put,
+                              (m1, m2) -> m2);
         }
 
         public <K, V> SyncMap<K, V> remove(final SyncMap<K, V> syncMap,
                                            final K key) {
             return narrow(syncMap).mapInternal(m -> {
-                tryCatchLift(() -> m.remove(key));
+                m.remove(key);
                 return m;
             });
         }
@@ -462,7 +460,7 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
                                                   final Iterable<? extends K> keys) {
             return narrow(syncMap).mapInternal(m -> {
                 for (K k : keys) {
-                    tryCatchLift(() -> m.remove(k));
+                    m.remove(k);
                 }
                 return m;
             });
@@ -528,9 +526,8 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
         public <K1, V1, K2, V2> SyncMap<K2, V2> flatMap(final SyncMap<K1, V1> syncMap,
                                                         final BiFunction<? super K1, ? super V1, ? extends SyncMap<K2, V2>> flatMapper) {
 
-            return stream(syncMap).flatMap(t -> t.fold(tryCatchLift(flatMapper))
-                                                 .map(SyncMap::stream)
-                                                 .orElseGet(Stream::empty))
+            return stream(syncMap).flatMap(t -> t.fold(flatMapper)
+                                                 .stream())
                                   .reduce(empty(),
                                           SyncMap::put,
                                           SyncMap::putAll);
@@ -540,10 +537,7 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
         public <K, V, R> SyncMap<K, R> map(final SyncMap<K, V> syncMap,
                                            final Function<? super V, ? extends R> mapper) {
 
-            return stream(syncMap).map(t -> t.map2(tryCatchLift(mapper)))
-                                  .filter(t -> t._2()
-                                                .isPresent())
-                                  .map(t -> t.map2(Optional::get))
+            return stream(syncMap).map(t -> t.map2(mapper))
                                   .reduce(empty(),
                                           SyncMap::put,
                                           SyncMap::putAll);
@@ -558,13 +552,8 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
             Objects.requireNonNull(valueMapper,
                                    () -> "valueMapper");
 
-            return stream(syncMap).map(t -> t.map1(tryCatchLift(keyMapper))
-                                             .map2(tryCatchLift(valueMapper)))
-                                  .filter(t -> t._1()
-                                                .isPresent() && t._2()
-                                                                 .isPresent())
-                                  .map(t -> t.map1(Optional::get)
-                                             .map2(Optional::get))
+            return stream(syncMap).map(t -> t.map1(keyMapper)
+                                             .map2(valueMapper))
                                   .reduce(empty(),
                                           SyncMap::put,
                                           SyncMap::putAll);
@@ -573,7 +562,7 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
 
         public <K, V> SyncMap<K, V> filterKeys(final SyncMap<K, V> syncMap,
                                                final Predicate<? super K> condition) {
-            return stream(syncMap).filter(t -> tryCatchLift(condition).test(t._1()))
+            return stream(syncMap).filter(t -> condition.test(t._1()))
                                   .reduce(empty(),
                                           SyncMap::put,
                                           SyncMap::putAll);
@@ -582,12 +571,12 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
         public <K, V> SyncMap<K, V> filterKeysNot(final SyncMap<K, V> syncMap,
                                                   final Predicate<? super K> condition) {
             return filterKeys(syncMap,
-                              tryCatchLift(condition).negate());
+                              condition.negate());
         }
 
         public <K, V> SyncMap<K, V> filterValues(final SyncMap<K, V> syncMap,
                                                  final Predicate<? super V> condition) {
-            return stream(syncMap).filter(t -> tryCatchLift(condition).test(t._2()))
+            return stream(syncMap).filter(t -> condition.test(t._2()))
                                   .reduce(empty(),
                                           SyncMap::put,
                                           SyncMap::putAll);
@@ -604,8 +593,8 @@ public interface SyncMap<K, V> extends Iterable<Tuple2<K, V>> {
             while (iterator.hasNext()) {
                 final T prevValue = currentValue;
                 currentValue = Optional.ofNullable(iterator.next())
-                                       .flatMap(tup -> tryCatchLift(foldFunc).apply(prevValue,
-                                                                                    tup))
+                                       .map(tup -> foldFunc.apply(prevValue,
+                                                                  tup))
                                        .orElse(prevValue);
             }
             return currentValue;
