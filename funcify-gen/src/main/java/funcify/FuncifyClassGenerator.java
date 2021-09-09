@@ -2,7 +2,7 @@ package funcify;
 
 import funcify.commandline.PathConverter;
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.basetype.session.TypeGenerationSession;
+import funcify.session.TypeGenerationSession;
 import funcify.ensemble.basetype.template.EnsembleTypesTemplate;
 import funcify.ensemble.function.FunctionTypeTemplate;
 import funcify.ensemble.trait.mappable.ConjunctMappableTypeTemplate;

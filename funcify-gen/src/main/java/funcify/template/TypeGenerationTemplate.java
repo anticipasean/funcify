@@ -1,6 +1,6 @@
 package funcify.template;
 
-import funcify.ensemble.basetype.session.TypeGenerationSession;
+import funcify.session.TypeGenerationSession;
 import java.nio.file.Path;
 import java.util.List;
 

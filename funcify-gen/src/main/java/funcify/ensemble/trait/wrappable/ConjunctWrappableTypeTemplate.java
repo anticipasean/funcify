@@ -1,19 +1,22 @@
 package funcify.ensemble.trait.wrappable;
 
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.basetype.session.TypeGenerationSession;
+import funcify.ensemble.template.TraitGenerationTemplate;
 import funcify.error.FuncifyCodeGenException;
+import funcify.session.TypeGenerationSession;
 import funcify.spec.DefaultStringTemplateSpec;
 import funcify.spec.StringTemplateSpec;
-import funcify.template.TypeGenerationTemplate;
 import funcify.tool.CharacterOps;
 import funcify.tool.container.SyncMap;
+import funcify.trait.Trait;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.WriteResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -24,9 +27,16 @@ import org.slf4j.LoggerFactory;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class ConjunctWrappableTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> {
+public class ConjunctWrappableTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConjunctWrappableTypeTemplate.class);
+
+
+    @Override
+    public Set<Trait> getTraits() {
+        return EnumSet.of(Trait.CONJUNCT,
+                          Trait.WRAPPABLE);
+    }
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {

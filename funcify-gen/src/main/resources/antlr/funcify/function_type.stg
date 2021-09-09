@@ -38,6 +38,8 @@ public interface <function_type_declaration(arity, type_variables)> extends <ens
 
 function_type_declaration(arity="0", type_variables=[]) ::= "Fn<arity>\<<type_variables; separator={, }>>"
 
+function_type_parameter_declaration(type_variables, next_type_variable) ::= "final Fn1\<<type_variables:{tv | ? super <tv>};separator={, }>, ? extends <next_type_variable>> function"
+
 witness_type_definition(witness_type) ::= <<
     static enum <witness_type> {
 
@@ -85,4 +87,3 @@ flat_map_method(arity="0", type_variables=[], next_type_variable="") ::= <<
     }
 >>
 
-function_type_parameter_declaration(type_variables, next_type_variable) ::= "final Fn1\<<type_variables:{tv | ? super <tv>};separator={, }>, ? extends <next_type_variable>> function"

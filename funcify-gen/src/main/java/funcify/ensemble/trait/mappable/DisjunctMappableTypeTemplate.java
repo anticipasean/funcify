@@ -2,9 +2,8 @@ package funcify.ensemble.trait.mappable;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.template.TraitGenerationTemplate;
-import funcify.ensemble.trait.name.TraitName;
-import funcify.session.TypeGenerationSession;
 import funcify.error.FuncifyCodeGenException;
+import funcify.session.TypeGenerationSession;
 import funcify.spec.DefaultStringTemplateSpec;
 import funcify.spec.StringTemplateSpec;
 import funcify.tool.CharacterOps;
@@ -30,13 +29,14 @@ import org.slf4j.LoggerFactory;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
+public class DisjunctMappableTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConjunctMappableTypeTemplate.class);
+    private static final Logger logger = LoggerFactory.getLogger(DisjunctMappableTypeTemplate.class);
 
     @Override
     public Set<Trait> getTraits() {
-        return EnumSet.of(Trait.CONJUNCT, Trait.MAPPABLE);
+        return EnumSet.of(Trait.DISJUNCT,
+                          Trait.MAPPABLE);
     }
 
     @Override
@@ -44,14 +44,14 @@ public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
         return Arrays.asList("funcify",
                              "trait",
                              "mappable",
-                             "conjunct");
+                             "disjunct");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
         return Paths.get("antlr",
                          "funcify",
-                         "conjunct_mappable_type.stg");
+                         "disjunct_mappable_type.stg");
     }
 
     @Override
@@ -59,12 +59,12 @@ public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
                             .put("types",
-                                 "ConjunctMappableEnsemble[1..n]"));
+                                 "disjunctMappableEnsemble[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getConjunctMappableEnsembleTypeResults();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctMappableEnsembleTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
-                final String className = "ConjunctMappable" + ek.getSimpleClassName();
+                final String className = "DisjunctMappable" + ek.getSimpleClassName();
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
                                                                   "class_name",
@@ -76,18 +76,18 @@ public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
                                                                               .orElse(null),
                                                                   "ensemble_type_name",
-                                                                  "ConjunctWrappable" + ek.getSimpleClassName())
+                                                                  "DisjunctWrappable" + ek.getSimpleClassName())
                                                               .put("ensemble_type_package",
                                                                    Arrays.asList("funcify",
                                                                                  "trait",
                                                                                  "wrappable",
-                                                                                 "conjunct"))
+                                                                                 "disjunct"))
                                                               .put("next_type_variable_sequences",
                                                                    nextTypeVariableSequences(ek.getNumberOfValueParameters()));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(getDestinationTypePackagePathSegments())
-                                                                         .templateFunctionName("conjunct_mappable_type")
+                                                                         .templateFunctionName("disjunct_mappable_type")
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())

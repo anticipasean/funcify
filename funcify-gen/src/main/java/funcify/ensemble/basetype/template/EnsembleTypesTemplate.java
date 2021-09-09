@@ -1,7 +1,7 @@
 package funcify.ensemble.basetype.template;
 
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.basetype.session.TypeGenerationSession;
+import funcify.session.TypeGenerationSession;
 import funcify.error.FuncifyCodeGenException;
 import funcify.spec.DefaultStringTemplateSpec;
 import funcify.spec.StringTemplateSpec;

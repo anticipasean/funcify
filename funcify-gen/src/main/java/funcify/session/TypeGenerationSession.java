@@ -1,4 +1,4 @@
-package funcify.ensemble.basetype.session;
+package funcify.session;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.tool.container.SyncList;
@@ -42,5 +42,11 @@ public class TypeGenerationSession<V, R> {
 
     @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> functionTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctMappableEnsembleTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctMappableEnsembleTypeResults = SyncMap.empty();
 
 }
