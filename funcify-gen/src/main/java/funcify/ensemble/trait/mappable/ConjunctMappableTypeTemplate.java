@@ -2,7 +2,6 @@ package funcify.ensemble.trait.mappable;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.template.TraitGenerationTemplate;
-import funcify.ensemble.trait.name.TraitName;
 import funcify.session.TypeGenerationSession;
 import funcify.error.FuncifyCodeGenException;
 import funcify.spec.DefaultStringTemplateSpec;

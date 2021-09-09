@@ -1,8 +1,8 @@
 package funcify.ensemble.function;
 
 import funcify.ensemble.EnsembleKind;
-import funcify.session.TypeGenerationSession;
 import funcify.error.FuncifyCodeGenException;
+import funcify.session.TypeGenerationSession;
 import funcify.spec.DefaultStringTemplateSpec;
 import funcify.spec.StringTemplateSpec;
 import funcify.template.TypeGenerationTemplate;
@@ -55,8 +55,6 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
                 final String className = "Fn" + arity;
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
-                                                                  "class_name",
-                                                                  className,
                                                                   "type_variables",
                                                                   CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(ek.getNumberOfValueParameters())
                                                                               .collect(Collectors.toList()),
@@ -89,6 +87,10 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
+                if (writeResult.isFailure()) {
+                    throw writeResult.getFailureValue()
+                                     .orElseThrow(() -> new FuncifyCodeGenException("missing throwable"));
+                }
                 results.put(ek,
                             writeResult);
             }

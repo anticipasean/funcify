@@ -1,6 +1,5 @@
 package funcify.ensemble.template;
 
-import funcify.ensemble.trait.name.TraitName;
 import funcify.template.TypeGenerationTemplate;
 import funcify.trait.Trait;
 import java.util.Set;

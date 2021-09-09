@@ -9,7 +9,7 @@ conjunct_mappable_type(class_name,
                        next_type_variable="",
                        next_type_variable_sequences=[],
                        ensemble_type_package=[]) ::= <<
-package <package; separator=".">
+package <package; separator=".">;
 
 <ensemble_type_import(ensemble_type_name, ensemble_type_package)>
 <null_check_import()>
