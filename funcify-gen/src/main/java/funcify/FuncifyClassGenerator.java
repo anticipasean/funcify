@@ -2,7 +2,9 @@ package funcify;
 
 import funcify.commandline.PathConverter;
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.basetype.template.EnsembleTypesTemplate;
+import funcify.ensemble.basetype.ConjunctEnsembleTypeTemplate;
+import funcify.ensemble.basetype.DisjunctEnsembleTypeTemplate;
+import funcify.ensemble.basetype.EnsembleTypesTemplate;
 import funcify.ensemble.function.FunctionTypeTemplate;
 import funcify.ensemble.trait.mappable.MappableConjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.mappable.MappableDisjunctFactoryTypeTemplate;
@@ -53,6 +55,8 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
 
     private static <V, R> SyncList<TypeGenerationTemplate<V, R>> typeGenerationTemplateSequence() {
         return SyncList.of(EnsembleTypesTemplate.of(),
+                           ConjunctEnsembleTypeTemplate.of(),
+                           DisjunctEnsembleTypeTemplate.of(),
                            WrappableDisjunctFactoryTypeTemplate.of(),
                            WrappableConjunctFactoryTypeTemplate.of(),
                            MappableConjunctFactoryTypeTemplate.of(),

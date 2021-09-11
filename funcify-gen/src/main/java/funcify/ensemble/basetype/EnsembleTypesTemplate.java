@@ -1,4 +1,4 @@
-package funcify.ensemble.basetype.template;
+package funcify.ensemble.basetype;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.session.TypeGenerationSession;

@@ -1,7 +1,7 @@
 package funcify.ensemble.trait.wrappable;
 
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.template.TraitGenerationTemplate;
+import funcify.ensemble.template.TraitFactoryGenerationTemplate;
 import funcify.error.FuncifyCodeGenException;
 import funcify.session.TypeGenerationSession;
 import funcify.spec.DefaultStringTemplateSpec;
@@ -27,43 +27,36 @@ import org.slf4j.LoggerFactory;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class WrappableConjunctFactoryTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
+public class WrappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGenerationTemplate<V, R> {
 
     private static final Logger logger = LoggerFactory.getLogger(WrappableConjunctFactoryTypeTemplate.class);
 
 
     @Override
     public Set<Trait> getTraits() {
-        return EnumSet.of(Trait.CONJUNCT,
-                          Trait.WRAPPABLE);
+        return EnumSet.of(Trait.CONJUNCT, Trait.WRAPPABLE);
     }
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify",
-                             "trait",
-                             "wrappable",
-                             "conjunct");
+        return Arrays.asList("funcify", "trait", "wrappable", "conjunct");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr",
-                         "funcify",
-                         "wrappable_conjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "wrappable_conjunct_factory_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
-                            .put("types",
-                                 "WrappableConjunctEnsembleFactory[1..n]"));
+                            .put("types", "WrappableConjunctEnsembleFactory[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctWrappableEnsembleFactoryTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
-                final String className = getTraitNameForEnsembleKind(ek);
+                final String className = getTraitNameForEnsembleKind(ek) + "Factory";
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
                                                                   "class_name",
@@ -73,24 +66,22 @@ public class WrappableConjunctFactoryTypeTemplate<V, R> implements TraitGenerati
                                                                               .collect(Collectors.toList()),
                                                                   "next_type_variable",
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
-                                                                              .orElse(null),
-                                                                  "ensemble_type_name",
-                                                                  ek.getSimpleClassName())
-                                                              .put("ensemble_type_package",
-                                                                   Arrays.asList("funcify",
-                                                                                 "ensemble"));
+                                                                              .orElse(null))
+                                                              .put("container_type",
+                                                                   getContainerTypeJsonInstanceFor(ek, Trait.CONJUNCT));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
-                                                                         .typePackagePathSegments(getDestinationTypePackagePathSegments())
-                                                                         .templateFunctionName("conjunct_wrappable_type")
+                                                                         .typePackagePathSegments(
+                                                                             getDestinationTypePackagePathSegments())
+                                                                         .templateFunctionName(getStringTemplateGroupFileName())
                                                                          .fileTypeExtension(".java")
-                                                                         .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
+                                                                         .stringTemplateGroupFilePath(
+                                                                             getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
-                results.put(ek,
-                            writeResult);
+                results.put(ek, writeResult);
             }
             return session.withDisjunctWrappableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
@@ -101,8 +92,7 @@ public class WrappableConjunctFactoryTypeTemplate<V, R> implements TraitGenerati
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else {
-                throw new FuncifyCodeGenException(t.getMessage(),
-                                                  t);
+                throw new FuncifyCodeGenException(t.getMessage(), t);
             }
         }
     }

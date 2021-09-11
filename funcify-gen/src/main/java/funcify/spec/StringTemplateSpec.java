@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -107,7 +108,8 @@ public interface StringTemplateSpec {
                 return LiftOps.tryCatchLift(() -> typedModelAdaptorRegistrar(tup).apply(f))
                               .orElseThrow(() -> modelAdaptorRegistryErrorFunc.apply(tup));
             });
-            return getTemplateFunctionParameterInput().foldLeft(stGroupFile.getInstanceOf(getTemplateFunctionName()),
+            return getTemplateFunctionParameterInput().foldLeft(Objects.requireNonNull(stGroupFile.getInstanceOf(
+                getTemplateFunctionName()), () -> "template_function_name was not found"),
                                                                 (st, entry) -> st.add(entry._1(), entry._2()));
         } catch (final Throwable t) {
             if (t instanceof FuncifyCodeGenException) {

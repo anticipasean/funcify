@@ -1,7 +1,7 @@
-package funcify.ensemble.trait.wrappable;
+package funcify.ensemble.basetype;
 
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.template.TraitFactoryGenerationTemplate;
+import funcify.ensemble.template.TraitGenerationTemplate;
 import funcify.error.FuncifyCodeGenException;
 import funcify.session.TypeGenerationSession;
 import funcify.spec.DefaultStringTemplateSpec;
@@ -27,35 +27,36 @@ import org.slf4j.LoggerFactory;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class WrappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGenerationTemplate<V, R> {
+public class ConjunctEnsembleTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
 
-    private static final Logger logger = LoggerFactory.getLogger(WrappableDisjunctFactoryTypeTemplate.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConjunctEnsembleTypeTemplate.class);
+
 
     @Override
     public Set<Trait> getTraits() {
-        return EnumSet.of(Trait.DISJUNCT, Trait.WRAPPABLE);
+        return EnumSet.of(Trait.CONJUNCT);
     }
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "wrappable", "disjunct");
+        return Arrays.asList("funcify", "ensemble", "conjunct");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "wrappable_disjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "conjunct_ensemble_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
-                            .put("types", "WrappableDisjunctEnsembleFactory[1..n]"));
+                            .put("types", "ConjunctEnsemble[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctWrappableEnsembleFactoryTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
-                final String className = getTraitNameForEnsembleKind(ek) + "Factory";
+                final String className = getTraitNameForEnsembleKind(ek);
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
                                                                   "class_name",
@@ -65,9 +66,10 @@ public class WrappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryG
                                                                               .collect(Collectors.toList()),
                                                                   "next_type_variable",
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
-                                                                              .orElse(null))
-                                                              .put("container_type",
-                                                                   getContainerTypeJsonInstanceFor(ek, Trait.DISJUNCT));
+                                                                              .orElse(null),
+                                                                  "ensemble_type_name",
+                                                                  ek.getSimpleClassName())
+                                                              .put("ensemble_type_package", Arrays.asList("funcify", "ensemble"));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(

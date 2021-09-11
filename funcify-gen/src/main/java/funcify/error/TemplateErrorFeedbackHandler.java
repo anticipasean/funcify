@@ -1,5 +1,6 @@
 package funcify.error;
 
+import funcify.tool.LiftOps;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -60,36 +61,30 @@ public interface TemplateErrorFeedbackHandler {
 
         private static Function<STMessage, String> formatSTMessageAsString() {
             return stMessage -> new StringBuilder().append("[ message: \"")
-                                                   .append(stMessage.error.message)
-                                                   .append("\", ")
-                                                   .append("cause: ")
-                                                   .append(stMessage.cause)
-                                                   .append(" ]")
+                                                   .append(LiftOps.tryCatchLift(stMessage::toString)
+                                                                  .orElse("<error_retrieving_st_message_to_string>"))
+                                                   .append("\" ]")
                                                    .toString();
         }
 
         @Override
         public void compileTimeError(final STMessage msg) {
-            messageHolder.compareAndSet(null,
-                                        msg);
+            messageHolder.compareAndSet(null, msg);
         }
 
         @Override
         public void runTimeError(final STMessage msg) {
-            messageHolder.compareAndSet(null,
-                                        msg);
+            messageHolder.compareAndSet(null, msg);
         }
 
         @Override
         public void IOError(final STMessage msg) {
-            messageHolder.compareAndSet(null,
-                                        msg);
+            messageHolder.compareAndSet(null, msg);
         }
 
         @Override
         public void internalError(final STMessage msg) {
-            messageHolder.compareAndSet(null,
-                                        msg);
+            messageHolder.compareAndSet(null, msg);
         }
 
         public Optional<STMessage> getSTMessageFeedback() {

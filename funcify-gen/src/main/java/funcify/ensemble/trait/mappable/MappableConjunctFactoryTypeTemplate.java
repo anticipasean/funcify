@@ -1,7 +1,7 @@
 package funcify.ensemble.trait.mappable;
 
 import funcify.ensemble.EnsembleKind;
-import funcify.ensemble.template.TraitGenerationTemplate;
+import funcify.ensemble.template.TraitFactoryGenerationTemplate;
 import funcify.error.FuncifyCodeGenException;
 import funcify.session.TypeGenerationSession;
 import funcify.spec.DefaultStringTemplateSpec;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
+public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGenerationTemplate<V, R> {
 
     private static final Logger logger = LoggerFactory.getLogger(MappableConjunctFactoryTypeTemplate.class);
 
@@ -57,7 +57,7 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitGeneratio
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getConjunctMappableEnsembleFactoryTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
-                final String className = getTraitNameForEnsembleKind(ek);
+                final String className = getTraitNameForEnsembleKind(ek) + "Factory";
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
                                                                   "class_name",
@@ -67,20 +67,20 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitGeneratio
                                                                               .collect(Collectors.toList()),
                                                                   "next_type_variable",
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
-                                                                              .orElse(null),
-                                                                  "ensemble_type_name",
-                                                                  Trait.generateTraitNameFrom(ek,
-                                                                                              Trait.CONJUNCT,
-                                                                                              Trait.WRAPPABLE))
-                                                              .put("ensemble_type_package",
-                                                                   Arrays.asList("funcify", "trait", "wrappable", "conjunct"))
+                                                                              .orElse(null))
+                                                              .put("implemented_type",
+                                                                   getImplementedTypeInstance(ek,
+                                                                                              Trait.WRAPPABLE,
+                                                                                              Trait.CONJUNCT))
                                                               .put("next_type_variable_sequences",
-                                                                   nextTypeVariableSequences(ek.getNumberOfValueParameters()));
+                                                                   nextTypeVariableSequences(ek.getNumberOfValueParameters()))
+                                                              .put("container_type",
+                                                                   getContainerTypeJsonInstanceFor(ek, Trait.CONJUNCT));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
                                                                              getDestinationTypePackagePathSegments())
-                                                                         .templateFunctionName("mappable_conjunct_type")
+                                                                         .templateFunctionName(getStringTemplateGroupFileName())
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(
                                                                              getStringTemplateGroupFilePath())
@@ -88,6 +88,10 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitGeneratio
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
+                if (writeResult.isFailure()) {
+                    throw writeResult.getFailureValue()
+                                     .orElseThrow(() -> new FuncifyCodeGenException("failure value missing"));
+                }
                 results.put(ek, writeResult);
             }
             return session.withConjunctMappableEnsembleFactoryTypeResults(results);

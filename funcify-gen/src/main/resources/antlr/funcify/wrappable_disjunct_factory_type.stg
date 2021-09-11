@@ -1,27 +1,35 @@
 import "ensemble_type.stg"
 
-disjunct_wrappable_type(class_name, ensemble_type_name, package=[], witness_type="WT", type_variables=[], next_type_variable="", ensemble_type_package=[]) ::= <<
+wrappable_disjunct_factory_type(class_name, container_type, package=[], witness_type="WT", type_variables=[], next_type_variable="") ::= <<
 package <package; separator=".">;
 
-<ensemble_type_import(ensemble_type_name, ensemble_type_package)>
+<ensemble_type_import(container_type.type_name, container_type.type_package)>
 <null_check_import()>
 <java_util_func_import()>
 
-public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> {
 
-<type_variables:{tv | <disjunct_wrap_method(class_name, tv, type_variables, i)>};separator="\n\n">
+<type_variables:{tv | <disjunct_wrap_method(container_type, tv, type_variables, i)>};separator="\n\n">
 
-<disjunct_unwrap_method(next_type_variable, type_variables)>
+<disjunct_unwrap_method(next_type_variable, container_type, witness_type, type_variables)>
 
 }
 >>
 
-disjunct_wrap_method(class_name, current_type_variable, type_variables=[], numeric_suffix="") ::= <<
-    \<<type_variables;separator=", ">\> <ensemble_type_declaration(class_name, witness_type, type_variables)> wrap<numeric_suffix>(final <current_type_variable> input<numeric_suffix>);
+disjunct_wrap_method(container_type, current_type_variable, type_variables=[], numeric_suffix="") ::= <<
+    \<<type_variables;separator=", ">\> <ensemble_type_declaration(container_type.type_name, witness_type, type_variables)> wrap<numeric_suffix>(final <current_type_variable> input<numeric_suffix>);
 >>
 
-disjunct_unwrap_method(next_type_variable, type_variables=[]) ::=  <<
-    \<<next_type_variable>\> <next_type_variable> unwrap(<type_variables:{tv | <disjunct_unwrap_method_parameter(tv, next_type_variable, i)>};anchor,separator=",\n">);
+disjunct_unwrap_method(next_type_variable, container_type, witness_type="WT", type_variables=[]) ::=  <<
+    default \<<next_type_variable>\> <next_type_variable> unwrap(<[disjunct_unwrap_container_parameter(container_type, witness_type, type_variables),type_variables:{tv | <disjunct_unwrap_method_parameter(tv, next_type_variable, i)>}];anchor,separator=",\n">) {
+        <null_check("container")>;
+        <type_variables:{tv | unwrapper<i>}:null_check();anchor,separator=";\n">;
+        return container.fold(<type_variables:{tv | unwrapper<i>};anchor,separator=",\n">);
+    }
+>>
+
+disjunct_unwrap_container_parameter(container_type, witness_type, type_variables=[]) ::= <<
+final <ensemble_type_declaration(container_type.type_name, witness_type, type_variables)> container
 >>
 
 disjunct_unwrap_method_parameter(type_variable, next_type_variable, numeric_suffix="") ::= "final Function\<? super <type_variable>, ? extends <next_type_variable>> unwrapper<numeric_suffix>"
