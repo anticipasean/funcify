@@ -1,4 +1,4 @@
-import "wrappable_conjunct_type.stg"
+import "wrappable_conjunct_factory_type.stg"
 
 
 mappable_conjunct_type(class_name,

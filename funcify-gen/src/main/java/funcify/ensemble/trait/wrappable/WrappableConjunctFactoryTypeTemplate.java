@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class WrappableConjunctTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
+public class WrappableConjunctFactoryTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
 
-    private static final Logger logger = LoggerFactory.getLogger(WrappableConjunctTypeTemplate.class);
+    private static final Logger logger = LoggerFactory.getLogger(WrappableConjunctFactoryTypeTemplate.class);
 
 
     @Override
@@ -50,7 +50,7 @@ public class WrappableConjunctTypeTemplate<V, R> implements TraitGenerationTempl
     public Path getStringTemplateGroupFilePath() {
         return Paths.get("antlr",
                          "funcify",
-                         "wrappable_conjunct_type.stg");
+                         "wrappable_conjunct_factory_type.stg");
     }
 
     @Override
@@ -58,10 +58,10 @@ public class WrappableConjunctTypeTemplate<V, R> implements TraitGenerationTempl
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
                             .put("types",
-                                 "ConjunctWrappableEnsemble[1..n]"));
+                                 "WrappableConjunctEnsembleFactory[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctWrappableEnsembleTypeResults();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctWrappableEnsembleFactoryTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
                 final String className = getTraitNameForEnsembleKind(ek);
                 final SyncMap<String, Object> params = SyncMap.of("package",
@@ -92,7 +92,7 @@ public class WrappableConjunctTypeTemplate<V, R> implements TraitGenerationTempl
                 results.put(ek,
                             writeResult);
             }
-            return session.withDisjunctWrappableEnsembleTypeResults(results);
+            return session.withDisjunctWrappableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
                          t.getClass()

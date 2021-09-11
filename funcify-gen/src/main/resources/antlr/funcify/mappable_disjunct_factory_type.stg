@@ -1,4 +1,4 @@
-import "wrappable_disjunct_type.stg"
+import "wrappable_disjunct_factory_type.stg"
 
 
 mappable_disjunct_type(class_name,

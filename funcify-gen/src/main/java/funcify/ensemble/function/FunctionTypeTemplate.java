@@ -94,7 +94,7 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
                 results.put(ek,
                             writeResult);
             }
-            return session.withDisjunctWrappableEnsembleTypeResults(results);
+            return session.withDisjunctWrappableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
                          t.getClass()

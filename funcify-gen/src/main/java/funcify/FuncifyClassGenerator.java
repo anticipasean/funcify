@@ -4,10 +4,10 @@ import funcify.commandline.PathConverter;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.template.EnsembleTypesTemplate;
 import funcify.ensemble.function.FunctionTypeTemplate;
-import funcify.ensemble.trait.mappable.MappableConjunctTypeTemplate;
-import funcify.ensemble.trait.mappable.MappableDisjunctTypeTemplate;
-import funcify.ensemble.trait.wrappable.WrappableConjunctTypeTemplate;
-import funcify.ensemble.trait.wrappable.WrappableDisjunctTypeTemplate;
+import funcify.ensemble.trait.mappable.MappableConjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.mappable.MappableDisjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.wrappable.WrappableConjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.wrappable.WrappableDisjunctFactoryTypeTemplate;
 import funcify.file.JavaSourceFile;
 import funcify.session.TypeGenerationSession;
 import funcify.template.TypeGenerationTemplate;
@@ -53,10 +53,10 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
 
     private static <V, R> SyncList<TypeGenerationTemplate<V, R>> typeGenerationTemplateSequence() {
         return SyncList.of(EnsembleTypesTemplate.of(),
-                           WrappableDisjunctTypeTemplate.of(),
-                           WrappableConjunctTypeTemplate.of(),
-                           MappableConjunctTypeTemplate.of(),
-                           MappableDisjunctTypeTemplate.of(),
+                           WrappableDisjunctFactoryTypeTemplate.of(),
+                           WrappableConjunctFactoryTypeTemplate.of(),
+                           MappableConjunctFactoryTypeTemplate.of(),
+                           MappableDisjunctFactoryTypeTemplate.of(),
                            FunctionTypeTemplate.of());
     }
 
