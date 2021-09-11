@@ -9,6 +9,7 @@ import <package; separator=".">.Fn<arity>.<witness_type>;
 <if(implements_supplier)>
 import java.util.function.Supplier;
 
+@FunctionalInterface
 public interface <function_type_declaration(arity, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)>, Supplier\<<first(type_variables)>\> {
 <elseif(implements_function)>
 <ensemble_type_import("Solo", ensemble_type_package)>
@@ -23,15 +24,15 @@ public interface <function_type_declaration(arity, type_variables)> extends <ens
 
 <witness_type_definition(witness_type)>
 
-<narrow_kind_functions(arity, type_variables, witness_type, ensemble_type_name)>
+<narrow_kind_functions(arity, type_variables, witness_type, ensemble_type_name, implements_supplier)>
 
-<apply_method(type_variables)>
+<apply_method(type_variables, implements_supplier)>
 
 <map_method(arity, type_variables, next_type_variable)>
 
 <and_then_method(arity, type_variables, next_type_variable, implements_function)>
 
-<flat_map_method(arity, type_variables, next_type_variable)>
+<flat_map_method(arity, type_variables, next_type_variable, implements_supplier, implements_function)>
 
 }
 >>
@@ -41,23 +42,34 @@ function_type_declaration(arity="0", type_variables=[]) ::= "Fn<arity>\<<type_va
 function_type_parameter_declaration(type_variables, next_type_variable) ::= "final Fn1\<<type_variables:{tv | ? super <tv>};separator={, }>, ? extends <next_type_variable>> function"
 
 witness_type_definition(witness_type) ::= <<
+
     static enum <witness_type> {
 
     }
 >>
 
-narrow_kind_functions(arity="0", type_variables=[], witness_type="WT", ensemble_type_name="") ::= <<
+narrow_kind_functions(arity="0", type_variables=[], witness_type="WT", ensemble_type_name="", implements_supplier=false) ::= <<
+
     static \<<type_variables; separator=", ">\> <function_type_declaration(arity, type_variables)> narrowK(final <recursive_solo_type_declaration(witness_type, type_variables)> wideInstance) {
         return (<function_type_declaration(arity, type_variables)>) wideInstance;
     }
 
+<if(!implements_supplier)>
     static \<<type_variables; separator=", ">\> <function_type_declaration(arity, type_variables)> narrowK(final <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> wideInstance) {
         return (<function_type_declaration(arity, type_variables)>) wideInstance;
     }
+<endif>
 >>
 
-apply_method(type_variables=[]) ::= <<
+apply_method(type_variables=[], implements_supplier=false) ::= <<
     <last(type_variables)> apply(<reverse(rest(reverse(type_variables))):{tv | final <tv> input<i>};anchor,separator=",\n">);
+
+<if(implements_supplier)>
+    @Override
+    default <last(type_variables)> get() {
+        return apply();
+    }
+<endif>
 >>
 
 map_method(arity="0", type_variables=[], next_type_variable="") ::= <<
@@ -78,12 +90,20 @@ and_then_method(arity="0", type_variables=[], next_type_variable="", implements_
     <endif>
 >>
 
-flat_map_method(arity="0", type_variables=[], next_type_variable="") ::= <<
-    default \<<next_type_variable>\> <function_type_declaration(arity, [reverse(rest(reverse(type_variables))), next_type_variable])> flatMap(final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<<reverse(rest(reverse(type_variables))):{tv | ? super <tv>};separator=", ">, ? extends <next_type_variable>\>> function) {
+flat_map_method(arity="0", type_variables=[], next_type_variable="", implements_supplier=false, implements_function=false) ::= <<
+    default \<<next_type_variable>\> <function_type_declaration(arity, [reverse(rest(reverse(type_variables))), next_type_variable])> flatMap(<flat_map_method_parameter(arity, type_variables, next_type_variable, implements_supplier, implements_function)>) {
         <null_check("function")>;
         return (<reverse(rest(reverse(type_variables))):{tv | <tv> input<i>};separator=", ">) -> {
             return function.apply(this.apply(<reverse(rest(reverse(type_variables))):{tv | input<i>};anchor,separator=",\n">)).apply(<reverse(rest(reverse(type_variables))):{tv | input<i>};anchor,separator=",\n">);
         };
     }
+>>
+
+flat_map_method_parameter(arity="0", type_variables=[], next_type_variable="", implements_supplier=false, implements_function=false) ::= <<
+<if(implements_supplier)><\\>
+final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<? extends <next_type_variable>\>> function<\\>
+<else><\\>
+final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<<reverse(rest(reverse(type_variables))):{tv | ? super <tv>};separator=", ">, ? extends <next_type_variable>\>> function<\\>
+<endif>
 >>
 
