@@ -2,13 +2,14 @@ package funcify;
 
 import funcify.commandline.PathConverter;
 import funcify.ensemble.EnsembleKind;
-import funcify.session.TypeGenerationSession;
 import funcify.ensemble.basetype.template.EnsembleTypesTemplate;
 import funcify.ensemble.function.FunctionTypeTemplate;
 import funcify.ensemble.trait.mappable.MappableConjunctTypeTemplate;
+import funcify.ensemble.trait.mappable.MappableDisjunctTypeTemplate;
 import funcify.ensemble.trait.wrappable.WrappableConjunctTypeTemplate;
 import funcify.ensemble.trait.wrappable.WrappableDisjunctTypeTemplate;
 import funcify.file.JavaSourceFile;
+import funcify.session.TypeGenerationSession;
 import funcify.template.TypeGenerationTemplate;
 import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
@@ -55,27 +56,24 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
                            WrappableDisjunctTypeTemplate.of(),
                            WrappableConjunctTypeTemplate.of(),
                            MappableConjunctTypeTemplate.of(),
+                           MappableDisjunctTypeTemplate.of(),
                            FunctionTypeTemplate.of());
     }
 
     private static <V, R> TypeGenerationSession<V, R> applyEachTemplateToSession(final TypeGenerationSession<V, R> session) {
         return FuncifyClassGenerator.<V, R>typeGenerationTemplateSequence()
-                                    .foldLeft(session,
-                                              (s, template) -> {
-                                                  return template.createTypesForSession(s);
-                                              });
+                                    .foldLeft(session, (s, template) -> {
+                                        return template.createTypesForSession(s);
+                                    });
     }
 
     @Override
     public TypeGenerationSession<?, ?> call() throws Exception {
         logger.info("call: [ {} ]",
                     SyncMap.empty()
-                           .put("destinationDirectory",
-                                destinationDirectory)
-                           .put("printToConsole",
-                                printToConsole)
-                           .put("valueParameterLimit",
-                                valueParameterLimit)
+                           .put("destinationDirectory", destinationDirectory)
+                           .put("printToConsole", printToConsole)
+                           .put("valueParameterLimit", valueParameterLimit)
                            .mkString());
         if (printToConsole) {
             final StringTemplateWriter<String, Void> consoleWriter = StringTemplateWriterFactory.createStringTemplateConsoleWriter();
@@ -94,8 +92,8 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
                                     .destinationDirectoryPath(destinationDirectory)
                                     .ensembleKinds(SyncList.of(EnsembleKind.values())
                                                            .filter(ek -> (valueParameterLimit >= 1
-                                                               && ek.getNumberOfValueParameters() <= valueParameterLimit)
-                                                               || valueParameterLimit <= 0))
+                                                                          && ek.getNumberOfValueParameters()
+                                                                             <= valueParameterLimit) || valueParameterLimit <= 0))
                                     .templateWriter(templateWriter)
                                     .build();
     }

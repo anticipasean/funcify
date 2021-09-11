@@ -1,5 +1,7 @@
 package funcify.spec;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import funcify.st.adapter.model.JsonNodeModelAdapter;
 import funcify.tool.container.SyncMap;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -9,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
+import org.stringtemplate.v4.ModelAdaptor;
 
 /**
  * @author smccarron
@@ -38,6 +41,7 @@ public class DefaultStringTemplateSpec implements StringTemplateSpec {
 
     private final String templateFunctionName;
 
+    private final SyncMap<Class<?>, ModelAdaptor<?>> modelAdapters = SyncMap.of(JsonNode.class, new JsonNodeModelAdapter());
 
     @Default
     private final SyncMap<String, Object> templateFunctionParameterInput = SyncMap.empty();

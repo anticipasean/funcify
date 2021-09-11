@@ -3,7 +3,13 @@ package funcify.st.adapter.model;
 import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.util.Spliterators;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.Interpreter;
 import org.stringtemplate.v4.ModelAdaptor;
 import org.stringtemplate.v4.ST;
@@ -14,6 +20,8 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
  * @created 2021-05-20
  */
 public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
+
+    private static Logger logger = LoggerFactory.getLogger(JsonNodeModelAdapter.class);
 
     public JsonNodeModelAdapter() {
 
@@ -53,60 +61,47 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
                               final JsonNode model,
                               final Object property,
                               final String propertyName) throws STNoSuchPropertyException {
-        requireNonNull(model,
-                       "model");
+        requireNonNull(model, "model");
+        logger.info("property_name: {}", propertyName);
         //        System.out.println(String.format("model_adapter: [ node_type: %s, property: %s, property_name: %s ]",
         //                                         model.getNodeType(),
         //                                         property,
         //                                         propertyName));
         if (property == null) {
-            return throwNoSuchProperty(JsonNode.class,
-                                       propertyName,
-                                       null);
+            return throwNoSuchProperty(JsonNode.class, propertyName, null);
         }
-        requireNonNull(propertyName,
-                       "propertyName");
+        requireNonNull(propertyName, "propertyName");
         try {
-            return mapJsonNode(model,
-                               propertyName);
+            return mapJsonNode(model, propertyName);
         } catch (final Throwable t) {
-            return throwNoSuchProperty(JsonNode.class,
-                                       propertyName,
-                                       t);
+            return throwNoSuchProperty(JsonNode.class, propertyName, t);
         }
     }
 
-    private Object mapJsonNode(JsonNode model,
-                               String propertyName) {
+    private Object mapJsonNode(JsonNode model, String propertyName) {
         switch (model.getNodeType()) {
             case POJO:
                 return model.asText();
             case OBJECT:
-                if (propertyFoundAndContainerPropertyValue(String.class).test(model,
-                                                                              propertyName)) {
+                if (propertyFoundAndContainerPropertyValue(String.class).test(model, propertyName)) {
                     return model.get(propertyName);
-                } else if (propertyFoundAndNotContainerPropertyValue(String.class).test(model,
-                                                                                        propertyName)) {
-                    return mapJsonNode(model.get(propertyName),
-                                       "");
+                } else if (propertyFoundAndNotContainerPropertyValue(String.class).test(model, propertyName)) {
+                    return mapJsonNode(model.get(propertyName), "");
                 } else {
-                    return throwNoSuchProperty(JsonNode.class,
-                                               propertyName,
-                                               null);
+                    return throwNoSuchProperty(JsonNode.class, propertyName, null);
                 }
             case ARRAY:
+                if (propertyName.isEmpty()) {
+                    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(((ArrayNode) model).iterator(), 0), false)
+                                        .collect(Collectors.toList());
+                }
                 final int index = Integer.parseInt(propertyName);
-                if (propertyFoundAndContainerPropertyValue(Integer.class).test(model,
-                                                                               index)) {
+                if (propertyFoundAndContainerPropertyValue(Integer.class).test(model, index)) {
                     return model.get(index);
-                } else if (propertyFoundAndNotContainerPropertyValue(Integer.class).test(model,
-                                                                                         index)) {
-                    return mapJsonNode(model.get(index),
-                                       "");
+                } else if (propertyFoundAndNotContainerPropertyValue(Integer.class).test(model, index)) {
+                    return mapJsonNode(model.get(index), "");
                 } else {
-                    return throwNoSuchProperty(JsonNode.class,
-                                               propertyName,
-                                               null);
+                    return throwNoSuchProperty(JsonNode.class, propertyName, null);
                 }
             case BOOLEAN:
                 return model.asBoolean();
@@ -118,15 +113,11 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
             case MISSING:
             case NULL:
             default:
-                return throwNoSuchProperty(JsonNode.class,
-                                           propertyName,
-                                           null);
+                return throwNoSuchProperty(JsonNode.class, propertyName, null);
         }
     }
 
-    private <T> T throwNoSuchProperty(Class<T> cls,
-                                      String propertyName,
-                                      Throwable cause) {
+    private <T> T throwNoSuchProperty(Class<T> cls, String propertyName, Throwable cause) {
         throw new STNoSuchPropertyException(cause instanceof Exception ? ((Exception) cause) : new RuntimeException(cause),
                                             null,
                                             cls.getName() + "." + propertyName);

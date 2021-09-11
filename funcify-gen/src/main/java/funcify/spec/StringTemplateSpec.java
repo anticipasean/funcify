@@ -3,13 +3,17 @@ package funcify.spec;
 import funcify.error.FuncifyCodeGenException;
 import funcify.tool.LiftOps;
 import funcify.tool.container.SyncMap;
+import funcify.tool.container.SyncMap.Tuple2;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
+import org.stringtemplate.v4.ModelAdaptor;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
 
@@ -53,11 +57,9 @@ public interface StringTemplateSpec {
 
     default STGroupFile getStringTemplateGroupFile() {
         try {
-            return new STGroupFile(getStringTemplateGroupFilePath().toString(),
-                                   getCharacterEncoding().displayName());
+            return new STGroupFile(getStringTemplateGroupFilePath().toString(), getCharacterEncoding().displayName());
         } catch (final Throwable t) {
-            throw new FuncifyCodeGenException(t.getMessage(),
-                                              t);
+            throw new FuncifyCodeGenException(t.getMessage(), t);
 
         }
     }
@@ -67,8 +69,7 @@ public interface StringTemplateSpec {
     default Path getDestinationPackageDirectoryPath() {
         final Supplier<IllegalArgumentException> invalidTypePackageErrorSupplier = () -> {
             final String message = String.format("type_package [ %s ] is empty or invalid and cannot be converted into a path",
-                                                 String.join(".",
-                                                             getTypePackagePathSegments()));
+                                                 String.join(".", getTypePackagePathSegments()));
             return new IllegalArgumentException(message);
         };
         final Path typePackagePath = getTypePackageAsFilePath().orElseThrow(invalidTypePackageErrorSupplier);
@@ -79,37 +80,51 @@ public interface StringTemplateSpec {
         return getDestinationPackageDirectoryPath().resolve(getTypeName() + getFileTypeExtension());
     }
 
-    //    default Path getStringTemplateGroupFilePath() {
-    //        return LiftOps.tryCatchLift(() -> URI.create("file://" + System.getProperty("user.dir")))
-    //                      .flatMap(LiftOps.<URI, Path>tryCatchLift(Paths::get))
-    //                      .flatMap(LiftOps.<Path, Path>tryCatchLift(p -> p.resolve(getStringTemplateGroupFilePath())))
-    //                      .flatMap(p -> LiftOps.tryCatchLift(Path::toFile)
-    //                                           .andThen(opt -> opt.filter(LiftOps.tryCatchLift(File::exists))
-    //                                                              .map(f -> p))
-    //                                           .apply(p))
-    //                      .orElseThrow(() -> new FuncifyCodeGenException(String.format("unable to find or get string template group file path instance at [ %s ]",
-    //                                                                                   LiftOps.tryCatchLift(() -> Paths.get(URI.create(
-    //                                                                                       "file://"
-    //                                                                                           + System.getProperty("user.dir")))
-    //                                                                                                                   .resolve(getStringTemplateGroupFilePath())
-    //                                                                                                                   .toString())
-    //                                                                                          .orElse("null"))));
-    //    }
-
     default boolean stringTemplateGroupFileExists() {
         return LiftOps.tryCatchLift(this::getStringTemplateGroupFile)
                       .isPresent();
     }
+
+    SyncMap<Class<?>, ModelAdaptor<?>> getModelAdapters();
 
     String getTemplateFunctionName();
 
     SyncMap<String, Object> getTemplateFunctionParameterInput();
 
     default ST getStringTemplate() {
-        final STGroupFile stGroupFile = getStringTemplateGroupFile();
-        return getTemplateFunctionParameterInput().foldLeft(stGroupFile.getInstanceOf(getTemplateFunctionName()),
-                                                            (st, entry) -> st.add(entry._1(),
-                                                                                  entry._2()));
+        try {
+            final STGroupFile stGroupFile = getStringTemplateGroupFile();
+            final Function<Tuple2<Class<?>, ModelAdaptor<?>>, FuncifyCodeGenException> modelAdaptorRegistryErrorFunc = tup -> {
+                return new FuncifyCodeGenException(String.format(
+                    "error occurred when attempting to register model adapter [ cls: %s, adaptor: %s ]",
+                    tup._1()
+                       .getSimpleName(),
+                    tup._2()
+                       .getClass()
+                       .getSimpleName()));
+            };
+            getModelAdapters().foldLeft(stGroupFile, (f, tup) -> {
+                return LiftOps.tryCatchLift(() -> typedModelAdaptorRegistrar(tup).apply(f))
+                              .orElseThrow(() -> modelAdaptorRegistryErrorFunc.apply(tup));
+            });
+            return getTemplateFunctionParameterInput().foldLeft(stGroupFile.getInstanceOf(getTemplateFunctionName()),
+                                                                (st, entry) -> st.add(entry._1(), entry._2()));
+        } catch (final Throwable t) {
+            if (t instanceof FuncifyCodeGenException) {
+                throw ((FuncifyCodeGenException) t);
+            } else {
+                throw new FuncifyCodeGenException(t.getMessage(), t);
+            }
+        }
+    }
+
+    static <T> UnaryOperator<STGroupFile> typedModelAdaptorRegistrar(final Tuple2<Class<?>, ModelAdaptor<?>> tuple) {
+        @SuppressWarnings("unchecked") final Class<T> cls = (Class<T>) tuple._1();
+        @SuppressWarnings("unchecked") final ModelAdaptor<T> modelAdaptor = (ModelAdaptor<T>) tuple._2();
+        return stGroupFile -> {
+            stGroupFile.registerModelAdaptor(cls, modelAdaptor);
+            return stGroupFile;
+        };
     }
 
 }

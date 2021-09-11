@@ -19,10 +19,10 @@ dependencies {
     implementation("org.antlr:ST4:${stringTemplateVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     compileClasspath("org.projectlombok:lombok:${lombokVersion}")
-    compileClasspath("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-    compileClasspath("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}")
-    compileClasspath("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
-    compileClasspath("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
     implementation "info.picocli:picocli:${picoCliVersion}"
     implementation("ch.qos.logback:logback-classic:${logbackVersion}")
 
