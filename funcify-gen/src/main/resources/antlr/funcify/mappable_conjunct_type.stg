@@ -1,7 +1,7 @@
-import "conjunct_wrappable_type.stg"
+import "wrappable_conjunct_type.stg"
 
 
-conjunct_mappable_type(class_name,
+mappable_conjunct_type(class_name,
                        ensemble_type_name,
                        package=[],
                        witness_type="WT",

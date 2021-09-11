@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
+public class MappableConjunctTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConjunctMappableTypeTemplate.class);
+    private static final Logger logger = LoggerFactory.getLogger(MappableConjunctTypeTemplate.class);
 
     @Override
     public Set<Trait> getTraits() {
@@ -45,7 +45,7 @@ public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "conjunct_mappable_type.stg");
+        return Paths.get("antlr", "funcify", "mappable_conjunct_type.stg");
     }
 
     @Override
@@ -80,7 +80,7 @@ public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
                                                                              getDestinationTypePackagePathSegments())
-                                                                         .templateFunctionName("conjunct_mappable_type")
+                                                                         .templateFunctionName("mappable_conjunct_type")
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(
                                                                              getStringTemplateGroupFilePath())

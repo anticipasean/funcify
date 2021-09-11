@@ -27,13 +27,14 @@ import org.slf4j.LoggerFactory;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class DisjunctWrappableTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
+public class WrappableConjunctTypeTemplate<V, R> implements TraitGenerationTemplate<V, R> {
 
-    private static final Logger logger = LoggerFactory.getLogger(DisjunctWrappableTypeTemplate.class);
+    private static final Logger logger = LoggerFactory.getLogger(WrappableConjunctTypeTemplate.class);
+
 
     @Override
     public Set<Trait> getTraits() {
-        return EnumSet.of(Trait.DISJUNCT,
+        return EnumSet.of(Trait.CONJUNCT,
                           Trait.WRAPPABLE);
     }
 
@@ -42,14 +43,14 @@ public class DisjunctWrappableTypeTemplate<V, R> implements TraitGenerationTempl
         return Arrays.asList("funcify",
                              "trait",
                              "wrappable",
-                             "disjunct");
+                             "conjunct");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
         return Paths.get("antlr",
                          "funcify",
-                         "disjunct_wrappable_type.stg");
+                         "wrappable_conjunct_type.stg");
     }
 
     @Override
@@ -57,7 +58,7 @@ public class DisjunctWrappableTypeTemplate<V, R> implements TraitGenerationTempl
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
                             .put("types",
-                                 "DisjunctWrappableEnsemble[1..n]"));
+                                 "ConjunctWrappableEnsemble[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctWrappableEnsembleTypeResults();
@@ -81,7 +82,7 @@ public class DisjunctWrappableTypeTemplate<V, R> implements TraitGenerationTempl
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(getDestinationTypePackagePathSegments())
-                                                                         .templateFunctionName("disjunct_wrappable_type")
+                                                                         .templateFunctionName("conjunct_wrappable_type")
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
