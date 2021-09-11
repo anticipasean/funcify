@@ -62,7 +62,7 @@ public class DisjunctWrappableTypeTemplate<V, R> implements TraitGenerationTempl
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctWrappableEnsembleTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
-                final String className = "DisjunctWrappable" + ek.getSimpleClassName();
+                final String className = getTraitNameForEnsembleKind(ek);
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
                                                                   "class_name",

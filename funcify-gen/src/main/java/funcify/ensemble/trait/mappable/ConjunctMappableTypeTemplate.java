@@ -2,8 +2,8 @@ package funcify.ensemble.trait.mappable;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.template.TraitGenerationTemplate;
-import funcify.session.TypeGenerationSession;
 import funcify.error.FuncifyCodeGenException;
+import funcify.session.TypeGenerationSession;
 import funcify.spec.DefaultStringTemplateSpec;
 import funcify.spec.StringTemplateSpec;
 import funcify.tool.CharacterOps;
@@ -40,30 +40,24 @@ public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify",
-                             "trait",
-                             "mappable",
-                             "conjunct");
+        return Arrays.asList("funcify", "trait", "mappable", "conjunct");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr",
-                         "funcify",
-                         "conjunct_mappable_type.stg");
+        return Paths.get("antlr", "funcify", "conjunct_mappable_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
-                            .put("types",
-                                 "ConjunctMappableEnsemble[1..n]"));
+                            .put("types", "ConjunctMappableEnsemble[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getConjunctMappableEnsembleTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
-                final String className = "ConjunctMappable" + ek.getSimpleClassName();
+                final String className = getTraitNameForEnsembleKind(ek);
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
                                                                   "class_name",
@@ -75,26 +69,26 @@ public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
                                                                               .orElse(null),
                                                                   "ensemble_type_name",
-                                                                  "ConjunctWrappable" + ek.getSimpleClassName())
+                                                                  Trait.generateTraitNameFrom(ek,
+                                                                                              Trait.CONJUNCT,
+                                                                                              Trait.WRAPPABLE))
                                                               .put("ensemble_type_package",
-                                                                   Arrays.asList("funcify",
-                                                                                 "trait",
-                                                                                 "wrappable",
-                                                                                 "conjunct"))
+                                                                   Arrays.asList("funcify", "trait", "wrappable", "conjunct"))
                                                               .put("next_type_variable_sequences",
                                                                    nextTypeVariableSequences(ek.getNumberOfValueParameters()));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
-                                                                         .typePackagePathSegments(getDestinationTypePackagePathSegments())
+                                                                         .typePackagePathSegments(
+                                                                             getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName("conjunct_mappable_type")
                                                                          .fileTypeExtension(".java")
-                                                                         .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
+                                                                         .stringTemplateGroupFilePath(
+                                                                             getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
-                results.put(ek,
-                            writeResult);
+                results.put(ek, writeResult);
             }
             return session.withConjunctMappableEnsembleTypeResults(results);
         } catch (final Throwable t) {
@@ -105,8 +99,7 @@ public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else {
-                throw new FuncifyCodeGenException(t.getMessage(),
-                                                  t);
+                throw new FuncifyCodeGenException(t.getMessage(), t);
             }
         }
     }
@@ -116,16 +109,10 @@ public class ConjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
                                                     .orElse("");
         final String[] array = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(numberOfValueParameters)
                                            .toArray(String[]::new);
-        return IntStream.range(0,
-                               numberOfValueParameters)
+        return IntStream.range(0, numberOfValueParameters)
                         .mapToObj(i -> {
-                            return Stream.concat(Stream.concat(Arrays.stream(array,
-                                                                             0,
-                                                                             i),
-                                                               Stream.of(nextTypeVariable)),
-                                                 Arrays.stream(array,
-                                                               i + 1,
-                                                               numberOfValueParameters))
+                            return Stream.concat(Stream.concat(Arrays.stream(array, 0, i), Stream.of(nextTypeVariable)),
+                                                 Arrays.stream(array, i + 1, numberOfValueParameters))
                                          .collect(Collectors.toList());
                         })
                         .collect(Collectors.toList());

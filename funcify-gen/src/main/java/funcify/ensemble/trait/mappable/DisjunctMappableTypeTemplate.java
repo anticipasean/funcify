@@ -35,36 +35,29 @@ public class DisjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
 
     @Override
     public Set<Trait> getTraits() {
-        return EnumSet.of(Trait.DISJUNCT,
-                          Trait.MAPPABLE);
+        return EnumSet.of(Trait.DISJUNCT, Trait.MAPPABLE);
     }
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify",
-                             "trait",
-                             "mappable",
-                             "disjunct");
+        return Arrays.asList("funcify", "trait", "mappable", "disjunct");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr",
-                         "funcify",
-                         "disjunct_mappable_type.stg");
+        return Paths.get("antlr", "funcify", "disjunct_mappable_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
-                            .put("types",
-                                 "disjunctMappableEnsemble[1..n]"));
+                            .put("types", "disjunctMappableEnsemble[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctMappableEnsembleTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
-                final String className = "DisjunctMappable" + ek.getSimpleClassName();
+                final String className = getTraitNameForEnsembleKind(ek);
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
                                                                   "class_name",
@@ -76,26 +69,26 @@ public class DisjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
                                                                               .orElse(null),
                                                                   "ensemble_type_name",
-                                                                  "DisjunctWrappable" + ek.getSimpleClassName())
+                                                                  Trait.generateTraitNameFrom(ek,
+                                                                                              Trait.DISJUNCT,
+                                                                                              Trait.WRAPPABLE))
                                                               .put("ensemble_type_package",
-                                                                   Arrays.asList("funcify",
-                                                                                 "trait",
-                                                                                 "wrappable",
-                                                                                 "disjunct"))
+                                                                   Arrays.asList("funcify", "trait", "wrappable", "disjunct"))
                                                               .put("next_type_variable_sequences",
                                                                    nextTypeVariableSequences(ek.getNumberOfValueParameters()));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
-                                                                         .typePackagePathSegments(getDestinationTypePackagePathSegments())
+                                                                         .typePackagePathSegments(
+                                                                             getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName("disjunct_mappable_type")
                                                                          .fileTypeExtension(".java")
-                                                                         .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
+                                                                         .stringTemplateGroupFilePath(
+                                                                             getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
-                results.put(ek,
-                            writeResult);
+                results.put(ek, writeResult);
             }
             return session.withConjunctMappableEnsembleTypeResults(results);
         } catch (final Throwable t) {
@@ -106,8 +99,7 @@ public class DisjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else {
-                throw new FuncifyCodeGenException(t.getMessage(),
-                                                  t);
+                throw new FuncifyCodeGenException(t.getMessage(), t);
             }
         }
     }
@@ -117,16 +109,10 @@ public class DisjunctMappableTypeTemplate<V, R> implements TraitGenerationTempla
                                                     .orElse("");
         final String[] array = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(numberOfValueParameters)
                                            .toArray(String[]::new);
-        return IntStream.range(0,
-                               numberOfValueParameters)
+        return IntStream.range(0, numberOfValueParameters)
                         .mapToObj(i -> {
-                            return Stream.concat(Stream.concat(Arrays.stream(array,
-                                                                             0,
-                                                                             i),
-                                                               Stream.of(nextTypeVariable)),
-                                                 Arrays.stream(array,
-                                                               i + 1,
-                                                               numberOfValueParameters))
+                            return Stream.concat(Stream.concat(Arrays.stream(array, 0, i), Stream.of(nextTypeVariable)),
+                                                 Arrays.stream(array, i + 1, numberOfValueParameters))
                                          .collect(Collectors.toList());
                         })
                         .collect(Collectors.toList());

@@ -6,6 +6,7 @@ package <package; separator=".">;
 <ensemble_type_import(ensemble_type_name, ensemble_type_package)>
 <null_check_import()>
 <java_util_func_import()>
+import funcify.function.Fn<length(type_variables)>;
 
 public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
 
