@@ -1,4 +1,4 @@
-package funcify.ensemble.trait.mappable;
+package funcify.ensemble.trait.flattenable;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.template.TraitFactoryGenerationTemplate;
@@ -31,30 +31,30 @@ import org.slf4j.LoggerFactory;
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class MappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGenerationTemplate<V, R> {
+public class FlattenableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGenerationTemplate<V, R> {
 
-    private static final Logger logger = LoggerFactory.getLogger(MappableDisjunctFactoryTypeTemplate.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlattenableDisjunctFactoryTypeTemplate.class);
 
     @Override
     public Set<Trait> getTraits() {
-        return EnumSet.of(Trait.DISJUNCT, Trait.MAPPABLE);
+        return EnumSet.of(Trait.DISJUNCT, Trait.FLATTENABLE);
     }
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "mappable", "disjunct");
+        return Arrays.asList("funcify", "trait", "flattenable", "disjunct");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "mappable_disjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "flattenable_disjunct_factory_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
-                            .put("types", "MappableDisjunctEnsembleFactory[1..n]"));
+                            .put("types", "FlattenableDisjunctEnsembleFactory[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctMappableEnsembleFactoryTypeResults();
@@ -76,12 +76,13 @@ public class MappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                                                               Trait.WRAPPABLE))
                                                               .put("next_type_variable_sequences",
                                                                    nextTypeVariableSequences(ek.getNumberOfValueParameters()))
-                                                              .put("map_impl_sequences",
-                                                                   createMapImplementationSequences(CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(
+                                                              .put("flat_map_impl_sequences",
+                                                                   createFlatMapImplementationSequences(CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(
                                                                        ek.getNumberOfValueParameters())
-                                                                                                                .collect(
-                                                                                                                    Collectors.toList()),
-                                                                                                    nextTypeVariableSequences(ek.getNumberOfValueParameters())))
+                                                                                                                    .collect(
+                                                                                                                        Collectors.toList()),
+                                                                                                        nextTypeVariableSequences(
+                                                                                                            ek.getNumberOfValueParameters())))
                                                               .put("container_type",
                                                                    getContainerTypeJsonInstanceFor(ek, Trait.DISJUNCT));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
@@ -102,7 +103,7 @@ public class MappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                 }
                 results.put(ek, writeResult);
             }
-            return session.withDisjunctMappableEnsembleFactoryTypeResults(results);
+            return session.withDisjunctFlattenableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
                          t.getClass()
@@ -116,8 +117,8 @@ public class MappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         }
     }
 
-    private List<List<String>> createMapImplementationSequences(final List<String> typeVariables,
-                                                                final List<List<String>> nextTypeVariableSequences) {
+    private List<List<String>> createFlatMapImplementationSequences(final List<String> typeVariables,
+                                                                    final List<List<String>> nextTypeVariableSequences) {
         return nextTypeVariableSequences.stream()
                                         .reduce(new ArrayList<>(), (seqList, seq) -> {
                                             final Iterator<String> typeVarIter = typeVariables.iterator();
@@ -137,12 +138,12 @@ public class MappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                                          ++index,
                                                                          typeVar);
                                                 } else {
-                                                    text = String.format("(%s input%s) -> this.<%s>wrap%d(mapper.apply(input%s))",
+                                                    ++index;
+                                                    text = String.format("(%s input%s) -> flatMapper.<%s>apply(input%s)",
                                                                          typeVar,
                                                                          typeVar,
                                                                          seq.stream()
                                                                             .collect(Collectors.joining(", ")),
-                                                                         ++index,
                                                                          typeVar);
                                                 }
                                                 currentSeq.add(text);

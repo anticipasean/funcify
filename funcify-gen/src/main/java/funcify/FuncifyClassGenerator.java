@@ -6,6 +6,8 @@ import funcify.ensemble.basetype.ConjunctEnsembleTypeTemplate;
 import funcify.ensemble.basetype.DisjunctEnsembleTypeTemplate;
 import funcify.ensemble.basetype.EnsembleTypesTemplate;
 import funcify.ensemble.function.FunctionTypeTemplate;
+import funcify.ensemble.trait.flattenable.FlattenableConjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.flattenable.FlattenableDisjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.mappable.MappableConjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.mappable.MappableDisjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.wrappable.WrappableConjunctFactoryTypeTemplate;
@@ -61,6 +63,8 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
                            WrappableConjunctFactoryTypeTemplate.of(),
                            MappableConjunctFactoryTypeTemplate.of(),
                            MappableDisjunctFactoryTypeTemplate.of(),
+                           FlattenableConjunctFactoryTypeTemplate.of(),
+                           FlattenableDisjunctFactoryTypeTemplate.of(),
                            FunctionTypeTemplate.of());
     }
 

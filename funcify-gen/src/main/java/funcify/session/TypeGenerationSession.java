@@ -49,4 +49,10 @@ public class TypeGenerationSession<V, R> {
     @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> disjunctMappableEnsembleFactoryTypeResults = SyncMap.empty();
 
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctFlattenableEnsembleFactoryTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctFlattenableEnsembleFactoryTypeResults = SyncMap.empty();
+
 }
