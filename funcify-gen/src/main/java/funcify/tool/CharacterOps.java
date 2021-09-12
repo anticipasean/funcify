@@ -15,9 +15,7 @@ public interface CharacterOps {
         if (n <= 0) {
             return Stream.empty();
         }
-        return streamRangeOfCharactersAsStringsFrom('A',
-                                                    (char) (((int) 'A') + Math.min(26,
-                                                                                   n)));
+        return streamRangeOfCharactersAsStringsFrom('A', (char) (((int) 'A') + Math.min(26, n)));
     }
 
     static Stream<String> firstNUppercaseLettersWithNumericIndexExtension(int n) {
@@ -25,34 +23,29 @@ public interface CharacterOps {
             return Stream.empty();
         }
         final int aToZSize = 'Z' - 'A' + 1;
-        return IntStream.range(0,
-                               n)
+        return IntStream.range(0, n)
                         .mapToObj(i -> {
                             return uppercaseLetterByIndex(i % aToZSize).map(String::valueOf)
                                                                        .map(s -> Optional.of(s)
                                                                                          .filter(s1 -> i >= aToZSize)
                                                                                          .map(s1 -> new StringBuilder().append(s1)
                                                                                                                        .append(i
-                                                                                                                           / aToZSize)
+                                                                                                                               / aToZSize)
                                                                                                                        .toString())
                                                                                          .orElse(s))
                                                                        .orElse("");
                         });
     }
 
-    static Stream<String> streamRangeOfCharactersAsStringsFrom(char start,
-                                                               char end) {
-        return streamRangeOfCharactersFrom(start,
-                                           end).map(String::valueOf);
+    static Stream<String> streamRangeOfCharactersAsStringsFrom(char start, char end) {
+        return streamRangeOfCharactersFrom(start, end).map(String::valueOf);
     }
 
-    static Stream<Character> streamRangeOfCharactersFrom(char start,
-                                                         char end) {
+    static Stream<Character> streamRangeOfCharactersFrom(char start, char end) {
         if (start == end) {
             return Stream.of(start);
         } else {
-            return IntStream.range(start,
-                                   end)
+            return IntStream.range(start, end)
                             .mapToObj(i -> {
                                 return (char) i;
                             });
@@ -71,8 +64,7 @@ public interface CharacterOps {
         return uppercaseLetterByIndex(index % aToZSize).map(c -> Optional.of(index)
                                                                          .filter(i -> i >= aToZSize)
                                                                          .map(i -> new StringBuilder().append(c)
-                                                                                                      .append(i
-                                                                                                          / aToZSize)
+                                                                                                      .append(i / aToZSize)
                                                                                                       .toString())
                                                                          .orElse(String.valueOf(c)));
     }
@@ -82,8 +74,7 @@ public interface CharacterOps {
     }
 
     enum CharacterOpsMapHolder {
-        INSTANCE(streamRangeOfCharactersFrom('A',
-                                             'Z').toArray(Character[]::new));
+        INSTANCE(streamRangeOfCharactersFrom('A', (char) ('Z' + 1)).toArray(Character[]::new));
 
         private final Character[] uppercaseLettersArr;
 

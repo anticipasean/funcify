@@ -1,5 +1,9 @@
 package funcify.ensemble.trait.mappable;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.template.TraitFactoryGenerationTemplate;
 import funcify.error.FuncifyCodeGenException;
@@ -17,6 +21,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -75,7 +80,9 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                               .put("next_type_variable_sequences",
                                                                    nextTypeVariableSequences(ek.getNumberOfValueParameters()))
                                                               .put("container_type",
-                                                                   getContainerTypeJsonInstanceFor(ek, Trait.CONJUNCT));
+                                                                   getContainerTypeJsonInstanceFor(ek, Trait.CONJUNCT))
+                                                              .put("map_all_type_variables",
+                                                                   mapAllMethodTypeVariablePairs(ek.getNumberOfValueParameters()));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
@@ -121,5 +128,25 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                         })
                         .collect(Collectors.toList());
 
+    }
+
+    private JsonNode mapAllMethodTypeVariablePairs(final int numberOfValueParameters) {
+        final Spliterator<String> nextTypeVariables = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(
+            numberOfValueParameters * 2)
+                                                                  //Need to make a list first rather than directly using the
+                                                                  //stream's spliterator so the result spliterator is SIZED
+                                                                  .collect(Collectors.toList())
+                                                                  .spliterator();
+        final Spliterator<String> givenTypeVariables = nextTypeVariables.trySplit();
+        final String[] typeVariablePairHolder = new String[2];
+        ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
+        while (givenTypeVariables.tryAdvance(s -> typeVariablePairHolder[0] = s)
+               && nextTypeVariables.tryAdvance(s -> typeVariablePairHolder[1] = s)) {
+            final ObjectNode objNode = JsonNodeFactory.instance.objectNode()
+                                                               .put("given", typeVariablePairHolder[0])
+                                                               .put("next", typeVariablePairHolder[1]);
+            arrayNode = arrayNode.add(objNode);
+        }
+        return arrayNode;
     }
 }

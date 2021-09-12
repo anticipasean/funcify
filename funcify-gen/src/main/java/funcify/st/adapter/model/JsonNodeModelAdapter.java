@@ -62,11 +62,11 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
                               final Object property,
                               final String propertyName) throws STNoSuchPropertyException {
         requireNonNull(model, "model");
-        //        logger.info("property_name: {}", propertyName);
-        //        System.out.println(String.format("model_adapter: [ node_type: %s, property: %s, property_name: %s ]",
-        //                                         model.getNodeType(),
-        //                                         property,
-        //                                         propertyName));
+
+//        logger.info("model_adapter: [ node_type: {}, property: {}, property_name: {} ]",
+//                    model.getNodeType(),
+//                    property,
+//                    propertyName);
         if (property == null) {
             return throwNoSuchProperty(JsonNode.class, propertyName, null);
         }
