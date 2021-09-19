@@ -3,8 +3,8 @@ package funcify.st.adapter.model;
 import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import java.util.Spliterators;
+import funcify.tool.LiftOps;
+import java.util.OptionalInt;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -62,10 +62,11 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
                               final Object property,
                               final String propertyName) throws STNoSuchPropertyException {
         requireNonNull(model, "model");
-
-//        logger.info("model_adapter: [ node_type: {}, property: {}, property_name: {} ]",
+//        logger.info("model_adapter: [ node_type: {}, property: {}, property.type: {}, property_name: {} ]",
 //                    model.getNodeType(),
 //                    property,
+//                    property == null ? "null" : property.getClass()
+//                                                        .getSimpleName(),
 //                    propertyName);
         if (property == null) {
             return throwNoSuchProperty(JsonNode.class, propertyName, null);
@@ -84,22 +85,28 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
                 return model.asText();
             case OBJECT:
                 if (propertyFoundAndContainerPropertyValue(String.class).test(model, propertyName)) {
-                    return model.get(propertyName);
+                    return model.get(propertyName)
+                                .isObject() ? model.get(propertyName) : mapJsonNode(model.get(propertyName), "");
                 } else if (propertyFoundAndNotContainerPropertyValue(String.class).test(model, propertyName)) {
                     return mapJsonNode(model.get(propertyName), "");
                 } else {
                     return throwNoSuchProperty(JsonNode.class, propertyName, null);
                 }
             case ARRAY:
-                if (propertyName.isEmpty()) {
-                    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(((ArrayNode) model).iterator(), 0), false)
+                //logger.info("model: {}, property_name: {}", model, propertyName);
+                final OptionalInt indexOpt = LiftOps.tryCatchLift(() -> Integer.parseInt(propertyName))
+                                                    .map(OptionalInt::of)
+                                                    .orElse(OptionalInt.empty());
+                if (indexOpt.isPresent() && propertyFoundAndContainerPropertyValue(Integer.class).test(model,
+                                                                                                       indexOpt.getAsInt())) {
+                    return model.get(indexOpt.getAsInt());
+                } else if (indexOpt.isPresent() && propertyFoundAndNotContainerPropertyValue(Integer.class).test(model,
+                                                                                                                 indexOpt.getAsInt())) {
+                    return mapJsonNode(model.get(indexOpt.getAsInt()), "");
+                } else if (!indexOpt.isPresent() && propertyName.isEmpty()) {
+                    return StreamSupport.stream(model.spliterator(), false)
+                                        .map(p -> mapJsonNode(p, ""))
                                         .collect(Collectors.toList());
-                }
-                final int index = Integer.parseInt(propertyName);
-                if (propertyFoundAndContainerPropertyValue(Integer.class).test(model, index)) {
-                    return model.get(index);
-                } else if (propertyFoundAndNotContainerPropertyValue(Integer.class).test(model, index)) {
-                    return mapJsonNode(model.get(index), "");
                 } else {
                     return throwNoSuchProperty(JsonNode.class, propertyName, null);
                 }
