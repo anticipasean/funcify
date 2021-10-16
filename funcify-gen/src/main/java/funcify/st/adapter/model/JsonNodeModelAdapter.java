@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import funcify.tool.LiftOps;
 import java.util.OptionalInt;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.Interpreter;
@@ -62,38 +60,34 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
                               final Object property,
                               final String propertyName) throws STNoSuchPropertyException {
         requireNonNull(model, "model");
-//        logger.info("model_adapter: [ node_type: {}, property: {}, property.type: {}, property_name: {} ]",
-//                    model.getNodeType(),
-//                    property,
-//                    property == null ? "null" : property.getClass()
-//                                                        .getSimpleName(),
-//                    propertyName);
+        //        logger.info("model_adapter: [ node_type: {}, property: {}, property.type: {}, property_name: {} ]",
+        //                    model.getNodeType(),
+        //                    property,
+        //                    property == null ? "null" : property.getClass()
+        //                                                        .getSimpleName(),
+        //                    propertyName);
         if (property == null) {
             return throwNoSuchProperty(JsonNode.class, propertyName, null);
         }
         requireNonNull(propertyName, "propertyName");
-        try {
-            return mapJsonNode(model, propertyName);
-        } catch (final Throwable t) {
-            return throwNoSuchProperty(JsonNode.class, propertyName, t);
-        }
-    }
-
-    private Object mapJsonNode(JsonNode model, String propertyName) {
+        //        logger.info("{}: model: {}, property_name: {}", model.getNodeType(), model, propertyName);
         switch (model.getNodeType()) {
             case POJO:
                 return model.asText();
             case OBJECT:
                 if (propertyFoundAndContainerPropertyValue(String.class).test(model, propertyName)) {
-                    return model.get(propertyName)
-                                .isObject() ? model.get(propertyName) : mapJsonNode(model.get(propertyName), "");
+                    return model.get(propertyName);
                 } else if (propertyFoundAndNotContainerPropertyValue(String.class).test(model, propertyName)) {
-                    return mapJsonNode(model.get(propertyName), "");
+                    return model.get(propertyName)
+                                .isBoolean() ? model.get(propertyName)
+                                                    .asBoolean() : model.get(propertyName)
+                                                                        .asText();
+                } else if (propertyName.isEmpty()) {
+                    return model;
                 } else {
                     return throwNoSuchProperty(JsonNode.class, propertyName, null);
                 }
             case ARRAY:
-                //logger.info("model: {}, property_name: {}", model, propertyName);
                 final OptionalInt indexOpt = LiftOps.tryCatchLift(() -> Integer.parseInt(propertyName))
                                                     .map(OptionalInt::of)
                                                     .orElse(OptionalInt.empty());
@@ -102,18 +96,22 @@ public class JsonNodeModelAdapter implements ModelAdaptor<JsonNode> {
                     return model.get(indexOpt.getAsInt());
                 } else if (indexOpt.isPresent() && propertyFoundAndNotContainerPropertyValue(Integer.class).test(model,
                                                                                                                  indexOpt.getAsInt())) {
-                    return mapJsonNode(model.get(indexOpt.getAsInt()), "");
+                    return model.get(indexOpt.getAsInt())
+                                .isBoolean() ? model.get(indexOpt.getAsInt())
+                                                    .asBoolean() : model.get(indexOpt.getAsInt())
+                                                                        .asText();
                 } else if (!indexOpt.isPresent() && propertyName.isEmpty()) {
-                    return StreamSupport.stream(model.spliterator(), false)
-                                        .map(p -> mapJsonNode(p, ""))
-                                        .collect(Collectors.toList());
-                } else {
+                    return model;
+                }
+                //                else if (!indexOpt.isPresent() && propertyName.isEmpty() && model.size() == 1) {
+                //                    return model.get(0);
+                //                }
+                else {
                     return throwNoSuchProperty(JsonNode.class, propertyName, null);
                 }
             case BOOLEAN:
                 return model.asBoolean();
             case NUMBER:
-                return model.isIntegralNumber() ? model.asLong() : model.asDouble();
             case BINARY:
             case STRING:
                 return model.asText();

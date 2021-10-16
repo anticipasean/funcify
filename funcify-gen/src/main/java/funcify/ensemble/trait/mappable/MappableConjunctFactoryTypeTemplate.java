@@ -71,8 +71,7 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                                   CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(ek.getNumberOfValueParameters())
                                                                               .collect(Collectors.toList()),
                                                                   "next_type_variable",
-                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
-                                                                              .orElse(null))
+                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters()))
                                                               .put("implemented_type",
                                                                    getImplementedTypeInstance(ek,
                                                                                               Trait.WRAPPABLE,
@@ -116,8 +115,7 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
     }
 
     private List<List<String>> nextTypeVariableSequences(final int numberOfValueParameters) {
-        final String nextTypeVariable = CharacterOps.uppercaseLetterByIndexWithNumericExtension(numberOfValueParameters)
-                                                    .orElse("");
+        final String nextTypeVariable = CharacterOps.uppercaseLetterByIndexWithNumericExtension(numberOfValueParameters);
         final String[] array = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(numberOfValueParameters)
                                            .toArray(String[]::new);
         return IntStream.range(0, numberOfValueParameters)

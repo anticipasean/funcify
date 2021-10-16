@@ -30,23 +30,19 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify",
-                             "function");
+        return Arrays.asList("funcify", "function");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr",
-                         "funcify",
-                         "function_type.stg");
+        return Paths.get("antlr", "funcify", "function_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
-                            .put("types",
-                                 "Fn[1..n]"));
+                            .put("types", "Fn[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getFunctionTypeResults();
@@ -59,30 +55,25 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
                                                                   CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(ek.getNumberOfValueParameters())
                                                                               .collect(Collectors.toList()),
                                                                   "next_type_variable",
-                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
-                                                                              .orElse(null),
+                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters()),
                                                                   "ensemble_type_name",
                                                                   ek.getSimpleClassName())
-                                                              .put("arity",
-                                                                   arity)
-                                                              .put("ensemble_type_package",
-                                                                   Arrays.asList("funcify",
-                                                                                 "ensemble"))
-                                                              .put("witness_type",
-                                                                   className + "W");
+                                                              .put("arity", arity)
+                                                              .put("ensemble_type_package", Arrays.asList("funcify", "ensemble"))
+                                                              .put("witness_type", className + "W");
                 if (ek.getNumberOfValueParameters() == 1) {
-                    params.put("implements_supplier",
-                               true);
+                    params.put("implements_supplier", true);
                 } else if (ek.getNumberOfValueParameters() == 2) {
-                    params.put("implements_function",
-                               true);
+                    params.put("implements_function", true);
                 }
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
-                                                                         .typePackagePathSegments(getDestinationTypePackagePathSegments())
+                                                                         .typePackagePathSegments(
+                                                                             getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName("function_type")
                                                                          .fileTypeExtension(".java")
-                                                                         .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
+                                                                         .stringTemplateGroupFilePath(
+                                                                             getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
@@ -91,8 +82,7 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
                     throw writeResult.getFailureValue()
                                      .orElseThrow(() -> new FuncifyCodeGenException("missing throwable"));
                 }
-                results.put(ek,
-                            writeResult);
+                results.put(ek, writeResult);
             }
             return session.withDisjunctWrappableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
@@ -103,8 +93,7 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else {
-                throw new FuncifyCodeGenException(t.getMessage(),
-                                                  t);
+                throw new FuncifyCodeGenException(t.getMessage(), t);
             }
         }
     }

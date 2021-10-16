@@ -1,8 +1,8 @@
 package funcify.ensemble.basetype;
 
 import funcify.ensemble.EnsembleKind;
-import funcify.session.TypeGenerationSession;
 import funcify.error.FuncifyCodeGenException;
+import funcify.session.TypeGenerationSession;
 import funcify.spec.DefaultStringTemplateSpec;
 import funcify.spec.StringTemplateSpec;
 import funcify.template.TypeGenerationTemplate;
@@ -30,37 +30,36 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify",
-                             "ensemble");
+        return Arrays.asList("funcify", "ensemble");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr",
-                         "funcify",
-                         "ensemble_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty()
-                            .put("types",
-                                 "Ensemble")
+                            .put("types", "Ensemble")
                             .put("ensemble_kinds.count",
                                  session.getEnsembleKinds()
                                         .size()));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final StringTemplateSpec ensembleBaseTypeSpec = DefaultStringTemplateSpec.builder()
-                                                                                     .typePackagePathSegments(getDestinationTypePackagePathSegments())
-                                                                                     .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
+                                                                                     .typePackagePathSegments(
+                                                                                         getDestinationTypePackagePathSegments())
+                                                                                     .stringTemplateGroupFilePath(
+                                                                                         getStringTemplateGroupFilePath())
                                                                                      .typeName("Ensemble")
                                                                                      .fileTypeExtension(".java")
                                                                                      .templateFunctionName("base_ensemble_type")
                                                                                      .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
-                                                                                     .templateFunctionParameterInput(SyncMap.of("package",
-                                                                                                                                getDestinationTypePackagePathSegments()))
+                                                                                     .templateFunctionParameterInput(SyncMap.of(
+                                                                                         "package",
+                                                                                         getDestinationTypePackagePathSegments()))
                                                                                      .build();
 
             final WriteResult<R> baseEnsembleTypeResult = templateWriter.write(ensembleBaseTypeSpec);
@@ -81,11 +80,12 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
                                                                   CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(ek.getNumberOfValueParameters())
                                                                               .collect(Collectors.toList()),
                                                                   "next_type_variable",
-                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
-                                                                              .orElse(null));
+                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters()));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
-                                                                         .typePackagePathSegments(getDestinationTypePackagePathSegments())
-                                                                         .stringTemplateGroupFilePath(getStringTemplateGroupFilePath())
+                                                                         .typePackagePathSegments(
+                                                                             getDestinationTypePackagePathSegments())
+                                                                         .stringTemplateGroupFilePath(
+                                                                             getStringTemplateGroupFilePath())
                                                                          .typeName(ek.getSimpleClassName())
                                                                          .fileTypeExtension(".java")
                                                                          .templateFunctionName("ensemble_type")
@@ -97,8 +97,7 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
                     throw ensembleTypeResult.getFailureValue()
                                             .orElseThrow(() -> new FuncifyCodeGenException("throwable missing"));
                 }
-                ensembleTypeResultsByEnsembleKind.put(ek,
-                                                      ensembleTypeResult);
+                ensembleTypeResultsByEnsembleKind.put(ek, ensembleTypeResult);
             }
             return updatedSession.withEnsembleTypeResultsByEnsembleKind(ensembleTypeResultsByEnsembleKind);
         } catch (final Throwable t) {
@@ -109,8 +108,7 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else {
-                throw new FuncifyCodeGenException(t.getMessage(),
-                                                  t);
+                throw new FuncifyCodeGenException(t.getMessage(), t);
             }
         }
     }

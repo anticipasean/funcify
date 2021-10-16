@@ -64,8 +64,7 @@ public class WrappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryG
                                                                   CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(ek.getNumberOfValueParameters())
                                                                               .collect(Collectors.toList()),
                                                                   "next_type_variable",
-                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
-                                                                              .orElse(null))
+                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters()))
                                                               .put("container_type",
                                                                    getContainerTypeJsonInstanceFor(ek, Trait.DISJUNCT));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()

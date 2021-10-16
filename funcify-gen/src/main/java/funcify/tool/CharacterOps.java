@@ -56,17 +56,22 @@ public interface CharacterOps {
         return uppercaseLetterByIndexMapper().apply(index);
     }
 
-    static Optional<String> uppercaseLetterByIndexWithNumericExtension(final int index) {
+    static String uppercaseLetterByIndexWithNumericExtension(final int index) {
+        int validatedIndex;
         if (index < 0) {
-            return Optional.empty();
+            validatedIndex = -index;
+        } else {
+            validatedIndex = index;
         }
         final int aToZSize = 'Z' - 'A' + 1;
-        return uppercaseLetterByIndex(index % aToZSize).map(c -> Optional.of(index)
-                                                                         .filter(i -> i >= aToZSize)
-                                                                         .map(i -> new StringBuilder().append(c)
-                                                                                                      .append(i / aToZSize)
-                                                                                                      .toString())
-                                                                         .orElse(String.valueOf(c)));
+        return uppercaseLetterByIndex(validatedIndex % aToZSize).map(c -> Optional.of(validatedIndex)
+                                                                                  .filter(i -> i >= aToZSize)
+                                                                                  .map(i -> new StringBuilder().append(c)
+                                                                                                               .append(i
+                                                                                                                       / aToZSize)
+                                                                                                               .toString())
+                                                                                  .orElse(String.valueOf(c)))
+                                                                .orElse(null);
     }
 
     static IntFunction<Optional<Character>> uppercaseLetterByIndexMapper() {

@@ -64,8 +64,7 @@ public class DisjunctEnsembleTypeTemplate<V, R> implements TraitGenerationTempla
                                                                   CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(ek.getNumberOfValueParameters())
                                                                               .collect(Collectors.toList()),
                                                                   "next_type_variable",
-                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters())
-                                                                              .orElse(null),
+                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters()),
                                                                   "ensemble_type_name",
                                                                   ek.getSimpleClassName())
                                                               .put("ensemble_type_package", Arrays.asList("funcify", "ensemble"));

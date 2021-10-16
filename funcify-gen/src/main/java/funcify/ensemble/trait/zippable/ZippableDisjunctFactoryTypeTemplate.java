@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.template.TraitFactoryGenerationTemplate;
 import funcify.error.FuncifyCodeGenException;
@@ -22,10 +23,9 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Spliterator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +118,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
             }
         }
     }
-    
+
     private JsonNode createZipImplementationSequences(final int numberOfTypeParameters) {
         return IntStream.range(1, 4)
                         .mapToObj(i -> createZipImplementationSequences(i, numberOfTypeParameters))
@@ -129,54 +129,75 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         if (zipMethodIndex <= 0) {
             return JsonNodeFactory.instance.objectNode();
         }
-        final Spliterator<String> givenTypeVars = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(
-            numberOfTypeParameters)
-                                                              .spliterator();
-        final Spliterator<String> otherTypeVars = IntStream.range(numberOfTypeParameters,
-                                                                  (numberOfTypeParameters * (zipMethodIndex + 1)))
-                                                           .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                                           .flatMap(opt -> opt.map(Stream::of)
-                                                                              .orElseGet(Stream::empty))
-                                                           .spliterator();
-        final Spliterator<String> nextTypeVars = IntStream.range(numberOfTypeParameters * (zipMethodIndex + 1),
-                                                                 (numberOfTypeParameters * (zipMethodIndex + 1))
-                                                                 + numberOfTypeParameters)
-                                                          .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                                          .flatMap(opt -> opt.map(Stream::of)
-                                                                             .orElseGet(Stream::empty))
-                                                          .spliterator();
-        final ArrayNode givenTypeVarsNode = JsonNodeFactory.instance.arrayNode();
-        final ArrayNode nextTypeVarsNode = JsonNodeFactory.instance.arrayNode();
-        final ArrayNode otherTypeVarsNode = JsonNodeFactory.instance.arrayNode();
-        while (givenTypeVars.tryAdvance(s -> givenTypeVarsNode.add(s)) && nextTypeVars.tryAdvance(s -> nextTypeVarsNode.add(s))) {
-
-        }
-        for (int i = 0; i < zipMethodIndex; i++) {
-            final ArrayNode otherNode = JsonNodeFactory.instance.arrayNode();
-            for (int j = 0; j < numberOfTypeParameters; j++) {
-                otherTypeVars.tryAdvance(s -> otherNode.add(s));
+        final ObjectNode containerNodes = JsonNodeFactory.instance.objectNode();
+        containerNodes.set("other",
+                           IntStream.range(numberOfTypeParameters,
+                                           (zipMethodIndex * numberOfTypeParameters) + numberOfTypeParameters)
+                                    .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                    .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+        containerNodes.set("next",
+                           IntStream.range((numberOfTypeParameters * zipMethodIndex) + numberOfTypeParameters,
+                                           (zipMethodIndex * numberOfTypeParameters) + (numberOfTypeParameters * 2))
+                                    .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                    .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+        containerNodes.set("given",
+                           IntStream.range(0, numberOfTypeParameters)
+                                    .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                    .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+        final ArrayNode containerNodeArr = JsonNodeFactory.instance.arrayNode();
+        for (int i = 0; i < numberOfTypeParameters; i++) {
+            final ObjectNode zipMethodContainer = JsonNodeFactory.instance.objectNode();
+            zipMethodContainer.put("method_name", "zip" + zipMethodIndex + "on" + (i + 1));
+            zipMethodContainer.set("new_type_variables",
+                                   StreamSupport.stream(containerNodes.get("other")
+                                                                      .spliterator(), false)
+                                                .limit(zipMethodIndex)
+                                                .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll)
+                                                .add(containerNodes.get("next")
+                                                                   .get(0)));
+            final ArrayNode returnTypeVariables = JsonNodeFactory.instance.arrayNode();
+            for (int ri = 0; ri < numberOfTypeParameters; ri++) {
+                if (ri == i) {
+                    returnTypeVariables.add(containerNodes.get("next")
+                                                          .get(0));
+                } else {
+                    returnTypeVariables.add(containerNodes.get("given")
+                                                          .get(ri));
+                }
             }
-            otherTypeVarsNode.add(otherNode);
+            zipMethodContainer.set("return_type_variables", returnTypeVariables);
+            final ArrayNode containerParams = JsonNodeFactory.instance.arrayNode();
+            final ArrayNode functionParams = JsonNodeFactory.instance.arrayNode();
+            containerParams.add(JsonNodeFactory.instance.objectNode()
+                                                        .put("index", 1)
+                                                        .set("type_variables", containerNodes.get("given")));
+            functionParams.add(containerNodes.get("given")
+                                             .get(i));
+            for (int z = 1; z < zipMethodIndex + 1; z++) {
+                final ObjectNode containerNode = JsonNodeFactory.instance.objectNode();
+                containerNode.put("index", z + 1);
+                final ArrayNode typeVariables = JsonNodeFactory.instance.arrayNode();
+                for (int j = 0; j < numberOfTypeParameters; j++) {
+                    if (j == i) {
+                        typeVariables.add(containerNodes.get("other")
+                                                        .get(z - 1));
+                        functionParams.add(containerNodes.get("other")
+                                                         .get(z - 1));
+                    } else {
+                        typeVariables.add(containerNodes.get("given")
+                                                        .get(j));
+                    }
+                }
+                containerNode.set("type_variables", typeVariables);
+                containerParams.add(containerNode);
+            }
+            zipMethodContainer.set("container_params", containerParams);
+            functionParams.add(containerNodes.get("next").get(0));
+            zipMethodContainer.set("function_params", functionParams);
+            containerNodeArr.add(zipMethodContainer);
         }
-        final ArrayNode functionTypeVarsNode = IntStream.range(0, numberOfTypeParameters)
-                                                        .mapToObj(i -> {
-                                                            final Spliterator<JsonNode> spliter = otherTypeVarsNode.spliterator();
-                                                            final ArrayNode accumNode = JsonNodeFactory.instance.arrayNode()
-                                                                                                                .add(
-                                                                                                                    givenTypeVarsNode.get(
-                                                                                                                        i));
-                                                            while (spliter.tryAdvance(jn -> accumNode.add(jn.get(i)))) {
-                                                            }
-                                                            return accumNode.add(nextTypeVarsNode.get(i));
-                                                        })
-                                                        .reduce(JsonNodeFactory.instance.arrayNode(),
-                                                                ArrayNode::add,
-                                                                ArrayNode::addAll);
-        return SyncMap.of("given", givenTypeVarsNode)
-                      .put("other", otherTypeVarsNode)
-                      .put("next", nextTypeVarsNode)
-                      .put("function", functionTypeVarsNode)
-                      .foldLeft(JsonNodeFactory.instance.objectNode(), (objNode, tup) -> objNode.set(tup._1(), tup._2()));
+
+        return containerNodes.set("containers", containerNodeArr);
     }
 
 
