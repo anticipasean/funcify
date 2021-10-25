@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -125,36 +126,35 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                         .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll);
     }
 
-    private JsonNode createZipImplementationSequences(final int zipMethodIndex, final int numberOfTypeParameters) {
+    private JsonNode createZipImplementationSequences(final int zipMethodIndex,
+                                                      final int numberOfTypeParameters) {
         if (zipMethodIndex <= 0) {
             return JsonNodeFactory.instance.objectNode();
         }
         final ObjectNode containerNodes = JsonNodeFactory.instance.objectNode();
-        containerNodes.set("other",
-                           IntStream.range(numberOfTypeParameters,
-                                           (zipMethodIndex * numberOfTypeParameters) + numberOfTypeParameters)
-                                    .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                    .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
-        containerNodes.set("next",
-                           IntStream.range((numberOfTypeParameters * zipMethodIndex) + numberOfTypeParameters,
-                                           (zipMethodIndex * numberOfTypeParameters) + (numberOfTypeParameters * 2))
-                                    .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                    .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
-        containerNodes.set("given",
-                           IntStream.range(0, numberOfTypeParameters)
-                                    .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                    .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+        containerNodes.set("other", IntStream.range(numberOfTypeParameters,
+                                                    (zipMethodIndex * numberOfTypeParameters) + numberOfTypeParameters)
+                                             .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                             .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+        containerNodes.set("next", IntStream.range((numberOfTypeParameters * zipMethodIndex) + numberOfTypeParameters,
+                                                   (zipMethodIndex * numberOfTypeParameters) + (numberOfTypeParameters * 2))
+                                            .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                            .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+        containerNodes.set("given", IntStream.range(0, numberOfTypeParameters)
+                                             .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                             .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
         final ArrayNode containerNodeArr = JsonNodeFactory.instance.arrayNode();
         for (int i = 0; i < numberOfTypeParameters; i++) {
             final ObjectNode zipMethodContainer = JsonNodeFactory.instance.objectNode();
             zipMethodContainer.put("method_name", "zip" + zipMethodIndex + "on" + (i + 1));
-            zipMethodContainer.set("new_type_variables",
-                                   StreamSupport.stream(containerNodes.get("other")
-                                                                      .spliterator(), false)
-                                                .limit(zipMethodIndex)
-                                                .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll)
-                                                .add(containerNodes.get("next")
-                                                                   .get(0)));
+            zipMethodContainer.set("new_type_variables", StreamSupport.stream(containerNodes.get("other")
+                                                                                            .spliterator(), false)
+                                                                      .limit(zipMethodIndex)
+                                                                      .reduce(JsonNodeFactory.instance.arrayNode(),
+                                                                              ArrayNode::add,
+                                                                              ArrayNode::addAll)
+                                                                      .add(containerNodes.get("next")
+                                                                                         .get(0)));
             final ArrayNode returnTypeVariables = JsonNodeFactory.instance.arrayNode();
             for (int ri = 0; ri < numberOfTypeParameters; ri++) {
                 if (ri == i) {
@@ -192,12 +192,125 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                 containerParams.add(containerNode);
             }
             zipMethodContainer.set("container_params", containerParams);
-            functionParams.add(containerNodes.get("next").get(0));
+            functionParams.add(containerNodes.get("next")
+                                             .get(0));
             zipMethodContainer.set("function_params", functionParams);
+            addPathsNodeToContainer(zipMethodContainer);
             containerNodeArr.add(zipMethodContainer);
         }
 
         return containerNodes.set("containers", containerNodeArr);
+    }
+
+    private void addPathsNodeToContainer(final ObjectNode zipMethodContainer) {
+        final JsonNode containerParamsNode = zipMethodContainer.get("container_params");
+        if (!containerParamsNode.isArray()) {
+            return;
+        }
+        final ArrayNode containerParams = (ArrayNode) containerParamsNode;
+        if (containerParams.size() == 0) {
+            return;
+        }
+        final StringBuilder builder = unwrapContainersRecursively(containerParams, 0, 0, new StringBuilder());
+        System.out.println(builder);
+    }
+
+    private StringBuilder unwrapContainersRecursively(final ArrayNode containerParams,
+                                                      final int containerIndex,
+                                                      final int typeVariableIndex,
+                                                      final StringBuilder currentPathBuilder) {
+        String outerIndent = createSpaceBasedIndentUsingContainerIndex(containerIndex);
+        if (containerIndex == 0) {
+            currentPathBuilder.append("return this.unwrap(container")
+                              .append(containerIndex + 1)
+                              .append(", ");
+        }
+        if (containerIndex >= containerParams.size() - 1) {
+            return appendReturnExpression(containerParams, containerIndex, typeVariableIndex, currentPathBuilder, outerIndent);
+
+        }
+        for (int i = 0; i < containerParams.get(containerIndex)
+                                           .get("type_variables")
+                                           .size(); i++) {
+            final String innerIndent = createSpaceBasedIndentUsingContainerIndex(containerIndex + 1);
+            appendFunctionParameterInputExpression(containerParams, containerIndex, i, currentPathBuilder);
+            currentPathBuilder.append(" -> {")
+                              .append("\n")
+                              .append(innerIndent)
+                              .append("return this.unwrap(container")
+                              .append(containerIndex + 2)
+                              .append(", ");
+            unwrapContainersRecursively(containerParams, containerIndex + 1, i, currentPathBuilder);
+            currentPathBuilder.append("\n")
+                              .append(innerIndent)
+                              .append("},")
+                              .append("\n");
+            if (containerParams.get(0)
+                               .get("type_variables")
+                               .size() == 1) {
+
+            }
+        }
+        return currentPathBuilder;
+
+    }
+
+    private String createSpaceBasedIndentUsingContainerIndex(final int containerIndex) {
+        return Stream.generate(() -> " ")
+                     .limit(containerIndex * 4L)
+                     .collect(Collectors.joining());
+    }
+
+    private StringBuilder appendFunctionParameterInputExpression(final ArrayNode containerParams,
+                                                                 final int containerIndex,
+                                                                 final int typeVariableIndex,
+                                                                 final StringBuilder currentPathBuilder) {
+        return currentPathBuilder.append("(")
+                                 .append(containerParams.get(containerIndex)
+                                                        .get("type_variables")
+                                                        .get(typeVariableIndex)
+                                                        .asText())
+                                 .append(" ")
+                                 .append("input")
+                                 .append(containerParams.get(containerIndex)
+                                                        .get("type_variables")
+                                                        .get(typeVariableIndex)
+                                                        .asText())
+                                 .append(")");
+    }
+
+    private StringBuilder appendReturnExpression(final ArrayNode containerParams,
+                                                 final int containerIndex,
+                                                 final int typeVariableIndex,
+                                                 final StringBuilder currentPathBuilder,
+                                                 final String indent) {
+        return currentPathBuilder.append("(")
+                                 .append(containerParams.get(containerIndex)
+                                                        .get("type_variables")
+                                                        .get(typeVariableIndex)
+                                                        .asText())
+                                 .append(" ")
+                                 .append("input")
+                                 .append(containerParams.get(containerIndex)
+                                                        .get("type_variables")
+                                                        .get(typeVariableIndex)
+                                                        .asText())
+                                 .append(") -> {")
+                                 .append("\n")
+                                 .append(indent)
+                                 .append(indent)
+                                 .append("return zipper.apply(")
+                                 .append(IntStream.range(0, containerParams.size())
+                                                  .mapToObj(i -> "input" + containerParams.get(i)
+                                                                                          .get("type_variables")
+                                                                                          .get(typeVariableIndex)
+                                                                                          .asText())
+                                                  .collect(Collectors.joining(", ")))
+                                 .append(");")
+                                 .append("\n")
+                                 .append(indent)
+                                 .append("}")
+                                 .append("\n");
     }
 
 

@@ -12,6 +12,10 @@ java_util_func_import() ::= <<
 import java.util.function.Function;
 >>
 
+java_util_supp_import() ::= <<
+import java.util.function.Supplier;
+>>
+
 function_call(input) ::= <<
 <if(input.expression && input.function_parameters)><expression(input.expression)>.apply(<input.function_parameters:{p | <p>};separator=", ">)<\\>
 <elseif(input.function_name && input.function_parameters)><input.function_name>.apply(<input.function_parameters:{p | <p>};separator=", ">)<\\>

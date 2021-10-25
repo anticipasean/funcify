@@ -48,7 +48,7 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
 
     @Option(names = {"-l", "--limit"},
             description = "limit for number of value parameters to consider in funcify ensembles and subtypes generated",
-            defaultValue = "22")
+            defaultValue = "2")
     private int valueParameterLimit;
 
     public static void main(String[] args) {
