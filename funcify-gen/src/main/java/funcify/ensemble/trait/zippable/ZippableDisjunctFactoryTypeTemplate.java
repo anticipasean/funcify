@@ -20,14 +20,21 @@ import funcify.writer.WriteResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Spliterator.OfInt;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.With;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,47 +218,57 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         if (containerParams.size() == 0) {
             return;
         }
-        final StringBuilder builder = unwrapContainersRecursively(containerParams, 0, 0, new StringBuilder());
+        final OfInt containerIndicesIter = createPeakingIndicesSpliterator(containerParams.size());
+        final ZipMethodContext context = ZipMethodContext.of(new StringBuilder(), containerParams, 0, 0, "");
+        final StringBuilder builder = unwrapContainersRecursively(context);
         System.out.println(builder);
+        zipMethodContainer.put("body", builder.toString());
     }
 
-    private StringBuilder unwrapContainersRecursively(final ArrayNode containerParams,
-                                                      final int containerIndex,
-                                                      final int typeVariableIndex,
-                                                      final StringBuilder currentPathBuilder) {
-        String outerIndent = createSpaceBasedIndentUsingContainerIndex(containerIndex);
-        if (containerIndex == 0) {
-            currentPathBuilder.append("return this.unwrap(container")
-                              .append(containerIndex + 1)
-                              .append(", ");
+    private static OfInt createPeakingIndicesSpliterator(final int peak) {
+        if (peak < 0) {
+            return Spliterators.emptyIntSpliterator();
         }
-        if (containerIndex >= containerParams.size() - 1) {
-            return appendReturnExpression(containerParams, containerIndex, typeVariableIndex, currentPathBuilder, outerIndent);
+        return IntStream.concat(IntStream.range(0, peak),
+                                IntStream.iterate(peak - 1, i -> i - 1)
+                                         .limit(peak))
+                        .spliterator();
+    }
 
+    private StringBuilder unwrapContainersRecursively(final ZipMethodContext context) {
+        String outerIndent = createSpaceBasedIndentUsingContainerIndex(context.getContainerIndex());
+        if (context.getContainerIndex() == 0) {
+            context.getMethodTextBuilder()
+                   .append("return container")
+                   .append(context.getContainerIndex() + 1)
+                   .append(".fold(");
         }
-        for (int i = 0; i < containerParams.get(containerIndex)
-                                           .get("type_variables")
-                                           .size(); i++) {
-            final String innerIndent = createSpaceBasedIndentUsingContainerIndex(containerIndex + 1);
-            appendFunctionParameterInputExpression(containerParams, containerIndex, i, currentPathBuilder);
-            currentPathBuilder.append(" -> {")
-                              .append("\n")
-                              .append(innerIndent)
-                              .append("return this.unwrap(container")
-                              .append(containerIndex + 2)
-                              .append(", ");
-            unwrapContainersRecursively(containerParams, containerIndex + 1, i, currentPathBuilder);
-            currentPathBuilder.append("\n")
-                              .append(innerIndent)
-                              .append("},")
-                              .append("\n");
-            if (containerParams.get(0)
-                               .get("type_variables")
-                               .size() == 1) {
-
-            }
+        if (context.getContainerIndex()
+            >= context.getContainerParams()
+                      .size() - 1) {
+            return appendReturnExpression(context);
         }
-        return currentPathBuilder;
+        for (int i = 0; i < context.getContainerParams()
+                                   .get(context.getContainerIndex())
+                                   .get("type_variables")
+                                   .size(); i++) {
+            final String innerIndent = createSpaceBasedIndentUsingContainerIndex(context.getContainerIndex() + 1);
+            appendFunctionParameterInputExpression(context);
+            context.getMethodTextBuilder()
+                   .append(" -> {")
+                   .append("\n")
+                   .append(innerIndent)
+                   .append("return container")
+                   .append(context.getContainerIndex() + 2)
+                   .append(".fold( ");
+            unwrapContainersRecursively(context.withContainerIndex(context.getContainerIndex() + 1)
+                                               .withTypeVariableIndex(i));
+            context.getMethodTextBuilder()
+                   .append(innerIndent)
+                   .append("}")
+                   .append(disjunctSoloEmptyCaseAppender(context));
+        }
+        return context.getMethodTextBuilder();
 
     }
 
@@ -261,57 +278,116 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                      .collect(Collectors.joining());
     }
 
-    private StringBuilder appendFunctionParameterInputExpression(final ArrayNode containerParams,
-                                                                 final int containerIndex,
-                                                                 final int typeVariableIndex,
-                                                                 final StringBuilder currentPathBuilder) {
-        return currentPathBuilder.append("(")
-                                 .append(containerParams.get(containerIndex)
-                                                        .get("type_variables")
-                                                        .get(typeVariableIndex)
-                                                        .asText())
-                                 .append(" ")
-                                 .append("input")
-                                 .append(containerParams.get(containerIndex)
-                                                        .get("type_variables")
-                                                        .get(typeVariableIndex)
-                                                        .asText())
-                                 .append(")");
+    private StringBuilder appendFunctionParameterInputExpression(final ZipMethodContext context) {
+        return context.getMethodTextBuilder()
+                      .append("(")
+                      .append(context.getContainerParams()
+                                     .get(context.getContainerIndex())
+                                     .get("type_variables")
+                                     .get(context.getTypeVariableIndex())
+                                     .asText())
+                      .append(" ")
+                      .append("input")
+                      .append(context.getContainerParams()
+                                     .get(context.getContainerIndex())
+                                     .get("type_variables")
+                                     .get(context.getTypeVariableIndex())
+                                     .asText())
+                      .append(")");
     }
 
-    private StringBuilder appendReturnExpression(final ArrayNode containerParams,
-                                                 final int containerIndex,
-                                                 final int typeVariableIndex,
-                                                 final StringBuilder currentPathBuilder,
-                                                 final String indent) {
-        return currentPathBuilder.append("(")
-                                 .append(containerParams.get(containerIndex)
-                                                        .get("type_variables")
-                                                        .get(typeVariableIndex)
-                                                        .asText())
-                                 .append(" ")
-                                 .append("input")
-                                 .append(containerParams.get(containerIndex)
-                                                        .get("type_variables")
-                                                        .get(typeVariableIndex)
-                                                        .asText())
-                                 .append(") -> {")
-                                 .append("\n")
-                                 .append(indent)
-                                 .append(indent)
-                                 .append("return zipper.apply(")
-                                 .append(IntStream.range(0, containerParams.size())
-                                                  .mapToObj(i -> "input" + containerParams.get(i)
-                                                                                          .get("type_variables")
-                                                                                          .get(typeVariableIndex)
-                                                                                          .asText())
-                                                  .collect(Collectors.joining(", ")))
-                                 .append(");")
-                                 .append("\n")
-                                 .append(indent)
-                                 .append("}")
-                                 .append("\n");
+    private StringBuilder appendReturnExpression(final ZipMethodContext context) {
+        return context.getMethodTextBuilder()
+                      .append("(")
+                      .append(context.getContainerParams()
+                                     .get(context.getContainerIndex())
+                                     .get("type_variables")
+                                     .get(context.getTypeVariableIndex())
+                                     .asText())
+                      .append(" ")
+                      .append("input")
+                      .append(context.getContainerParams()
+                                     .get(context.getContainerIndex())
+                                     .get("type_variables")
+                                     .get(context.getTypeVariableIndex())
+                                     .asText())
+                      .append(") -> {")
+                      .append("\n")
+                      .append(context.getIndent())
+                      .append(context.getIndent())
+                      .append("return this.wrap")
+                      .append(context.getContainerIndex() + 1)
+                      .append("(")
+                      .append("zipper.apply(")
+                      .append(IntStream.range(0,
+                                              context.getContainerParams()
+                                                     .size())
+                                       .mapToObj(i -> "input" + context.getContainerParams()
+                                                                       .get(i)
+                                                                       .get("type_variables")
+                                                                       .get(context.getTypeVariableIndex())
+                                                                       .asText())
+                                       .collect(Collectors.joining(", ")))
+                      .append("));")
+                      .append("\n")
+                      .append(context.getIndent())
+                      .append("}")
+                      .append(disjunctSoloEmptyCaseAppender(context));
     }
 
+    private StringBuilder disjunctSoloEmptyCaseAppender(final ZipMethodContext context) {
+        if (context.getContainerParams()
+                   .get(context.getContainerIndex())
+                   .get("type_variables")
+                   .size() != 1) {
+            return new StringBuilder("\n");
+        }
+        return new StringBuilder().append(",")
+                                  .append("\n")
+                                  .append(context.getIndent())
+                                  .append("() -> {")
+                                  .append("\n")
+                                  .append(context.getIndent())
+                                  .append("    return this.empty();")
+                                  .append("\n")
+                                  .append(context.getIndent())
+                                  .append("});")
+                                  .append("\n");
+    }
+
+    @AllArgsConstructor(staticName = "of")
+    @Builder
+    @Getter
+    @With
+    private static class ZipMethodContext {
+
+        //        private final Deque<FunctionBlock> funcBlockDeque;
+
+        private final StringBuilder methodTextBuilder;
+
+        private final ArrayNode containerParams;
+
+        private final int containerIndex;
+
+        private final int typeVariableIndex;
+
+        private final String indent;
+
+    }
+
+    @AllArgsConstructor(staticName = "of")
+    @Builder
+    @Getter
+    @With
+    private static class FunctionBlock {
+
+        private final int parentContainerIndex;
+
+        private final int parentTypeVariableIndex;
+
+        private final int childContainerIndex;
+
+        private final int childTypeVariableIndex;
+    }
 
 }

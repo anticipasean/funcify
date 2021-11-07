@@ -32,6 +32,7 @@ disjunct_zip_method_container(container, container_type, witness_type="WT") ::= 
 <disjunct_zip_method(container_type,
                      witness_type,
                      container.method_name,
+                     container.body,
                      container.return_type_variables,
                      container.container_params,
                      container.new_type_variables,
@@ -41,6 +42,7 @@ disjunct_zip_method_container(container, container_type, witness_type="WT") ::= 
 disjunct_zip_method(container_type,
                     witness_type,
                     method_name,
+                    body="",
                     return_type_variables=[],
                     container_params=[],
                     new_type_variables=[],
@@ -53,7 +55,7 @@ disjunct_zip_method(container_type,
                                                                                                                                                                  function_params)>) {
         <container_params:{c|container<c.index>}:null_check();anchor,separator=";\n">;
         <null_check("zipper")>;
-        <!<disjunct_unwrap(container_params)>!>
+        <body>
     }
 
 >>
