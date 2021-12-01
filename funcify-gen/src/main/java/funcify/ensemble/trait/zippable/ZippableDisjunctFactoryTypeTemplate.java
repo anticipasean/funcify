@@ -24,6 +24,8 @@ import java.util.Deque;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator.OfInt;
 import java.util.Spliterators;
@@ -33,6 +35,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.With;
 import org.slf4j.Logger;
@@ -218,11 +221,14 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         if (containerParams.size() == 0) {
             return;
         }
-        final OfInt containerIndicesIter = createPeakingIndicesSpliterator(containerParams.size());
-        final ZipMethodContext context = ZipMethodContext.of(new StringBuilder(), containerParams, 0, 0, "");
-        final StringBuilder builder = unwrapContainersRecursively(context);
-        System.out.println(builder);
-        zipMethodContainer.put("body", builder.toString());
+        final ZipMethodContext context = ZipMethodContext.builder()
+                                                         .containerParams(containerParams)
+                                                         .build();
+        final ZipMethodContext updatedContext = unwrapContainersRecursively(context);
+        System.out.println(updatedContext.getMethodTextBuilder());
+        zipMethodContainer.put("body",
+                               updatedContext.getMethodTextBuilder()
+                                             .toString());
     }
 
     private static OfInt createPeakingIndicesSpliterator(final int peak) {
@@ -235,124 +241,205 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                         .spliterator();
     }
 
-    private StringBuilder unwrapContainersRecursively(final ZipMethodContext context) {
-        String outerIndent = createSpaceBasedIndentUsingContainerIndex(context.getContainerIndex());
-        if (context.getContainerIndex() == 0) {
-            context.getMethodTextBuilder()
-                   .append("return container")
-                   .append(context.getContainerIndex() + 1)
-                   .append(".fold(");
+    private ZipMethodContext unwrapContainersRecursively(final ZipMethodContext context) {
+        Objects.requireNonNull(context, () -> "context");
+        if (context.getMethodTextBuilder()
+                   .length() == 0
+            && context.getContainerParams()
+                      .size() > 0) {
+            context.getContextStack()
+                   .push(context.withContainerIndex(0)
+                                .withTypeVariableIndex(0));
         }
-        if (context.getContainerIndex()
-            >= context.getContainerParams()
-                      .size() - 1) {
-            return appendReturnExpression(context);
+        while (!context.getContextStack()
+                       .isEmpty()) {
+            final ZipMethodContext currentContext = context.getContextStack()
+                                                           .pop();
+            if (isUnhappyPath(currentContext)) {
+                unwrapUnhappyPath(currentContext);
+            } else {
+                unwrapHappyPath(currentContext);
+            }
+            // Shift type variable until done
+            if (currentContext.getTypeVariableIndex()
+                < currentContext.getTypeVariablesForContainer()
+                                .size() - 1) {
+                context.getContextStack()
+                       .push(currentContext.withTypeVariableIndex(currentContext.getTypeVariableIndex() + 1));
+            }
         }
-        for (int i = 0; i < context.getContainerParams()
-                                   .get(context.getContainerIndex())
-                                   .get("type_variables")
-                                   .size(); i++) {
-            final String innerIndent = createSpaceBasedIndentUsingContainerIndex(context.getContainerIndex() + 1);
-            appendFunctionParameterInputExpression(context);
-            context.getMethodTextBuilder()
-                   .append(" -> {")
-                   .append("\n")
-                   .append(innerIndent)
-                   .append("return container")
-                   .append(context.getContainerIndex() + 2)
-                   .append(".fold( ");
-            unwrapContainersRecursively(context.withContainerIndex(context.getContainerIndex() + 1)
-                                               .withTypeVariableIndex(i));
-            context.getMethodTextBuilder()
-                   .append(innerIndent)
-                   .append("}")
-                   .append(disjunctSoloEmptyCaseAppender(context));
-        }
-        return context.getMethodTextBuilder();
-
+        return context;
     }
 
-    private String createSpaceBasedIndentUsingContainerIndex(final int containerIndex) {
-        return Stream.generate(() -> " ")
-                     .limit(containerIndex * 4L)
-                     .collect(Collectors.joining());
+    private boolean requiresContainerDeclaration(final ZipMethodContext context) {
+        return context.getTypeVariableIndex() == 0;
     }
 
-    private StringBuilder appendFunctionParameterInputExpression(final ZipMethodContext context) {
-        return context.getMethodTextBuilder()
-                      .append("(")
-                      .append(context.getContainerParams()
-                                     .get(context.getContainerIndex())
-                                     .get("type_variables")
-                                     .get(context.getTypeVariableIndex())
-                                     .asText())
-                      .append(" ")
-                      .append("input")
-                      .append(context.getContainerParams()
-                                     .get(context.getContainerIndex())
-                                     .get("type_variables")
-                                     .get(context.getTypeVariableIndex())
-                                     .asText())
-                      .append(")");
-    }
 
-    private StringBuilder appendReturnExpression(final ZipMethodContext context) {
-        return context.getMethodTextBuilder()
-                      .append("(")
-                      .append(context.getContainerParams()
-                                     .get(context.getContainerIndex())
-                                     .get("type_variables")
-                                     .get(context.getTypeVariableIndex())
-                                     .asText())
-                      .append(" ")
-                      .append("input")
-                      .append(context.getContainerParams()
-                                     .get(context.getContainerIndex())
-                                     .get("type_variables")
-                                     .get(context.getTypeVariableIndex())
-                                     .asText())
-                      .append(") -> {")
-                      .append("\n")
-                      .append(context.getIndent())
-                      .append(context.getIndent())
-                      .append("return this.wrap")
-                      .append(context.getContainerIndex() + 1)
-                      .append("(")
-                      .append("zipper.apply(")
-                      .append(IntStream.range(0,
-                                              context.getContainerParams()
-                                                     .size())
-                                       .mapToObj(i -> "input" + context.getContainerParams()
-                                                                       .get(i)
-                                                                       .get("type_variables")
-                                                                       .get(context.getTypeVariableIndex())
-                                                                       .asText())
-                                       .collect(Collectors.joining(", ")))
-                      .append("));")
-                      .append("\n")
-                      .append(context.getIndent())
-                      .append("}")
-                      .append(disjunctSoloEmptyCaseAppender(context));
-    }
-
-    private StringBuilder disjunctSoloEmptyCaseAppender(final ZipMethodContext context) {
-        if (context.getContainerParams()
-                   .get(context.getContainerIndex())
-                   .get("type_variables")
-                   .size() != 1) {
-            return new StringBuilder("\n");
+    private void unwrapUnhappyPath(final ZipMethodContext currentContext) {
+        if (requiresContainerDeclaration(currentContext)) {
+            currentContext.getMethodTextBuilder()
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("return container")
+                          .append(currentContext.getContainerIndex() + 1)
+                          .append(".fold(");
+        } else {
+            currentContext.getMethodTextBuilder()
+                          .append(getNFourSpaceIndent(Math.max(2, currentContext.getContainerIndex())));
         }
-        return new StringBuilder().append(",")
-                                  .append("\n")
-                                  .append(context.getIndent())
-                                  .append("() -> {")
-                                  .append("\n")
-                                  .append(context.getIndent())
-                                  .append("    return this.empty();")
-                                  .append("\n")
-                                  .append(context.getIndent())
-                                  .append("});")
-                                  .append("\n");
+        if (currentContext.getContainerIndex()
+            < currentContext.getContainerParams()
+                            .size() - 1) {
+            appendFunctionParameterInputExpressionWithInputIndex(currentContext);
+            currentContext.getMethodTextBuilder()
+                          .append(" -> ")
+                          .append("{\n");
+            // shift container_index until done
+            currentContext.getContextStack()
+                          .push(currentContext.withContainerIndex(currentContext.getContainerIndex() + 1));
+            unwrapContainersRecursively(currentContext);
+        } else {
+            appendFunctionParameterInputExpression(currentContext);
+            currentContext.getMethodTextBuilder()
+                          .append(" -> ")
+                          .append("{\n");
+            currentContext.getMethodTextBuilder()
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("return this.wrap")
+                          .append(currentContext.getTypeVariableIndex() + 1)
+                          .append("(")
+                          .append("input")
+                          .append(currentContext.getTypeVariableText())
+                          .append(currentContext.getContainerIndex() + 1)
+                          .append("));\n");
+        }
+        if (currentContext.getTypeVariableIndex()
+            < currentContext.getTypeVariablesForContainer()
+                            .size() - 1) {
+            currentContext.getMethodTextBuilder()
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("},\n");
+        } else {
+            currentContext.getMethodTextBuilder()
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("}\n");
+        }
+    }
+
+    private boolean isUnhappyPath(final ZipMethodContext currentContext) {
+        return currentContext.getTypeVariablesForContainer()
+                             .size() > 1 && StreamSupport.stream(currentContext.getContainerParams()
+                                                                               .spliterator(), false)
+                                                         .map(jn -> jn.get("type_variables"))
+                                                         .map(jn -> jn.get(currentContext.getTypeVariableIndex()))
+                                                         .map(JsonNode::asText)
+                                                         .distinct()
+                                                         .count() == 1;
+    }
+
+    private void unwrapHappyPath(final ZipMethodContext currentContext) {
+        if (requiresContainerDeclaration(currentContext)) {
+            currentContext.getMethodTextBuilder()
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("return container")
+                          .append(currentContext.getContainerIndex() + 1)
+                          .append(".fold(");
+        } else {
+            currentContext.getMethodTextBuilder()
+                          .append(getNFourSpaceIndent(Math.max(2, currentContext.getContainerIndex())));
+        }
+        if (currentContext.getContainerIndex()
+            < currentContext.getContainerParams()
+                            .size() - 1) {
+            appendFunctionParameterInputExpression(currentContext);
+            currentContext.getMethodTextBuilder()
+                          .append(" -> ")
+                          .append("{\n");
+            // shift container_index until done
+            currentContext.getContextStack()
+                          .push(currentContext.withContainerIndex(currentContext.getContainerIndex() + 1));
+            unwrapContainersRecursively(currentContext);
+        } else {
+            appendFunctionParameterInputExpression(currentContext);
+            currentContext.getMethodTextBuilder()
+                          .append(" -> ")
+                          .append("{\n");
+            currentContext.getMethodTextBuilder()
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("return this.wrap")
+                          .append(currentContext.getTypeVariableIndex() + 1)
+                          .append("(")
+                          .append("zipper.apply(")
+                          .append(StreamSupport.stream(currentContext.getContainerParams()
+                                                                     .spliterator(), false)
+                                               .map(jn -> jn.get("type_variables"))
+                                               .map(jn -> jn.get(currentContext.getTypeVariableIndex())
+                                                            .asText())
+                                               .map(s -> "input" + s)
+                                               .collect(Collectors.joining(", ")))
+                          .append("));\n");
+        }
+        if (currentContext.getTypeVariablesForContainer()
+                          .size() == 1) {
+            currentContext.getMethodTextBuilder()
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("},\n")
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("() -> {\n")
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("return this.empty();\n")
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("}")
+                          .append(currentContext.getTypeVariablesForContainer()
+                                                .size() == 1 ? ");" : "")
+                          .append("\n");
+        } else if (currentContext.getTypeVariableIndex()
+                   < currentContext.getTypeVariablesForContainer()
+                                   .size() - 1) {
+            currentContext.getMethodTextBuilder()
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("},\n");
+        } else {
+            currentContext.getMethodTextBuilder()
+                          .append(currentContext.getIndent())
+                          .append(currentContext.getIndent())
+                          .append("}\n");
+        }
+    }
+
+    private void appendFunctionParameterInputExpression(final ZipMethodContext context) {
+        context.getMethodTextBuilder()
+               .append("(")
+               .append(context.getTypeVariableText())
+               .append(" ")
+               .append("input")
+               .append(context.getTypeVariableText())
+               .append(")");
+    }
+
+    private void appendFunctionParameterInputExpressionWithInputIndex(final ZipMethodContext context) {
+        context.getMethodTextBuilder()
+               .append("(")
+               .append(context.getTypeVariableText())
+               .append(" ")
+               .append("input")
+               .append(context.getTypeVariableText())
+               .append(context.getContainerIndex() + 1)
+               .append(")");
     }
 
     @AllArgsConstructor(staticName = "of")
@@ -361,33 +448,50 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
     @With
     private static class ZipMethodContext {
 
-        //        private final Deque<FunctionBlock> funcBlockDeque;
+        @Default
+        private final ArrayNode containerParams = JsonNodeFactory.instance.arrayNode();
 
-        private final StringBuilder methodTextBuilder;
+        @Default
+        private final Deque<ZipMethodContext> contextStack = new LinkedList<>();
 
-        private final ArrayNode containerParams;
+        @Default
+        private final StringBuilder methodTextBuilder = new StringBuilder();
 
-        private final int containerIndex;
+        @Default
+        private final int containerIndex = 0;
 
-        private final int typeVariableIndex;
+        @Default
+        private final int typeVariableIndex = 0;
 
-        private final String indent;
+        public JsonNode getContainerParam() {
+            return containerParams.get(containerIndex);
+        }
+
+        public JsonNode getTypeVariable() {
+            return getTypeVariablesForContainer().get(typeVariableIndex);
+        }
+
+        public ArrayNode getTypeVariablesForContainer() {
+            return Optional.of(getContainerParam().get("type_variables"))
+                           .filter(ArrayNode.class::isInstance)
+                           .map(ArrayNode.class::cast)
+                           .orElseThrow(() -> new IllegalArgumentException("type_variables json_node is not an array_node"));
+        }
+
+        public String getTypeVariableText() {
+            return getTypeVariable().asText();
+        }
+
+        public String getIndent() {
+            return getNFourSpaceIndent(containerIndex);
+        }
 
     }
 
-    @AllArgsConstructor(staticName = "of")
-    @Builder
-    @Getter
-    @With
-    private static class FunctionBlock {
-
-        private final int parentContainerIndex;
-
-        private final int parentTypeVariableIndex;
-
-        private final int childContainerIndex;
-
-        private final int childTypeVariableIndex;
+    private static String getNFourSpaceIndent(final int numberOfIndents) {
+        return Stream.generate(() -> " ")
+                     .limit(numberOfIndents * 4L)
+                     .collect(Collectors.joining());
     }
 
 }
