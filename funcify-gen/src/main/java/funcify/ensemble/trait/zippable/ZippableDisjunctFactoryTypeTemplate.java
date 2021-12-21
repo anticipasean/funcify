@@ -1,7 +1,6 @@
 package funcify.ensemble.trait.zippable;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -19,16 +18,15 @@ import funcify.writer.StringTemplateWriter;
 import funcify.writer.WriteResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator.OfInt;
-import java.util.Spliterators;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -37,6 +35,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.With;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,16 +85,9 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                                    getImplementedTypeInstance(ek,
                                                                                               Trait.DISJUNCT,
                                                                                               Trait.WRAPPABLE))
-                                                              .put("zip_impl_sequences", LiftOps.tryCatchLift(() -> {
-                                                                  final JsonNode zipImplementationSequences = createZipImplementationSequences(
-                                                                      ek.getNumberOfValueParameters());
-                                                                  logger.debug("full_model: {}",
-                                                                               new ObjectMapper().writerWithDefaultPrettyPrinter()
-                                                                                                 .writeValueAsString(
-                                                                                                     zipImplementationSequences));
-                                                                  return zipImplementationSequences;
-                                                              })
-                                                                                                .orElse(JsonNodeFactory.instance.nullNode()))
+                                                              .put("zip_impl_sequences",
+                                                                   LiftOps.tryCatchLift(() -> createZipImplementationSequences(ek.getNumberOfValueParameters()))
+                                                                          .orElse(JsonNodeFactory.instance.nullNode()))
                                                               .put("container_type",
                                                                    getContainerTypeJsonInstanceFor(ek, Trait.DISJUNCT));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
@@ -221,241 +213,152 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         if (containerParams.size() == 0) {
             return;
         }
-        final ZipMethodContext context = ZipMethodContext.builder()
-                                                         .containerParams(containerParams)
-                                                         .build();
-        final ZipMethodContext updatedContext = unwrapContainersRecursively(context);
-        System.out.println(updatedContext.getMethodTextBuilder());
+        final ZipMethodBodyContextVisitor visitor = new ZipMethodBodyContextVisitor();
+        final MethodContext context = MethodContext.builder()
+                                                   .containerParams(containerParams)
+                                                   .returnTypeVariables(Optional.of(zipMethodContainer)
+                                                                                .map(on -> on.path("return_type_variables"))
+                                                                                .filter(jn -> !jn.isMissingNode())
+                                                                                .filter(JsonNode::isArray)
+                                                                                .map(ArrayNode.class::cast)
+                                                                                .map(an -> an.spliterator())
+                                                                                .map(spl -> StreamSupport.stream(spl, false))
+                                                                                .orElseGet(Stream::empty)
+                                                                                .map(JsonNode::asText)
+                                                                                .collect(Collectors.toList()))
+                                                   .build();
+
+        try {
+            final ContainerRef topContainerRef = ContainerRef.builder()
+                                                             .containerSuffix(String.valueOf(1))
+                                                             .build();
+            context.getComponentStack()
+                   .push(topContainerRef);
+            visitor.visit(context, topContainerRef);
+        } catch (final Throwable t) {
+            logger.error("add_paths_node_to_container: [ status: failed ] with error [ type: {}, message: {} ]",
+                         t.getClass()
+                          .getSimpleName(),
+                         t.getMessage());
+        }
         zipMethodContainer.put("body",
-                               updatedContext.getMethodTextBuilder()
-                                             .toString());
+                               context.getMethodTextBuilder()
+                                      .toString());
     }
 
-    private static OfInt createPeakingIndicesSpliterator(final int peak) {
-        if (peak < 0) {
-            return Spliterators.emptyIntSpliterator();
-        }
-        return IntStream.concat(IntStream.range(0, peak),
-                                IntStream.iterate(peak - 1, i -> i - 1)
-                                         .limit(peak))
-                        .spliterator();
+    private static interface MethodBodyComponent {
+
+        void accept(final MethodContext context,
+                    final MethodContextVisitor visitor);
     }
 
-    private ZipMethodContext unwrapContainersRecursively(final ZipMethodContext context) {
-        Objects.requireNonNull(context, () -> "context");
-        if (context.getMethodTextBuilder()
-                   .length() == 0
-            && context.getContainerParams()
-                      .size() > 0) {
-            context.getContextStack()
-                   .push(context.withContainerIndex(0)
-                                .withTypeVariableIndex(0));
-        }
-        while (!context.getContextStack()
-                       .isEmpty()) {
-            final ZipMethodContext currentContext = context.getContextStack()
-                                                           .pop();
-            if (isUnhappyPath(currentContext)) {
-                unwrapUnhappyPath(currentContext);
-            } else {
-                unwrapHappyPath(currentContext);
-            }
-            // Shift type variable until done
-            if (currentContext.getTypeVariableIndex()
-                < currentContext.getTypeVariablesForContainer()
-                                .size() - 1) {
-                context.getContextStack()
-                       .push(currentContext.withTypeVariableIndex(currentContext.getTypeVariableIndex() + 1));
-            }
-        }
-        return context;
-    }
+    private static interface MethodContextVisitor {
 
-    private boolean requiresContainerDeclaration(final ZipMethodContext context) {
-        return context.getTypeVariableIndex() == 0;
+        default void visit(final MethodContext context,
+                           final ContainerRef containerRef) {
+        }
+
+        default void visit(final MethodContext context,
+                           final FoldMethodCall foldMethodCall) {
+        }
+
+        default void visit(final MethodContext context,
+                           final FunctionParameterValue functionParameterValue) {
+        }
+
+        default void visit(final MethodContext context,
+                           final ZipperFunctionCallReturnValue zipperFunctionCallReturnValue) {
+        }
+
+        default void visit(final MethodContext context,
+                           final FunctionBody functionBody) {
+        }
+
+        default void visit(final MethodContext context,
+                           final EmptyCallReturnValue emptyCallReturnValue) {
+        }
+
+        default void visit(final MethodContext context,
+                           final WrapCallReturnValue wrapCallReturnValue) {
+        }
     }
 
 
-    private void unwrapUnhappyPath(final ZipMethodContext currentContext) {
-        if (requiresContainerDeclaration(currentContext)) {
-            currentContext.getMethodTextBuilder()
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("return container")
-                          .append(currentContext.getContainerIndex() + 1)
-                          .append(".fold(");
-        } else {
-            currentContext.getMethodTextBuilder()
-                          .append(getNFourSpaceIndent(Math.max(2, currentContext.getContainerIndex())));
+    @AllArgsConstructor(staticName = "of")
+    @Builder
+    @Getter
+    @With
+    private static class MethodContext {
+
+        @Default
+        private final ArrayNode containerParams = JsonNodeFactory.instance.arrayNode();
+
+        @Default
+        private final Deque<MethodBodyComponent> componentStack = new LinkedList<>();
+
+        @Default
+        private final StringBuilder methodTextBuilder = new StringBuilder();
+
+        @Default
+        private final List<String> returnTypeVariables = new ArrayList<>();
+
+        public int getTotalNumberOfContainers() {
+            return getContainerParams().size();
         }
-        if (currentContext.getContainerIndex()
-            < currentContext.getContainerParams()
-                            .size() - 1) {
-            appendFunctionParameterInputExpressionWithInputIndex(currentContext);
-            currentContext.getMethodTextBuilder()
-                          .append(" -> ")
-                          .append("{\n");
-            // shift container_index until done
-            currentContext.getContextStack()
-                          .push(currentContext.withContainerIndex(currentContext.getContainerIndex() + 1));
-            unwrapContainersRecursively(currentContext);
-        } else {
-            appendFunctionParameterInputExpression(currentContext);
-            currentContext.getMethodTextBuilder()
-                          .append(" -> ")
-                          .append("{\n");
-            currentContext.getMethodTextBuilder()
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("return this.wrap")
-                          .append(currentContext.getTypeVariableIndex() + 1)
-                          .append("(")
-                          .append("input")
-                          .append(currentContext.getTypeVariableText())
-                          .append(currentContext.getContainerIndex() + 1)
-                          .append("));\n");
+
+        public int getTotalNumberOfTypeVariables() {
+            return getContainerParams().size() == 0 ? 0 : getContainerParams().get(0)
+                                                                              .get("type_variables")
+                                                                              .size();
         }
-        if (currentContext.getTypeVariableIndex()
-            < currentContext.getTypeVariablesForContainer()
-                            .size() - 1) {
-            currentContext.getMethodTextBuilder()
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("},\n");
-        } else {
-            currentContext.getMethodTextBuilder()
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("}\n");
-        }
+
     }
 
-    private boolean isUnhappyPath(final ZipMethodContext currentContext) {
-        return currentContext.getTypeVariablesForContainer()
-                             .size() > 1 && StreamSupport.stream(currentContext.getContainerParams()
-                                                                               .spliterator(), false)
-                                                         .map(jn -> jn.get("type_variables"))
-                                                         .map(jn -> jn.get(currentContext.getTypeVariableIndex()))
-                                                         .map(JsonNode::asText)
-                                                         .distinct()
-                                                         .count() == 1;
-    }
 
-    private void unwrapHappyPath(final ZipMethodContext currentContext) {
-        if (requiresContainerDeclaration(currentContext)) {
-            currentContext.getMethodTextBuilder()
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("return container")
-                          .append(currentContext.getContainerIndex() + 1)
-                          .append(".fold(");
-        } else {
-            currentContext.getMethodTextBuilder()
-                          .append(getNFourSpaceIndent(Math.max(2, currentContext.getContainerIndex())));
-        }
-        if (currentContext.getContainerIndex()
-            < currentContext.getContainerParams()
-                            .size() - 1) {
-            appendFunctionParameterInputExpression(currentContext);
-            currentContext.getMethodTextBuilder()
-                          .append(" -> ")
-                          .append("{\n");
-            // shift container_index until done
-            currentContext.getContextStack()
-                          .push(currentContext.withContainerIndex(currentContext.getContainerIndex() + 1));
-            unwrapContainersRecursively(currentContext);
-        } else {
-            appendFunctionParameterInputExpression(currentContext);
-            currentContext.getMethodTextBuilder()
-                          .append(" -> ")
-                          .append("{\n");
-            currentContext.getMethodTextBuilder()
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("return this.wrap")
-                          .append(currentContext.getTypeVariableIndex() + 1)
-                          .append("(")
-                          .append("zipper.apply(")
-                          .append(StreamSupport.stream(currentContext.getContainerParams()
-                                                                     .spliterator(), false)
-                                               .map(jn -> jn.get("type_variables"))
-                                               .map(jn -> jn.get(currentContext.getTypeVariableIndex())
-                                                            .asText())
-                                               .map(s -> "input" + s)
-                                               .collect(Collectors.joining(", ")))
-                          .append("));\n");
-        }
-        if (currentContext.getTypeVariablesForContainer()
-                          .size() == 1) {
-            currentContext.getMethodTextBuilder()
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("},\n")
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("() -> {\n")
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("return this.empty();\n")
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("}")
-                          .append(currentContext.getTypeVariablesForContainer()
-                                                .size() == 1 ? ");" : "")
-                          .append("\n");
-        } else if (currentContext.getTypeVariableIndex()
-                   < currentContext.getTypeVariablesForContainer()
-                                   .size() - 1) {
-            currentContext.getMethodTextBuilder()
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("},\n");
-        } else {
-            currentContext.getMethodTextBuilder()
-                          .append(currentContext.getIndent())
-                          .append(currentContext.getIndent())
-                          .append("}\n");
-        }
-    }
+    @AllArgsConstructor(staticName = "of")
+    @Builder
+    @Getter
+    @With
+    @ToString
+    private static class ContainerRef implements MethodBodyComponent {
 
-    private void appendFunctionParameterInputExpression(final ZipMethodContext context) {
-        context.getMethodTextBuilder()
-               .append("(")
-               .append(context.getTypeVariableText())
-               .append(" ")
-               .append("input")
-               .append(context.getTypeVariableText())
-               .append(")");
-    }
+        @Default
+        private final String containerName = "container";
 
-    private void appendFunctionParameterInputExpressionWithInputIndex(final ZipMethodContext context) {
-        context.getMethodTextBuilder()
-               .append("(")
-               .append(context.getTypeVariableText())
-               .append(" ")
-               .append("input")
-               .append(context.getTypeVariableText())
-               .append(context.getContainerIndex() + 1)
-               .append(")");
+        @Default
+        private final String containerSuffix = "";
+
+        @Default
+        private final int containerIndex = 0;
+
+        @Override
+        public void accept(final MethodContext context,
+                           final MethodContextVisitor visitor) {
+            visitor.visit(context, this);
+        }
     }
 
     @AllArgsConstructor(staticName = "of")
     @Builder
     @Getter
     @With
-    private static class ZipMethodContext {
+    @ToString
+    private static class FoldMethodCall implements MethodBodyComponent {
 
-        @Default
-        private final ArrayNode containerParams = JsonNodeFactory.instance.arrayNode();
+        @Override
+        public void accept(final MethodContext context,
+                           final MethodContextVisitor visitor) {
+            visitor.visit(context, this);
+        }
+    }
 
-        @Default
-        private final Deque<ZipMethodContext> contextStack = new LinkedList<>();
 
-        @Default
-        private final StringBuilder methodTextBuilder = new StringBuilder();
+    @AllArgsConstructor(staticName = "of")
+    @Builder
+    @Getter
+    @With
+    @ToString
+    private static class FunctionParameterValue implements MethodBodyComponent {
 
         @Default
         private final int containerIndex = 0;
@@ -463,29 +366,402 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         @Default
         private final int typeVariableIndex = 0;
 
-        public JsonNode getContainerParam() {
-            return containerParams.get(containerIndex);
+        @Default
+        private final String inputParameterName = "input";
+
+        @Default
+        private final String inputParameterSuffix = "";
+
+        @Default
+        private final boolean isUnhappyPath = true;
+
+        @Override
+        public void accept(final MethodContext context,
+                           final MethodContextVisitor visitor) {
+            visitor.visit(context, this);
+        }
+    }
+
+    @AllArgsConstructor(staticName = "of")
+    @Builder
+    @Getter
+    @With
+    @ToString
+    private static class FunctionBody implements MethodBodyComponent {
+
+        @Override
+        public void accept(final MethodContext context,
+                           final MethodContextVisitor visitor) {
+            visitor.visit(context, this);
+        }
+    }
+
+
+    @AllArgsConstructor(staticName = "of")
+    @Builder
+    @Getter
+    @With
+    @ToString
+    private static class ZipperFunctionCallReturnValue implements MethodBodyComponent {
+
+        @Default
+        private final String wrapFunctionName = "wrap";
+
+        @Default
+        private final String wrapFunctionSuffix = "";
+
+        @Default
+        private final String zipperFunctionName = "zipper";
+
+        @Default
+        private final String functionNameSuffix = "";
+
+        @Override
+        public void accept(final MethodContext context,
+                           final MethodContextVisitor visitor) {
+            visitor.visit(context, this);
+        }
+    }
+
+    @AllArgsConstructor(staticName = "of")
+    @Builder
+    @Getter
+    @With
+    @ToString
+    private static class WrapCallReturnValue implements MethodBodyComponent {
+
+        @Default
+        private final String wrapMethodName = "wrap";
+
+        @Default
+        private final String methodSuffix = "";
+
+        @Override
+        public void accept(final MethodContext context,
+                           final MethodContextVisitor visitor) {
+            visitor.visit(context, this);
+        }
+    }
+
+    @AllArgsConstructor(staticName = "of")
+    @Builder
+    @Getter
+    @With
+    @ToString
+    private static class EmptyCallReturnValue implements MethodBodyComponent {
+
+        @Default
+        private final String emptyFunctionName = "empty";
+
+        @Override
+        public void accept(final MethodContext context,
+                           final MethodContextVisitor visitor) {
+            visitor.visit(context, this);
+        }
+    }
+
+
+    private static class ZipMethodBodyContextVisitor implements MethodContextVisitor {
+
+        @Override
+        public void visit(final MethodContext context,
+                          final ContainerRef containerRef) {
+
+            final FoldMethodCall foldMethodCall = FoldMethodCall.of();
+            context.getMethodTextBuilder()
+                   .append(getNFourSpaceIndent(containerRef.getContainerIndex()))
+                   .append("return ")
+                   .append(String.join("", containerRef.getContainerName(), containerRef.getContainerSuffix()));
+            visit(context, foldMethodCall);
+            context.getMethodTextBuilder()
+                   .append(";\n");
+
+
         }
 
-        public JsonNode getTypeVariable() {
-            return getTypeVariablesForContainer().get(typeVariableIndex);
+        @Override
+        public void visit(final MethodContext context,
+                          final FoldMethodCall foldMethodCall) {
+
+            final MethodBodyComponent currentContainerRef = context.getComponentStack()
+                                                                   .pollFirst();
+            if (currentContainerRef == null) {
+                throw new IllegalStateException("current container ref expected but not present on stack");
+            }
+            final int containerIndex = Optional.of(currentContainerRef)
+                                               .filter(ContainerRef.class::isInstance)
+                                               .map(ContainerRef.class::cast)
+                                               .map(ContainerRef::getContainerIndex)
+                                               .orElse(-1);
+            context.getComponentStack()
+                   .push(currentContainerRef);
+            context.getMethodTextBuilder()
+                   .append(".fold(");
+            context.getComponentStack()
+                   .push(foldMethodCall);
+            final int totalNumberOfTypeVariables = context.getTotalNumberOfTypeVariables();
+            for (int i = 0; i < totalNumberOfTypeVariables; i++) {
+                final int typeVariableIndex = i;
+                final String typeVariable = getTypeVariableForContainerAndTypeVariableIndex(context.getContainerParams(),
+                                                                                            containerIndex,
+                                                                                            typeVariableIndex);
+                final boolean isUnhappyPath = Optional.of(context.getContainerParams())
+                                                      .map(Iterable::spliterator)
+                                                      .map(spl -> StreamSupport.stream(spl, false))
+                                                      .orElseGet(Stream::empty)
+                                                      .map(jn -> jn.path("type_variables"))
+                                                      .filter(jn -> !jn.isMissingNode())
+                                                      .map(jn -> jn.path(typeVariableIndex))
+                                                      .filter(jn -> !jn.isMissingNode())
+                                                      .map(JsonNode::asText)
+                                                      .distinct()
+                                                      .count() == 1;
+                final FunctionParameterValue functionParameterValue = FunctionParameterValue.builder()
+                                                                                            .inputParameterSuffix(
+                                                                                                isUnhappyPath ? String.join("",
+                                                                                                                            typeVariable,
+                                                                                                                            String.valueOf(
+                                                                                                                                containerIndex
+                                                                                                                                + 1))
+                                                                                                    : typeVariable)
+                                                                                            .containerIndex(containerIndex)
+                                                                                            .typeVariableIndex(typeVariableIndex)
+                                                                                            .isUnhappyPath(isUnhappyPath)
+                                                                                            .build();
+                visit(context, functionParameterValue);
+                if (i < totalNumberOfTypeVariables - 1) {
+                    context.getMethodTextBuilder()
+                           .append(",\n");
+                }
+                if (totalNumberOfTypeVariables == 1) {
+                    visit(context,
+                          EmptyCallReturnValue.builder()
+                                              .build());
+                }
+            }
+            context.getMethodTextBuilder()
+                   .append(")");
+            if (context.getComponentStack()
+                       .peekFirst() instanceof FoldMethodCall) {
+                context.getComponentStack()
+                       .pop();
+            }
+
         }
 
-        public ArrayNode getTypeVariablesForContainer() {
-            return Optional.of(getContainerParam().get("type_variables"))
-                           .filter(ArrayNode.class::isInstance)
-                           .map(ArrayNode.class::cast)
-                           .orElseThrow(() -> new IllegalArgumentException("type_variables json_node is not an array_node"));
+        @Override
+        public void visit(final MethodContext context,
+                          final FunctionParameterValue functionParameterValue) {
+            context.getComponentStack()
+                   .push(functionParameterValue);
+            if (functionParameterValue.getTypeVariableIndex() != 0) {
+                context.getMethodTextBuilder()
+                       .append(getNFourSpaceIndent(functionParameterValue.getContainerIndex()));
+            }
+            context.getMethodTextBuilder()
+                   .append("(")
+                   .append(getTypeVariableForContainerAndTypeVariableIndex(context.getContainerParams(),
+                                                                           functionParameterValue.getContainerIndex(),
+                                                                           functionParameterValue.getTypeVariableIndex()))
+                   .append(" ")
+                   .append(functionParameterValue.getInputParameterName())
+                   .append(functionParameterValue.getInputParameterSuffix())
+                   .append(") -> {\n");
+            final FunctionBody functionBody = FunctionBody.of();
+            visit(context, functionBody);
+            context.getMethodTextBuilder()
+                   .append(getNFourSpaceIndent(functionParameterValue.getContainerIndex()))
+                   .append("}");
+            if (context.getComponentStack()
+                       .peekFirst() instanceof FunctionParameterValue) {
+                context.getComponentStack()
+                       .pop();
+            }
+
         }
 
-        public String getTypeVariableText() {
-            return getTypeVariable().asText();
+        @Override
+        public void visit(final MethodContext context,
+                          final FunctionBody functionBody) {
+
+            context.getComponentStack()
+                   .push(functionBody);
+            final Optional<FunctionParameterValue> functionParameterValueForBody = Optional.ofNullable(context.getComponentStack())
+                                                                                           .map(Deque::stream)
+                                                                                           .orElseGet(Stream::empty)
+                                                                                           .filter(FunctionParameterValue.class::isInstance)
+                                                                                           .map(FunctionParameterValue.class::cast)
+                                                                                           .findFirst();
+
+            if (functionParameterValueForBody.filter(FunctionParameterValue::isUnhappyPath)
+                                             .isPresent()
+                && functionParameterValueForBody.map(FunctionParameterValue::getTypeVariableIndex)
+                                                .orElse(-1) >= 0) {
+                final int typeVariableIndex = functionParameterValueForBody.map(FunctionParameterValue::getTypeVariableIndex)
+                                                                           .orElse(-1);
+                visit(context,
+                      WrapCallReturnValue.builder()
+                                         .methodSuffix(String.valueOf(typeVariableIndex + 1))
+                                         .build());
+            } else {
+                final long numOfContainersTraversed = Optional.ofNullable(context.getComponentStack())
+                                                              .map(Deque::stream)
+                                                              .orElseGet(Stream::empty)
+                                                              .filter(ContainerRef.class::isInstance)
+                                                              .count();
+                if (numOfContainersTraversed <= context.getTotalNumberOfContainers() - 1) {
+                    final Optional<ContainerRef> parentContainerRefOpt = Optional.ofNullable(context.getComponentStack())
+                                                                                 .map(Deque::stream)
+                                                                                 .orElseGet(Stream::empty)
+                                                                                 .filter(ContainerRef.class::isInstance)
+                                                                                 .map(ContainerRef.class::cast)
+                                                                                 .findFirst();
+                    final int nextContainerIndex = parentContainerRefOpt.map(ContainerRef::getContainerIndex)
+                                                                        .map(i -> i + 1)
+                                                                        .filter(i -> i < context.getTotalNumberOfContainers())
+                                                                        .orElse(-1);
+                    if (nextContainerIndex >= 0) {
+                        final ContainerRef containerRef = ContainerRef.builder()
+                                                                      .containerIndex(nextContainerIndex)
+                                                                      .containerSuffix(String.valueOf(nextContainerIndex + 1))
+                                                                      .build();
+                        context.getComponentStack()
+                               .push(containerRef);
+                        visit(context, containerRef);
+                        if (context.getComponentStack()
+                                   .peekFirst() instanceof ContainerRef) {
+                            context.getComponentStack()
+                                   .pop();
+                        }
+                    }
+                } else {
+                    final int closestFuncParamValTypeVariableIndex = Optional.of(context.getComponentStack())
+                                                                             .map(Deque::stream)
+                                                                             .orElseGet(Stream::empty)
+                                                                             .filter(FunctionParameterValue.class::isInstance)
+                                                                             .map(FunctionParameterValue.class::cast)
+                                                                             .findFirst()
+                                                                             .map(FunctionParameterValue::getTypeVariableIndex)
+                                                                             .orElse(-1);
+                    final ZipperFunctionCallReturnValue zipperFunctionCallReturnValue = ZipperFunctionCallReturnValue.builder()
+                                                                                                                     .wrapFunctionSuffix(
+                                                                                                                         String.valueOf(
+                                                                                                                             closestFuncParamValTypeVariableIndex
+                                                                                                                             + 1))
+                                                                                                                     .build();
+                    visit(context, zipperFunctionCallReturnValue);
+                }
+            }
+            if (context.getComponentStack()
+                       .peekFirst() instanceof FunctionBody) {
+                context.getComponentStack()
+                       .pop();
+            }
+
         }
 
-        public String getIndent() {
-            return getNFourSpaceIndent(containerIndex);
+        @Override
+        public void visit(final MethodContext context,
+                          final ZipperFunctionCallReturnValue zipperFunctionCallReturnValue) {
+            final String stringListOfInputParams = context.getComponentStack()
+                                                          .stream()
+                                                          .filter(FunctionParameterValue.class::isInstance)
+                                                          .map(FunctionParameterValue.class::cast)
+                                                          .map(fpv -> String.join("",
+                                                                                  fpv.getInputParameterName(),
+                                                                                  fpv.getInputParameterSuffix()))
+                                                          .reduce(new LinkedList<String>(), (strList, str) -> {
+                                                              strList.push(str);
+                                                              return strList;
+                                                          }, (l1, l2) -> {
+                                                              l1.addAll(l2);
+                                                              return l1;
+                                                          })
+                                                          .stream()
+                                                          .collect(Collectors.joining(", "));
+            final int totalNumberOfContainers = context.getTotalNumberOfContainers();
+            context.getMethodTextBuilder()
+                   .append(getNFourSpaceIndent(totalNumberOfContainers))
+                   .append("return this.")
+                   .append(new StringJoiner("", "<", ">").add(context.getReturnTypeVariables()
+                                                                     .stream()
+                                                                     .collect(Collectors.joining(", ")))
+                                                         .toString())
+                   .append(zipperFunctionCallReturnValue.getWrapFunctionName())
+                   .append(zipperFunctionCallReturnValue.getWrapFunctionSuffix())
+                   .append("(")
+                   .append(zipperFunctionCallReturnValue.getZipperFunctionName())
+                   .append(".apply(")
+                   .append(stringListOfInputParams)
+                   .append("));\n");
         }
 
+        @Override
+        public void visit(final MethodContext context,
+                          final EmptyCallReturnValue emptyCallReturnValue) {
+
+            final int closestContainerIndex = context.getComponentStack()
+                                                     .stream()
+                                                     .filter(ContainerRef.class::isInstance)
+                                                     .map(ContainerRef.class::cast)
+                                                     .map(ContainerRef::getContainerIndex)
+                                                     .findFirst()
+                                                     .orElse(-1);
+            context.getMethodTextBuilder()
+                   .append(",\n")
+                   .append(getNFourSpaceIndent(closestContainerIndex))
+                   .append("() -> {\n")
+                   .append(getNFourSpaceIndent(closestContainerIndex + 1))
+                   .append("return this.empty();\n")
+                   .append(getNFourSpaceIndent(closestContainerIndex))
+                   .append("}");
+        }
+
+        @Override
+        public void visit(final MethodContext context,
+                          final WrapCallReturnValue wrapCallReturnValue) {
+            final int closestContainerIndex = context.getComponentStack()
+                                                     .stream()
+                                                     .filter(ContainerRef.class::isInstance)
+                                                     .map(ContainerRef.class::cast)
+                                                     .map(ContainerRef::getContainerIndex)
+                                                     .findFirst()
+                                                     .orElse(-1);
+            final Optional<FunctionParameterValue> closestFunctionalParameterVal = Optional.ofNullable(context.getComponentStack())
+                                                                                           .map(Deque::stream)
+                                                                                           .orElseGet(Stream::empty)
+                                                                                           .filter(FunctionParameterValue.class::isInstance)
+                                                                                           .map(FunctionParameterValue.class::cast)
+                                                                                           .findFirst();
+            closestFunctionalParameterVal.ifPresent(fvp -> {
+                context.getMethodTextBuilder()
+                       .append(getNFourSpaceIndent(closestContainerIndex + 1))
+                       .append("return this.")
+                       .append(new StringJoiner("", "<", ">").add(context.getReturnTypeVariables()
+                                                                         .stream()
+                                                                         .collect(Collectors.joining(", ")))
+                                                             .toString())
+                       .append(wrapCallReturnValue.getWrapMethodName())
+                       .append(wrapCallReturnValue.getMethodSuffix())
+                       .append("(")
+                       .append(fvp.getInputParameterName())
+                       .append(fvp.getInputParameterSuffix())
+                       .append(");\n");
+            });
+        }
+    }
+
+    private static String getTypeVariableForContainerAndTypeVariableIndex(final ArrayNode containerParams,
+                                                                          final int containerIndex,
+                                                                          final int typeVariableIndex) {
+        return Optional.ofNullable(containerParams)
+                       .map(jn -> jn.get(containerIndex))
+                       .map(jn -> jn.get("type_variables"))
+                       .filter(ArrayNode.class::isInstance)
+                       .map(ArrayNode.class::cast)
+                       .map(an -> an.get(typeVariableIndex))
+                       .map(jn -> jn.asText(""))
+                       .orElseThrow(() -> new IllegalArgumentException("type_variables json_node is not an array_node"));
     }
 
     private static String getNFourSpaceIndent(final int numberOfIndents) {
