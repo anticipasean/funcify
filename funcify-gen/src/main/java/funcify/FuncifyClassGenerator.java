@@ -12,6 +12,7 @@ import funcify.ensemble.trait.mappable.MappableConjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.mappable.MappableDisjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.wrappable.WrappableConjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.wrappable.WrappableDisjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.zippable.ZippableConjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.zippable.ZippableDisjunctFactoryTypeTemplate;
 import funcify.file.JavaSourceFile;
 import funcify.session.TypeGenerationSession;
@@ -48,7 +49,7 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
 
     @Option(names = {"-l", "--limit"},
             description = "limit for number of value parameters to consider in funcify ensembles and subtypes generated",
-            defaultValue = "18")
+            defaultValue = "20")
     private int valueParameterLimit;
 
     public static void main(String[] args) {
@@ -67,7 +68,8 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
                            FlattenableConjunctFactoryTypeTemplate.of(),
                            FlattenableDisjunctFactoryTypeTemplate.of(),
                            FunctionTypeTemplate.of(),
-                           ZippableDisjunctFactoryTypeTemplate.of());
+                           ZippableDisjunctFactoryTypeTemplate.of(),
+                           ZippableConjunctFactoryTypeTemplate.of());
     }
 
     private static <V, R> TypeGenerationSession<V, R> applyEachTemplateToSession(final TypeGenerationSession<V, R> session) {

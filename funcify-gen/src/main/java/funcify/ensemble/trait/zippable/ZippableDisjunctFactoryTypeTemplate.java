@@ -71,7 +71,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                             .put("types", "ZippableDisjunctEnsembleFactory[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctMappableEnsembleFactoryTypeResults();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = SyncMap.empty();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
                 final String className = getTraitNameForEnsembleKind(ek) + "Factory";
                 final SyncMap<String, Object> params = SyncMap.of("package",

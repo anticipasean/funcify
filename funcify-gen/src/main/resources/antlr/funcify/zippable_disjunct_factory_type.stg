@@ -72,23 +72,3 @@ final <ensemble_type_declaration(container_type.type_name, witness_type, type_va
 disjunct_zip_method_function_parameter(type_variables) ::= <<
 final Fn<length(trunc(type_variables))>\<<trunc(type_variables):{tv|? super <tv.(i0)>};separator=", ">, ? extends <last(type_variables).("0")>\> zipper
 >>
-
-disjunct_unwrap(container_params, full_container_params=[]) ::= <<
-<if(container_params && full_container_params)><\\>
-return this.unwrap(container<first(container_params).index>, <first(container_params).type_variables:{ tv | <disjunct_unwrap_inner(container_params, i0, full_container_params)>};anchor,separator=",\n">);
-<elseif(container_params)><\\>
-return this.unwrap(container<first(container_params).index>, <first(container_params).type_variables:{ tv | <disjunct_unwrap_inner(container_params, i0, container_params)>};anchor,separator=",\n">);
-<endif>
->>
-
-disjunct_unwrap_inner(remaining_container_params, index, full_container_params=[]) ::= <<
-<if(remaining_container_params)>
-(<first(remaining_container_params).type_variables.(index)> input<first(remaining_container_params).type_variables.(index)>) -> {
-<if(rest(remaining_container_params))><\\>
-    <disjunct_unwrap(rest(remaining_container_params), full_container_params)>
-<else>
-    return zipper.apply(<full_container_params:{cp|input<cp.type_variables.(index)>};separator=", ">);
-<endif><\\>
-}
-<endif>
->>

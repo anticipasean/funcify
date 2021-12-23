@@ -17,7 +17,7 @@ public interface <ensemble_type_declaration(class_name, witness_type, type_varia
 
 disjunct_fold_method(next_type_variable, type_variables=[]) ::=  <<
     \<<next_type_variable>\> <next_type_variable> fold(<\\>
-<if(!rest(type_variables))><[disjunct_fold_method_parameter(first(type_variables), next_type_variable, i),disjunct_solo_empty_case_parameter(next_type_variable)];anchor,separator=",\n">);
+<if(!rest(type_variables))><[disjunct_fold_method_parameter(first(type_variables), next_type_variable, ""),disjunct_solo_empty_case_parameter(next_type_variable)];anchor,separator=",\n">);
 <else><\\>
 <type_variables:{tv | <disjunct_fold_method_parameter(tv, next_type_variable, i)>};anchor,separator=",\n">);
 <endif>
