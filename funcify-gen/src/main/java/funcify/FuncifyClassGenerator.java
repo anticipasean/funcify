@@ -10,6 +10,7 @@ import funcify.ensemble.trait.flattenable.FlattenableConjunctFactoryTypeTemplate
 import funcify.ensemble.trait.flattenable.FlattenableDisjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.mappable.MappableConjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.mappable.MappableDisjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.traversable.TraversableConjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.wrappable.WrappableConjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.wrappable.WrappableDisjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.zippable.ZippableConjunctFactoryTypeTemplate;
@@ -21,13 +22,14 @@ import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.StringTemplateWriterFactory;
-import java.io.File;
-import java.nio.file.Path;
-import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.concurrent.Callable;
 
 /**
  * @author smccarron
@@ -37,19 +39,16 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
 
     private static final Logger logger = LoggerFactory.getLogger(FuncifyClassGenerator.class);
 
-    @Option(names = {"-d", "--destination-dir"},
-            description = "directory where the generated funcify packages and classes should be placed",
-            defaultValue = ".",
-            converter = PathConverter.class)
+    @Option(names = {"-d",
+                     "--destination-dir"}, description = "directory where the generated funcify packages and classes should be placed", defaultValue = ".", converter = PathConverter.class)
     private Path destinationDirectory;
 
-    @Option(names = {"-p", "--print-to-console"},
-            description = "print classes to console instead of generating java source files for classes")
+    @Option(names = {"-p",
+                     "--print-to-console"}, description = "print classes to console instead of generating java source files for classes")
     private boolean printToConsole;
 
-    @Option(names = {"-l", "--limit"},
-            description = "limit for number of value parameters to consider in funcify ensembles and subtypes generated",
-            defaultValue = "20")
+    @Option(names = {"-l",
+                     "--limit"}, description = "limit for number of value parameters to consider in funcify ensembles and subtypes generated", defaultValue = "20")
     private int valueParameterLimit;
 
     public static void main(String[] args) {
@@ -69,14 +68,14 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
                            FlattenableDisjunctFactoryTypeTemplate.of(),
                            FunctionTypeTemplate.of(),
                            ZippableDisjunctFactoryTypeTemplate.of(),
-                           ZippableConjunctFactoryTypeTemplate.of());
+                           ZippableConjunctFactoryTypeTemplate.of(),
+                           TraversableConjunctFactoryTypeTemplate.of());
     }
 
     private static <V, R> TypeGenerationSession<V, R> applyEachTemplateToSession(final TypeGenerationSession<V, R> session) {
-        return FuncifyClassGenerator.<V, R>typeGenerationTemplateSequence()
-                                    .foldLeft(session, (s, template) -> {
-                                        return template.createTypesForSession(s);
-                                    });
+        return FuncifyClassGenerator.<V, R>typeGenerationTemplateSequence().foldLeft(session, (s, template) -> {
+            return template.createTypesForSession(s);
+        });
     }
 
     @Override
@@ -103,9 +102,9 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
         return TypeGenerationSession.<V, R>builder()
                                     .destinationDirectoryPath(destinationDirectory)
                                     .ensembleKinds(SyncList.of(EnsembleKind.values())
-                                                           .filter(ek -> (valueParameterLimit >= 1
-                                                                          && ek.getNumberOfValueParameters()
-                                                                             <= valueParameterLimit) || valueParameterLimit <= 0))
+                                                           .filter(ek -> (valueParameterLimit >= 1 &&
+                                                                          ek.getNumberOfValueParameters() <=
+                                                                          valueParameterLimit) || valueParameterLimit <= 0))
                                     .templateWriter(templateWriter)
                                     .build();
     }

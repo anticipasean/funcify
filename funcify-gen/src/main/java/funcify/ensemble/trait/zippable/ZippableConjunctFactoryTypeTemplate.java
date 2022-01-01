@@ -79,7 +79,6 @@ public class ZippableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                                    getContainerTypeJsonInstanceFor(ek, Trait.CONJUNCT))
                                                               .put("zip_impl_sequences",
                                                                    createZipImplementationSequences(ek.getNumberOfValueParameters()));
-                logger.info("params: {}", params.mkString(o -> Objects.toString(o)));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(

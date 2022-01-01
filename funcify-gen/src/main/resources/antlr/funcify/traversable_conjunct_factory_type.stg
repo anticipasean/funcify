@@ -1,0 +1,97 @@
+import "wrappable_conjunct_factory_type.stg"
+
+
+traversable_conjunct_factory_type(class_name,
+                                  implemented_type,
+                                  container_type,
+                                  package=[],
+                                  witness_type="WT",
+                                  type_variables=[],
+                                  ensemble_type_package=[]) ::= <<
+package <package; separator=".">;
+
+<ensemble_type_import(implemented_type.type_name, implemented_type.type_package)>
+<ensemble_type_import(container_type.type_name, container_type.type_package)>
+<null_check_import()>
+<java_util_func_import()>
+import java.util.Collections;
+import java.util.List;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.stream.Stream;
+<["2","3","4"]:{fi|import funcify.function.Fn<fi>};separator=";\n">;
+
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
+
+<type_variables:{tv | <conjunct_to_list_method(container_type=container_type,
+                                               witness_type=witness_type,
+                                               current_type_variable=tv,
+                                               type_variables=type_variables,
+                                               suffix=i)>};separator="\n\n">
+
+
+<type_variables:{tv | <conjunct_iterator_method(container_type=container_type,
+                                                witness_type=witness_type,
+                                                current_type_variable=tv,
+                                                type_variables=type_variables,
+                                                suffix=i)>};separator="\n\n">
+
+
+<type_variables:{tv | <conjunct_spliterator_method(container_type=container_type,
+                                                   witness_type=witness_type,
+                                                   current_type_variable=tv,
+                                                   type_variables=type_variables,
+                                                   suffix=i)>};separator="\n\n">
+
+
+<type_variables:{tv | <conjunct_stream_method(container_type=container_type,
+                                              witness_type=witness_type,
+                                              current_type_variable=tv,
+                                              type_variables=type_variables,
+                                              suffix=i)>};separator="\n\n">
+
+
+}
+>>
+
+conjunct_to_list_method(container_type,
+                        witness_type="WT",
+                        current_type_variable="",
+                        suffix="",
+                        type_variables=[]) ::= <<
+    default List\<<current_type_variable>\> toList<suffix>(final <container_type.type_name>\<<witness_type>, <type_variables:{tv | <tv>};separator=", ">\> container) {
+        return container.fold((<type_variables:{tv|<tv> input<tv>};anchor,separator=",\n">) -> {
+            return Collections.singletonList(input<current_type_variable>);
+        });
+    }
+>>
+
+conjunct_iterator_method(container_type,
+                         witness_type="WT",
+                         current_type_variable="",
+                         suffix="",
+                         type_variables=[]) ::= <<
+    default Iterator\<<current_type_variable>\> iterator<suffix>(final <container_type.type_name>\<<witness_type>, <type_variables:{tv | <tv>};separator=", ">\> container) {
+        return toList<suffix>(container).iterator();
+    }
+>>
+
+conjunct_spliterator_method(container_type,
+                            witness_type="WT",
+                            current_type_variable="",
+                            suffix="",
+                            type_variables=[]) ::= <<
+    default Spliterator\<<current_type_variable>\> spliterator<suffix>(final <container_type.type_name>\<<witness_type>, <type_variables:{tv | <tv>};separator=", ">\> container) {
+        return toList<suffix>(container).spliterator();
+    }
+>>
+
+conjunct_stream_method(container_type,
+                       witness_type="WT",
+                       current_type_variable="",
+                       suffix="",
+                       type_variables=[]) ::= <<
+    default Stream\<<current_type_variable>\> stream<suffix>(final <container_type.type_name>\<<witness_type>, <type_variables:{tv | <tv>};separator=", ">\> container) {
+        return toList<suffix>(container).stream();
+    }
+>>

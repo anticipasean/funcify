@@ -1,10 +1,13 @@
 package funcify.tool.container;
 
 
-import static java.util.Objects.requireNonNull;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,10 +29,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author smccarron
@@ -41,45 +42,37 @@ public interface SyncList<E> extends Iterable<E> {
     @SafeVarargs
     @SuppressWarnings("varargs")
     static <E> SyncList<E> of(final E... e) {
-        return SyncListFactory.of()
-                              .ofConcurrent(e);
+        return SyncListFactory.of().ofConcurrent(e);
     }
 
     @SafeVarargs
     @SuppressWarnings("varargs")
     static <E> SyncList<E> ofNonConcurrent(final E... e) {
-        return SyncListFactory.of()
-                              .ofNonConcurrent(e);
+        return SyncListFactory.of().ofNonConcurrent(e);
     }
 
     static <E> SyncList<E> fromIterable(final Iterable<? extends E> iterable) {
-        return SyncListFactory.of()
-                              .concurrentFromIterable(iterable);
+        return SyncListFactory.of().concurrentFromIterable(iterable);
     }
 
     static <E> SyncList<E> nonConcurrentFromIterable(final Iterable<? extends E> iterable) {
-        return SyncListFactory.of()
-                              .nonConcurrentFromIterable(iterable);
+        return SyncListFactory.of().nonConcurrentFromIterable(iterable);
     }
 
     static <E> SyncList<E> fromStream(final Stream<? extends E> stream) {
-        return SyncListFactory.of()
-                              .concurrentFromStream(stream);
+        return SyncListFactory.of().concurrentFromStream(stream);
     }
 
     static <E> SyncList<E> nonConcurrentFromStream(final Stream<? extends E> stream) {
-        return SyncListFactory.of()
-                              .nonConcurrentFromStream(stream);
+        return SyncListFactory.of().nonConcurrentFromStream(stream);
     }
 
     static <E> SyncList<E> empty() {
-        return SyncListFactory.of()
-                              .emptyConcurrent();
+        return SyncListFactory.of().emptyConcurrent();
     }
 
     static <E> SyncList<E> emptyNonConcurrent() {
-        return SyncListFactory.of()
-                              .emptyNonConcurrent();
+        return SyncListFactory.of().emptyNonConcurrent();
     }
 
     default SyncListFactory factory() {
@@ -87,54 +80,42 @@ public interface SyncList<E> extends Iterable<E> {
     }
 
     default SyncList<E> prepend(E e) {
-        return factory().prepend(this,
-                                 e);
+        return factory().prepend(this, e);
     }
 
     default SyncList<E> prependAll(final Iterable<? extends E> list) {
-        return factory().prependAll(this,
-                                    list);
+        return factory().prependAll(this, list);
     }
 
     default SyncList<E> append(final E e) {
-        return factory().append(this,
-                                e);
+        return factory().append(this, e);
     }
 
     default SyncList<E> appendAll(final Iterable<? extends E> list) {
-        return factory().appendAll(this,
-                                   list);
+        return factory().appendAll(this, list);
     }
 
     default SyncList<E> updateAt(final int index,
                                  final E e) {
-        return factory().updateAt(this,
-                                  index,
-                                  e);
+        return factory().updateAt(this, index, e);
     }
 
     default SyncList<E> insertAt(final int index,
                                  final E e) {
-        return factory().insertAt(this,
-                                  index,
-                                  e);
+        return factory().insertAt(this, index, e);
     }
 
     default SyncList<E> insertAt(int index,
                                  final Iterable<? extends E> list) {
-        return factory().insertAt(this,
-                                  index,
-                                  list);
+        return factory().insertAt(this, index, list);
     }
 
     default SyncList<E> removeValue(final E e) {
-        return factory().removeValue(this,
-                                     e);
+        return factory().removeValue(this, e);
     }
 
     default SyncList<E> removeAt(final int i) {
-        return factory().removeAt(this,
-                                  i);
+        return factory().removeAt(this, i);
     }
 
     default int size() {
@@ -146,8 +127,7 @@ public interface SyncList<E> extends Iterable<E> {
     }
 
     default Optional<E> get(final int index) {
-        return factory().get(this,
-                             index);
+        return factory().get(this, index);
     }
 
     default E getOrElse(final int index,
@@ -157,23 +137,19 @@ public interface SyncList<E> extends Iterable<E> {
 
     default E getOrElseGet(final int index,
                            final Supplier<? extends E> alt) {
-        return get(index).orElseGet(requireNonNull(alt,
-                                                   () -> "alt"));
+        return get(index).orElseGet(requireNonNull(alt, () -> "alt"));
     }
 
     default <R> SyncList<R> map(final Function<? super E, ? extends R> mapper) {
-        return factory().map(this,
-                             mapper);
+        return factory().map(this, mapper);
     }
 
     default <R> SyncList<R> flatMap(final Function<? super E, ? extends SyncList<R>> flatMapper) {
-        return factory().flatMap(this,
-                                 flatMapper);
+        return factory().flatMap(this, flatMapper);
     }
 
     default SyncList<E> filter(final Predicate<? super E> condition) {
-        return factory().filter(this,
-                                condition);
+        return factory().filter(this, condition);
     }
 
     @Override
@@ -195,9 +171,7 @@ public interface SyncList<E> extends Iterable<E> {
     }
 
     default Optional<E> firstMatch(final Predicate<? super E> condition) {
-        return stream().filter(requireNonNull(condition,
-                                              () -> "condition"))
-                       .findFirst();
+        return stream().filter(requireNonNull(condition, () -> "condition")).findFirst();
     }
 
     default Optional<E> last() {
@@ -206,35 +180,29 @@ public interface SyncList<E> extends Iterable<E> {
 
     default <T> T foldLeft(final T initialValue,
                            final BiFunction<T, ? super E, T> foldFunction) {
-        return factory().foldLeft(this,
-                                  initialValue,
-                                  foldFunction);
+        return factory().foldLeft(this, initialValue, foldFunction);
     }
 
     default String join(final String delimiter) {
-        return factory().join(this,
-                              delimiter,
-                              "",
-                              "");
+        return factory().join(this, delimiter, "", "");
     }
 
     default String join(final String delimiter,
                         final String prefix,
                         final String suffix) {
-        return factory().join(this,
-                              delimiter,
-                              prefix,
-                              suffix);
+        return factory().join(this, delimiter, prefix, suffix);
     }
 
     default SyncList<E> sorted(final Comparator<? super E> comparator) {
-        return factory().sorted(this,
-                                comparator);
+        return factory().sorted(this, comparator);
+    }
+
+    default SyncList<E> copy() {
+        return factory().copy(this);
     }
 
 
-    @AllArgsConstructor(staticName = "of",
-                        access = AccessLevel.PACKAGE)
+    @AllArgsConstructor(staticName = "of", access = AccessLevel.PACKAGE)
     class SyncListFactory {
 
         private static <E> DefaultSyncList<E> narrow(final SyncList<E> syncList) {
@@ -247,8 +215,8 @@ public interface SyncList<E> extends Iterable<E> {
                                }
                            })
                            .orElseThrow(() -> new IllegalArgumentException(
-                               SyncList.class.getSimpleName() + " is not an instance of "
-                                   + DefaultSyncList.class.getSimpleName()));
+                                   SyncList.class.getSimpleName() + " is not an instance of " +
+                                   DefaultSyncList.class.getSimpleName()));
         }
 
         @SuppressWarnings("unchecked")
@@ -270,77 +238,59 @@ public interface SyncList<E> extends Iterable<E> {
 
         public <E> SyncList<E> concurrentFromIterable(final Iterable<? extends E> iterable) {
             if (iterable instanceof DefaultSyncList) {
-                @SuppressWarnings("unchecked")
-                final List<? extends E> baseList = ((DefaultSyncList<? extends E>) iterable).baseList;
+                @SuppressWarnings("unchecked") final List<? extends E> baseList = ((DefaultSyncList<? extends E>) iterable).baseList;
                 if (baseList instanceof CopyOnWriteArrayList) {
-                    @SuppressWarnings("unchecked")
-                    final SyncList<E> syncList = (SyncList<E>) iterable;
+                    @SuppressWarnings("unchecked") final SyncList<E> syncList = (SyncList<E>) iterable;
                     return syncList;
                 } else {
                     return DefaultSyncList.of(new CopyOnWriteArrayList<>(baseList));
                 }
             } else if (iterable instanceof CopyOnWriteArrayList) {
-                @SuppressWarnings("unchecked")
-                final List<E> baseList = (List<E>) iterable;
+                @SuppressWarnings("unchecked") final List<E> baseList = (List<E>) iterable;
                 return DefaultSyncList.of(baseList);
             } else if (iterable instanceof Collection) {
-                @SuppressWarnings("unchecked")
-                final List<E> baseList = new CopyOnWriteArrayList<>(((Collection<? extends E>) iterable));
+                @SuppressWarnings("unchecked") final List<E> baseList = new CopyOnWriteArrayList<>(((Collection<? extends E>) iterable));
                 return DefaultSyncList.of(baseList);
             } else {
-                @SuppressWarnings("unchecked")
-                final List<E> baseList = (List<E>) new CopyOnWriteArrayList<>(StreamSupport.stream(requireNonNull(iterable,
-                                                                                                                  () -> "iterable").spliterator(),
-                                                                                                   false)
-                                                                                           .toArray());
+                @SuppressWarnings("unchecked") final List<E> baseList = (List<E>) new CopyOnWriteArrayList<>(StreamSupport.stream(
+                        requireNonNull(iterable, () -> "iterable").spliterator(),
+                        false).toArray());
                 return DefaultSyncList.of(baseList);
             }
         }
 
         public <E> SyncList<E> nonConcurrentFromIterable(final Iterable<? extends E> iterable) {
-            requireNonNull(iterable,
-                           () -> "iterable");
+            requireNonNull(iterable, () -> "iterable");
             if (iterable instanceof DefaultSyncList) {
-                @SuppressWarnings("unchecked")
-                final List<? extends E> baseList = ((DefaultSyncList<? extends E>) iterable).baseList;
+                @SuppressWarnings("unchecked") final List<? extends E> baseList = ((DefaultSyncList<? extends E>) iterable).baseList;
                 if (baseList instanceof CopyOnWriteArrayList) {
                     return DefaultSyncList.of(new ArrayList<>(baseList));
                 } else {
-                    @SuppressWarnings("unchecked")
-                    final SyncList<E> syncList = (SyncList<E>) iterable;
+                    @SuppressWarnings("unchecked") final SyncList<E> syncList = (SyncList<E>) iterable;
                     return syncList;
                 }
             } else if (iterable instanceof List && !(iterable instanceof CopyOnWriteArrayList)) {
-                @SuppressWarnings("unchecked")
-                final List<E> baseList = (List<E>) iterable;
+                @SuppressWarnings("unchecked") final List<E> baseList = (List<E>) iterable;
                 return DefaultSyncList.of(baseList);
             } else if (iterable instanceof Collection && !(iterable instanceof CopyOnWriteArrayList)) {
-                @SuppressWarnings("unchecked")
-                final List<E> baseList = new ArrayList<>((Collection<? extends E>) iterable);
+                @SuppressWarnings("unchecked") final List<E> baseList = new ArrayList<>((Collection<? extends E>) iterable);
                 return DefaultSyncList.of(baseList);
             } else if (iterable instanceof CopyOnWriteArrayList) {
-                @SuppressWarnings("unchecked")
-                final List<E> baseList = new ArrayList<>(((CopyOnWriteArrayList<? extends E>) iterable));
+                @SuppressWarnings("unchecked") final List<E> baseList = new ArrayList<>(((CopyOnWriteArrayList<? extends E>) iterable));
                 return DefaultSyncList.of(baseList);
             } else {
-                final List<E> baseList = StreamSupport.stream(iterable.spliterator(),
-                                                              false)
-                                                      .collect(Collectors.toList());
+                final List<E> baseList = StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
                 return DefaultSyncList.of(baseList);
             }
         }
 
         public <E> SyncList<E> concurrentFromStream(final Stream<? extends E> stream) {
-            @SuppressWarnings("unchecked")
-            final E[] elements = (E[]) requireNonNull(stream,
-                                                      () -> "stream").toArray();
+            @SuppressWarnings("unchecked") final E[] elements = (E[]) requireNonNull(stream, () -> "stream").toArray();
             return ofConcurrent(elements);
         }
 
         public <E> SyncList<E> nonConcurrentFromStream(final Stream<? extends E> stream) {
-            @SuppressWarnings("unchecked")
-            final E[] elements = (E[]) requireNonNull(stream,
-                                                      () -> "stream").toArray();
+            @SuppressWarnings("unchecked") final E[] elements = (E[]) requireNonNull(stream, () -> "stream").toArray();
             return ofNonConcurrent(elements);
         }
 
@@ -352,36 +302,36 @@ public interface SyncList<E> extends Iterable<E> {
             return DefaultSyncList.of(new CopyOnWriteArrayList<>());
         }
 
+        public <E> SyncList<E> copy(final SyncList<E> syncList) {
+            if (syncList instanceof DefaultSyncList<?>) {
+                if (((DefaultSyncList<E>) syncList).baseList instanceof CopyOnWriteArrayList<?>) {
+                    return DefaultSyncList.of(new CopyOnWriteArrayList<>(((DefaultSyncList<E>) syncList).baseList));
+                } else {
+                    return DefaultSyncList.of(new ArrayList<>(((DefaultSyncList<E>) syncList).baseList));
+                }
+            } else {
+                return concurrentFromStream(syncList == null ? Stream.empty() : syncList.stream());
+            }
+        }
+
         public <E> SyncList<E> prepend(final SyncList<E> syncList,
                                        final E e) {
-            return insertAt(syncList,
-                            0,
-                            e);
+            return insertAt(syncList, 0, e);
         }
 
         public <E> SyncList<E> prependAll(final SyncList<E> syncList,
                                           final Iterable<? extends E> list) {
-            return insertAt(syncList,
-                            0,
-                            list);
+            return insertAt(syncList, 0, list);
         }
 
         public <E> SyncList<E> append(final SyncList<E> syncList,
                                       final E e) {
-            return insertAt(syncList,
-                            Optional.of(size(syncList))
-                                    .filter(i -> i > 0)
-                                    .orElse(0),
-                            e);
+            return insertAt(syncList, Optional.of(size(syncList)).filter(i -> i > 0).orElse(0), e);
         }
 
         public <E> SyncList<E> appendAll(final SyncList<E> syncList,
                                          final Iterable<? extends E> list) {
-            return insertAt(syncList,
-                            Optional.of(size(syncList))
-                                    .filter(i -> i > 0)
-                                    .orElse(0),
-                            list);
+            return insertAt(syncList, Optional.of(size(syncList)).filter(i -> i > 0).orElse(0), list);
         }
 
         public <E> SyncList<E> updateAt(final SyncList<E> syncList,
@@ -389,16 +339,13 @@ public interface SyncList<E> extends Iterable<E> {
                                         final E e) {
             return narrow(syncList).mapInternal(l -> {
                 if (i >= 0 && i <= l.size()) {
-                    final List<E> updatedList = IntStream.range(0,
-                                                                l.size())
-                                                         .mapToObj(idx -> {
-                                                             if (i == idx) {
-                                                                 return e;
-                                                             } else {
-                                                                 return l.get(idx);
-                                                             }
-                                                         })
-                                                         .collect(Collectors.toList());
+                    final List<E> updatedList = IntStream.range(0, l.size()).mapToObj(idx -> {
+                        if (i == idx) {
+                            return e;
+                        } else {
+                            return l.get(idx);
+                        }
+                    }).collect(Collectors.toList());
                     if (l instanceof CopyOnWriteArrayList) {
                         return new CopyOnWriteArrayList<>(updatedList);
                     } else {
@@ -415,8 +362,7 @@ public interface SyncList<E> extends Iterable<E> {
                                         final E e) {
             return narrow(syncList).mapInternal(l -> {
                 if (i >= 0 && i <= l.size()) {
-                    l.add(i,
-                          e);
+                    l.add(i, e);
                 }
                 return l;
             });
@@ -425,19 +371,13 @@ public interface SyncList<E> extends Iterable<E> {
         public <E> SyncList<E> insertAt(final SyncList<E> syncList,
                                         final int i,
                                         final Iterable<? extends E> iterable) {
-            requireNonNull(iterable,
-                           () -> "list");
+            requireNonNull(iterable, () -> "list");
             return narrow(syncList).mapInternal(l -> {
                 if (i >= 0 && iterable instanceof Collection<?>) {
-                    @SuppressWarnings("unchecked")
-                    final boolean result = l.addAll(i,
-                                                    (Collection<? extends E>) iterable);
+                    @SuppressWarnings("unchecked") final boolean result = l.addAll(i, (Collection<? extends E>) iterable);
                     return l;
                 } else if (i >= 0) {
-                    l.addAll(i,
-                             StreamSupport.stream(iterable.spliterator(),
-                                                  false)
-                                          .collect(Collectors.toList()));
+                    l.addAll(i, StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList()));
                     return l;
                 } else {
                     return l;
@@ -486,12 +426,9 @@ public interface SyncList<E> extends Iterable<E> {
 
         public <E, R> SyncList<R> map(final SyncList<E> syncList,
                                       final Function<? super E, ? extends R> mapper) {
-            requireNonNull(mapper,
-                           () -> "mapper");
+            requireNonNull(mapper, () -> "mapper");
             return narrow(syncList).mapInternal(l -> {
-                final List<R> updatedList = l.stream()
-                                             .map(mapper)
-                                             .collect(Collectors.toList());
+                final List<R> updatedList = l.stream().map(mapper).collect(Collectors.toList());
                 if (l instanceof CopyOnWriteArrayList) {
                     // Create standard arraylist first and create copy-on-write-array list in one call to its constructor rather than
                     // through multiple (hidden) calls to List.add within Stream.collect(Collectors.toCollection(CopyOnWriteArrayList
@@ -504,13 +441,9 @@ public interface SyncList<E> extends Iterable<E> {
 
         public <E, R> SyncList<R> flatMap(final SyncList<E> syncList,
                                           final Function<? super E, ? extends SyncList<R>> flatMapper) {
-            requireNonNull(flatMapper,
-                           () -> "flatMapper");
+            requireNonNull(flatMapper, () -> "flatMapper");
             return narrow(syncList).mapInternal(l -> {
-                final List<R> updatedList = l.stream()
-                                             .map(flatMapper)
-                                             .flatMap(SyncList::stream)
-                                             .collect(Collectors.toList());
+                final List<R> updatedList = l.stream().map(flatMapper).flatMap(SyncList::stream).collect(Collectors.toList());
                 if (l instanceof CopyOnWriteArrayList) {
                     // Create standard arraylist first and create copy-on-write-array list in one call to its constructor rather than
                     // through multiple (hidden) calls to List.add within Stream.collect(Collectors.toCollection(CopyOnWriteArrayList::new)
@@ -535,24 +468,19 @@ public interface SyncList<E> extends Iterable<E> {
         }
 
         public <E> Stream<E> stream(final SyncList<E> syncList) {
-            return StreamSupport.stream(spliterator(syncList),
-                                        false);
+            return StreamSupport.stream(spliterator(syncList), false);
         }
 
         public <E, T> T foldLeft(final SyncList<E> syncList,
                                  final T initialValue,
                                  final BiFunction<T, ? super E, T> foldFunction) {
-            return stream(syncList).reduce(initialValue,
-                                           foldFunction::apply,
-                                           (t1, t2) -> t2);
+            return stream(syncList).reduce(initialValue, foldFunction::apply, (t1, t2) -> t2);
         }
 
         public <E> SyncList<E> filter(final SyncList<E> syncList,
                                       final Predicate<? super E> condition) {
             return narrow(syncList).mapInternal(l -> {
-                final List<E> updatedList = l.stream()
-                                             .filter(condition)
-                                             .collect(Collectors.toList());
+                final List<E> updatedList = l.stream().filter(condition).collect(Collectors.toList());
                 if (l instanceof CopyOnWriteArrayList) {
                     return new CopyOnWriteArrayList<>(updatedList);
                 }
@@ -565,20 +493,16 @@ public interface SyncList<E> extends Iterable<E> {
                                final String prefix,
                                final String suffix) {
             return stream(syncList).map(Objects::toString)
-                                   .collect(Collectors.joining(requireNonNull(delimiter,
-                                                                              () -> "delimiter"),
-                                                               requireNonNull(prefix,
-                                                                              () -> "prefix"),
-                                                               requireNonNull(suffix,
-                                                                              () -> "suffix")));
+                                   .collect(Collectors.joining(requireNonNull(delimiter, () -> "delimiter"),
+                                                               requireNonNull(prefix, () -> "prefix"),
+                                                               requireNonNull(suffix, () -> "suffix")));
         }
 
         public <E> SyncList<E> sorted(final SyncList<E> syncList,
                                       final Comparator<? super E> comparator) {
             return narrow(syncList).mapInternal(l -> {
                 final List<E> sortedList = l.stream()
-                                            .sorted(requireNonNull(comparator,
-                                                                   () -> "comparator"))
+                                            .sorted(requireNonNull(comparator, () -> "comparator"))
                                             .collect(Collectors.toList());
                 if (l instanceof CopyOnWriteArrayList) {
                     return new CopyOnWriteArrayList<>(sortedList);
@@ -589,8 +513,7 @@ public interface SyncList<E> extends Iterable<E> {
     }
 
 
-    @AllArgsConstructor(staticName = "of",
-                        access = AccessLevel.PACKAGE)
+    @AllArgsConstructor(staticName = "of", access = AccessLevel.PACKAGE)
     @EqualsAndHashCode
     @ToString
     class DefaultSyncList<E> implements SyncList<E> {
@@ -599,8 +522,7 @@ public interface SyncList<E> extends Iterable<E> {
         private final List<E> baseList;
 
         <R> DefaultSyncList<R> mapInternal(final Function<? super List<E>, ? extends List<R>> mapper) {
-            return DefaultSyncList.of(requireNonNull(mapper,
-                                                     () -> "mapper").apply(baseList));
+            return DefaultSyncList.of(requireNonNull(mapper, () -> "mapper").apply(baseList));
         }
 
     }
