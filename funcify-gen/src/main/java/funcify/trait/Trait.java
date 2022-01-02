@@ -15,7 +15,6 @@ public enum Trait implements Sequential {
     MAPPABLE,
     FILTERABLE,
     TRAVERSABLE,
-    STREAMABLE,
     ZIPPABLE,
     PEEKABLE,
     FLATTENABLE,

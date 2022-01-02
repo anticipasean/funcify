@@ -34,6 +34,10 @@ public interface <function_type_declaration(arity, type_variables)> extends <ens
 
 <flat_map_method(arity, type_variables, next_type_variable, implements_supplier, implements_function)>
 
+<curry_method(type_variables)>
+
+<uncurry_method(arity,type_variables)>
+
 }
 >>
 
@@ -62,7 +66,7 @@ narrow_kind_functions(arity="0", type_variables=[], witness_type="WT", ensemble_
 >>
 
 apply_method(type_variables=[], implements_supplier=false) ::= <<
-    <last(type_variables)> apply(<reverse(rest(reverse(type_variables))):{tv | final <tv> input<i>};anchor,separator=",\n">);
+    <last(type_variables)> apply(<trunc(type_variables):{tv | final <tv> input<i>};anchor,separator=",\n">);
 
 <if(implements_supplier)>
     @Override
@@ -73,10 +77,10 @@ apply_method(type_variables=[], implements_supplier=false) ::= <<
 >>
 
 map_method(arity="0", type_variables=[], next_type_variable="") ::= <<
-    default \<<next_type_variable>\> <function_type_declaration(arity, [reverse(rest(reverse(type_variables))), next_type_variable])> map(<function_type_parameter_declaration(last(type_variables), next_type_variable)>) {
+    default \<<next_type_variable>\> <function_type_declaration(arity, [trunc(type_variables), next_type_variable])> map(<function_type_parameter_declaration(last(type_variables), next_type_variable)>) {
         <null_check("function")>;
-        return (<reverse(rest(reverse(type_variables))):{tv | <tv> input<i>};separator=", ">) -> {
-            return function.apply(this.apply(<reverse(rest(reverse(type_variables))):{tv | input<i>};anchor,separator=",\n">));
+        return (<trunc(type_variables):{tv | <tv> input<i>};separator=", ">) -> {
+            return function.apply(this.apply(<trunc(type_variables):{tv | input<i>};anchor,separator=",\n">));
         };
     }
 >>
@@ -84,17 +88,17 @@ map_method(arity="0", type_variables=[], next_type_variable="") ::= <<
 and_then_method(arity="0", type_variables=[], next_type_variable="", implements_function=false) ::= <<
     <if(implements_function)><\\>
     <else><\\>
-    default \<<next_type_variable>\> <function_type_declaration(arity, [reverse(rest(reverse(type_variables))), next_type_variable])> andThen(<function_type_parameter_declaration(last(type_variables), next_type_variable)>) {
+    default \<<next_type_variable>\> <function_type_declaration(arity, [trunc(type_variables), next_type_variable])> andThen(<function_type_parameter_declaration(last(type_variables), next_type_variable)>) {
         return map(function);
     }
     <endif>
 >>
 
 flat_map_method(arity="0", type_variables=[], next_type_variable="", implements_supplier=false, implements_function=false) ::= <<
-    default \<<next_type_variable>\> <function_type_declaration(arity, [reverse(rest(reverse(type_variables))), next_type_variable])> flatMap(<flat_map_method_parameter(arity, type_variables, next_type_variable, implements_supplier, implements_function)>) {
+    default \<<next_type_variable>\> <function_type_declaration(arity, [trunc(type_variables), next_type_variable])> flatMap(<flat_map_method_parameter(arity, type_variables, next_type_variable, implements_supplier, implements_function)>) {
         <null_check("function")>;
-        return (<reverse(rest(reverse(type_variables))):{tv | <tv> input<i>};separator=", ">) -> {
-            return function.apply(this.apply(<reverse(rest(reverse(type_variables))):{tv | input<i>};anchor,separator=",\n">)).apply(<reverse(rest(reverse(type_variables))):{tv | input<i>};anchor,separator=",\n">);
+        return (<trunc(type_variables):{tv | <tv> input<i>};separator=", ">) -> {
+            return function.apply(this.apply(<trunc(type_variables):{tv | input<i>};anchor,separator=",\n">)).apply(<trunc(type_variables):{tv | input<i>};anchor,separator=",\n">);
         };
     }
 >>
@@ -103,7 +107,56 @@ flat_map_method_parameter(arity="0", type_variables=[], next_type_variable="", i
 <if(implements_supplier)><\\>
 final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<? extends <next_type_variable>\>> function<\\>
 <else><\\>
-final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<<reverse(rest(reverse(type_variables))):{tv | ? super <tv>};separator=", ">, ? extends <next_type_variable>\>> function<\\>
+final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<<trunc(type_variables):{tv | ? super <tv>};separator=", ">, ? extends <next_type_variable>\>> function<\\>
 <endif>
 >>
 
+curry_method(type_variables=[]) ::= <<
+<if(rest(type_variables))>
+    default <curry_method_return_type(first(type_variables), rest(type_variables))> curry() {
+        return <curry_method_return_function(type_variables,
+                                             first(type_variables),
+                                             rest(type_variables))>
+    }
+<endif>
+>>
+
+curry_method_return_type(current_type_variable="",
+                         remaining_type_variables=[]) ::= <<
+Fn1\<<current_type_variable>, <if(rest(remaining_type_variables))><curry_method_return_type(first(remaining_type_variables),
+                                                                                            rest(remaining_type_variables))><\\>
+                              <else><first(remaining_type_variables)><\\>
+                              <endif>\>
+>>
+
+curry_method_return_function(all_type_variables=[],
+                             current_type_variable="",
+                             remaining_type_variables=[]) ::= <<
+    (<current_type_variable> input<current_type_variable>) -> {
+            <if(rest(remaining_type_variables))>return <curry_method_return_function(all_type_variables,
+                                                                                     first(remaining_type_variables),
+                                                                                     rest(remaining_type_variables))>
+            <else>return apply(<trunc(all_type_variables):{tv | input<tv>};anchor,separator=",\n">);
+            <endif>
+        };
+>>
+
+uncurry_method(arity="0",
+               type_variables=[]) ::= <<
+<if(rest(rest(type_variables)))>
+    static \<<type_variables; separator=", ">\> <function_type_declaration(arity, type_variables)> uncurry(final <curry_method_return_type(first(type_variables), rest(type_variables))> function) {
+        <null_check("function")>;
+        return (<trunc(type_variables):{tv|<tv> input<tv>};anchor,separator=",\n">) -> {
+                return function<uncurry_method_apply(first(type_variables), rest(type_variables))>;
+            };
+    }
+<endif>
+>>
+
+uncurry_method_apply(current_type_variable, remaining_type_variables) ::= <<
+<if(rest(remaining_type_variables))>
+                .apply(input<current_type_variable>)<uncurry_method_apply(first(remaining_type_variables), rest(remaining_type_variables))><\\>
+<else>
+                .apply(input<current_type_variable>)<\\>
+<endif>
+>>

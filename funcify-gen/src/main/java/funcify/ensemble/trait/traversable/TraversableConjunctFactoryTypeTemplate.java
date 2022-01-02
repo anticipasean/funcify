@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -79,8 +78,6 @@ public class TraversableConjunctFactoryTypeTemplate<V, R> implements TraitFactor
                                                                                               Trait.WRAPPABLE))
                                                               .put("container_type",
                                                                    getContainerTypeJsonInstanceFor(ek, Trait.CONJUNCT));
-                logger.info("params: {}", params.mkString(o -> Objects.toString(o)));
-
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(

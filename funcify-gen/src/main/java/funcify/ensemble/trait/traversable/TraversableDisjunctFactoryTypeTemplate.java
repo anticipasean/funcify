@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -87,8 +86,6 @@ public class TraversableDisjunctFactoryTypeTemplate<V, R> implements TraitFactor
                                                                    getContainerTypeJsonInstanceFor(ek, Trait.DISJUNCT))
                                                               .put("disjunct_to_list_sequences",
                                                                    determineDisjunctToListSequencesForEnsembleKind(ek));
-                logger.info("params: {}", params.mkString(o -> Objects.toString(o)));
-
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
