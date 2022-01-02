@@ -1,13 +1,14 @@
-import "wrappable_conjunct_factory_type.stg"
+import "wrappable_disjunct_factory_type.stg"
 
 
-traversable_conjunct_factory_type(class_name,
+traversable_disjunct_factory_type(class_name,
                                   implemented_type,
                                   container_type,
                                   package=[],
                                   witness_type="WT",
                                   type_variables=[],
-                                  ensemble_type_package=[]) ::= <<
+                                  ensemble_type_package=[],
+                                  disjunct_to_list_sequences=[]) ::= <<
 package <package; separator=".">;
 
 <ensemble_type_import(implemented_type.type_name, implemented_type.type_package)>
@@ -21,28 +22,29 @@ import java.util.stream.Stream;
 
 public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
 
-<type_variables:{tv | <conjunct_to_list_method(container_type=container_type,
+<type_variables:{tv | <disjunct_to_list_method(container_type=container_type,
                                                witness_type=witness_type,
                                                current_type_variable=tv,
                                                type_variables=type_variables,
-                                               suffix=i)>};separator="\n\n">
+                                               suffix=i,
+                                               disjunct_to_list_sequence=disjunct_to_list_sequences.(i0))>};separator="\n\n">
 
 
-<type_variables:{tv | <conjunct_iterator_method(container_type=container_type,
+<type_variables:{tv | <disjunct_iterator_method(container_type=container_type,
                                                 witness_type=witness_type,
                                                 current_type_variable=tv,
                                                 type_variables=type_variables,
                                                 suffix=i)>};separator="\n\n">
 
 
-<type_variables:{tv | <conjunct_spliterator_method(container_type=container_type,
+<type_variables:{tv | <disjunct_spliterator_method(container_type=container_type,
                                                    witness_type=witness_type,
                                                    current_type_variable=tv,
                                                    type_variables=type_variables,
                                                    suffix=i)>};separator="\n\n">
 
 
-<type_variables:{tv | <conjunct_stream_method(container_type=container_type,
+<type_variables:{tv | <disjunct_stream_method(container_type=container_type,
                                               witness_type=witness_type,
                                               current_type_variable=tv,
                                               type_variables=type_variables,
@@ -52,20 +54,40 @@ public interface <ensemble_type_declaration(class_name, witness_type, type_varia
 }
 >>
 
-conjunct_to_list_method(container_type,
+disjunct_to_list_method(container_type,
+                        disjunct_to_list_sequence,
                         witness_type="WT",
                         current_type_variable="",
                         suffix="",
                         type_variables=[]) ::= <<
     default List\<<current_type_variable>\> toList<suffix>(final <container_type.type_name>\<<witness_type>, <type_variables:{tv | <tv>};separator=", ">\> container) {
         <null_check("container")>;
-        return container.fold((<type_variables:{tv|<tv> input<tv>};anchor,separator=",\n">) -> {
-            return Collections.singletonList(input<current_type_variable>);
-        });
+        <if(!rest(type_variables))><solo_disjunct_to_list_method(type_variable=first(type_variables))>
+        <else>return container.fold(<disjunct_to_list_sequence.fold_method_parameter_nodes:{fmpn|<disjunct_fold_method_parameter_node(type_variable=fmpn.type_variable,
+                                                                                                                                is_empty=fmpn.empty)>};anchor,separator=",\n">);
+        <endif>
     }
 >>
 
-conjunct_iterator_method(container_type,
+solo_disjunct_to_list_method(type_variable) ::= <<
+return container.fold((<type_variable> input<type_variable>) -> {
+                          return Collections.singletonList(input<type_variable>);
+                      },
+                      () -> {
+                          return Collections.emptyList();
+                      });
+>>
+
+disjunct_fold_method_parameter_node(type_variable,
+                                    is_empty) ::= <<
+(<type_variable> input<type_variable>) -> {
+<if(is_empty)>    return Collections.emptyList();
+<else>    return Collections.singletonList(input<type_variable>);
+<endif>
+}
+>>
+
+disjunct_iterator_method(container_type,
                          witness_type="WT",
                          current_type_variable="",
                          suffix="",
@@ -75,7 +97,7 @@ conjunct_iterator_method(container_type,
     }
 >>
 
-conjunct_spliterator_method(container_type,
+disjunct_spliterator_method(container_type,
                             witness_type="WT",
                             current_type_variable="",
                             suffix="",
@@ -85,7 +107,7 @@ conjunct_spliterator_method(container_type,
     }
 >>
 
-conjunct_stream_method(container_type,
+disjunct_stream_method(container_type,
                        witness_type="WT",
                        current_type_variable="",
                        suffix="",

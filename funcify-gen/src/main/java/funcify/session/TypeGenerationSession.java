@@ -64,4 +64,7 @@ public class TypeGenerationSession<V, R> {
     @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> conjunctTraversableEnsembleFactoryTypeResults = SyncMap.empty();
 
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctTraversableEnsembleFactoryTypeResults = SyncMap.empty();
+
 }
