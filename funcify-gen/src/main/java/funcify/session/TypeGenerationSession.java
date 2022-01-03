@@ -5,12 +5,13 @@ import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.WriteResult;
-import java.nio.file.Path;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.With;
+
+import java.nio.file.Path;
 
 /**
  * @author smccarron
@@ -42,6 +43,9 @@ public class TypeGenerationSession<V, R> {
 
     @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> functionTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> errableFunctionTypeResults = SyncMap.empty();
 
     @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> conjunctMappableEnsembleFactoryTypeResults = SyncMap.empty();

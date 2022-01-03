@@ -51,8 +51,7 @@ task generateSources(dependsOn: shadowJar) {
         File funcifyGenJar = shadowJar.outputs.getFiles().filter({ File f -> f.getName().endsWith(".jar") }).singleFile
         if (funcifyGenJar) {
             File funcifyCoreMainJavaSourceSetDir = project(":funcify-core").sourceSets.main.java.srcDirs.stream().findFirst().orElseThrow({
-                ->
-                new IllegalStateException("no destination directory found for main java source set")
+                -> new IllegalStateException("no destination directory found for main java source set")
             })
             delete { DeleteSpec ds ->
                 ds.delete(funcifyCoreMainJavaSourceSetDir)
