@@ -5,6 +5,8 @@ import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.basetype.ConjunctEnsembleTypeTemplate;
 import funcify.ensemble.basetype.DisjunctEnsembleTypeTemplate;
 import funcify.ensemble.basetype.EnsembleTypesTemplate;
+import funcify.ensemble.function.ConsumerFunctionTypeTemplate;
+import funcify.ensemble.function.ErrableConsumerFunctionTypeTemplate;
 import funcify.ensemble.function.ErrableFunctionTypeTemplate;
 import funcify.ensemble.function.FunctionTypeTemplate;
 import funcify.ensemble.trait.flattenable.FlattenableConjunctFactoryTypeTemplate;
@@ -70,6 +72,8 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
                            FlattenableDisjunctFactoryTypeTemplate.of(),
                            FunctionTypeTemplate.of(),
                            ErrableFunctionTypeTemplate.of(),
+                           ConsumerFunctionTypeTemplate.of(),
+                           ErrableConsumerFunctionTypeTemplate.of(),
                            ZippableDisjunctFactoryTypeTemplate.of(),
                            ZippableConjunctFactoryTypeTemplate.of(),
                            TraversableConjunctFactoryTypeTemplate.of(),

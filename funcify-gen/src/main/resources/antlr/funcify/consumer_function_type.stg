@@ -1,0 +1,70 @@
+import "ensemble_type.stg"
+
+consumer_function_type(ensemble_type_name,
+                       arity="",
+                       ensemble_type_package=[],
+                       package=[],
+                       witness_type="WT",
+                       next_type_variable="",
+                       type_variables=[]) ::= <<
+package <package; separator=".">;
+
+<null_check_import()>
+<ensemble_type_import(ensemble_type_name, ensemble_type_package)>
+import <package; separator=".">.ConsumerFn<arity>.<witness_type>;
+<if(!rest(type_variables))>import java.util.function.Consumer;<endif>
+
+<if(rest(type_variables))>
+<ensemble_type_import("Solo", ensemble_type_package)>
+<endif>
+
+public interface <function_type_declaration(arity, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)><implement_consumer_if_fits(type_variables)> {
+
+<witness_type_definition(witness_type)>
+
+<narrow_kind_functions(arity, type_variables, witness_type, ensemble_type_name)>
+
+<apply_method(type_variables)>
+
+}
+>>
+
+function_type_declaration(arity="0", type_variables=[]) ::= "ConsumerFn<arity>\<<type_variables; separator={, }>>"
+
+function_type_parameter_declaration(type_variables, next_type_variable) ::= "final Fn1\<<type_variables:{tv | ? super <tv>};separator={, }>, ? extends <next_type_variable>> function"
+
+witness_type_definition(witness_type) ::= <<
+
+    static enum <witness_type> {
+
+    }
+>>
+
+narrow_kind_functions(arity="0", type_variables=[], witness_type="WT", ensemble_type_name="") ::= <<
+
+    static \<<type_variables; separator=", ">\> <function_type_declaration(arity, type_variables)> narrowK(final <recursive_solo_type_declaration(witness_type, type_variables)> wideInstance) {
+        return (<function_type_declaration(arity, type_variables)>) wideInstance;
+    }
+<if(rest(type_variables))>
+    static \<<type_variables; separator=", ">\> <function_type_declaration(arity, type_variables)> narrowK(final <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> wideInstance) {
+        return (<function_type_declaration(arity, type_variables)>) wideInstance;
+    }
+<endif>
+>>
+
+apply_method(type_variables=[]) ::= <<
+    void apply(<type_variables:{tv | final <tv> input<i>};anchor,separator=",\n">);
+
+<if(!rest(type_variables))>
+    @Override
+    default void accept(final <first(type_variables)> input<first(type_variables)>) {
+        this.apply(input<first(type_variables)>);
+    }
+<endif>
+>>
+
+implement_consumer_if_fits(type_variables=[]) ::= <<
+<if(!rest(type_variables))><\\>
+, Consumer\<<first(type_variables)>\><\\>
+<endif>
+>>
