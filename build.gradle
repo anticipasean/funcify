@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+allprojects {
+    sourceCompatibility = sourceCompatibility
+    targetCompatibility = targetCompatibility
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    sourceCompatibility = sourceCompatibility
+    targetCompatibility = targetCompatibility
+}

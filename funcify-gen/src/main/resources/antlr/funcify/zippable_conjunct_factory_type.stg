@@ -1,0 +1,86 @@
+import "wrappable_conjunct_factory_type.stg"
+
+
+zippable_conjunct_factory_type(class_name,
+                               implemented_type,
+                               container_type,
+                               package=[],
+                               witness_type="WT",
+                               type_variables=[],
+                               ensemble_type_package=[],
+                               zip_impl_sequences=[]) ::= <<
+package <package; separator=".">;
+
+<ensemble_type_import(implemented_type.type_name, implemented_type.type_package)>
+<ensemble_type_import(container_type.type_name, container_type.type_package)>
+<null_check_import()>
+<java_util_func_import()>
+<["2","3","4"]:{fi|import funcify.function.Fn<fi>};separator=";\n">;
+
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
+
+<zip_impl_sequences:{zis | <conjunct_zip_method(container_type=container_type,
+                                                witness_type=witness_type,
+                                                method_name=zis.method_name,
+                                                return_type_variables=zis.return_type_variables,
+                                                container_params=zis.container_params,
+                                                new_type_variables=zis.new_type_variables,
+                                                function_params=zis.zipper_function_params)>};separator="\n\n">
+
+}
+>>
+conjunct_zip_method(container_type,
+                    witness_type,
+                    method_name,
+                    return_type_variables=[],
+                    container_params=[],
+                    new_type_variables=[],
+                    function_params=[]) ::= <<
+    default \<<new_type_variables:{ntv|<ntv.(i0)>};separator=", ">\> <ensemble_type_declaration(container_type.type_name,
+                                                                                                witness_type,
+                                                                                                return_type_variables:{tv|<tv.(i0)>})> <method_name>(<conjunct_zip_method_parameters(container_type,
+                                                                                                                                                                                     witness_type,
+                                                                                                                                                                                     container_params,
+                                                                                                                                                                                     function_params)>) {
+        <container_params:{c|container<c.index>}:null_check();anchor,separator=";\n">;
+        <function_params:{fp|zipper<i>}:null_check();anchor,separator=";\n">;
+        <conjunct_zip_method_body(function_params, container_params)>
+    }
+
+>>
+
+conjunct_zip_method_parameters(container_type, witness_type, container_params, function_params) ::= <<
+<[container_params:{c | <conjunct_zip_method_container_parameter(container_type, witness_type, c.type_variables, c.index)>},
+  function_params:{fp | <conjunct_zip_method_function_parameter(fp, i)>}];anchor,separator=",\n">
+>>
+
+conjunct_zip_method_container_parameter(container_type, witness_type="WT", type_variables=[], suffix="") ::= <<
+final <ensemble_type_declaration(container_type.type_name, witness_type, type_variables:{tv | <tv.(i0)>})> container<suffix>
+>>
+
+conjunct_zip_method_function_parameter(type_variables, suffix="") ::= <<
+final Fn<length(trunc(type_variables))>\<<trunc(type_variables):{tv|? super <tv.(i0)>};separator=", ">, ? extends <last(type_variables).("0")>\> zipper<suffix>
+>>
+
+conjunct_zip_method_body(function_params, container_params) ::= <<
+<container_fold(function_params=function_params,
+                all_container_params=container_params,
+                current_container_param=first(container_params),
+                remaining_container_params=rest(container_params))>
+>>
+
+container_fold(function_params,
+               all_container_params,
+               current_container_param,
+               remaining_container_params=[]) ::= <<
+return container<current_container_param.index>.fold((<current_container_param.type_variables:{tv|<tv.(i0)> input<tv.(i0)>};anchor,separator=",\n">) -> {
+<if(remaining_container_params)>
+    <container_fold(function_params=function_params,
+                    all_container_params=all_container_params,
+                    current_container_param=first(remaining_container_params),
+                    remaining_container_params=rest(remaining_container_params))>
+<else>
+    return this.wrap(<function_params:{fp|zipper<i>.apply(<trunc(fp):{tv|input<tv.(i0)>};anchor,separator=",\n">)};anchor,separator=",\n">);
+<endif>
+});
+>>

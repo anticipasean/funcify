@@ -1,0 +1,44 @@
+import "java_type_definition.stg"
+
+null_check_import() ::= <<
+import java.util.Objects;
+>>
+
+null_check(parameter="defaultParameterName") ::= <<
+Objects.requireNonNull(<parameter>, () -> "<parameter>")
+>>
+
+java_util_func_import() ::= <<
+import java.util.function.Function;
+>>
+
+java_util_supp_import() ::= <<
+import java.util.function.Supplier;
+>>
+
+function_call(input) ::= <<
+<if(input.expression && input.function_parameters)><expression(input.expression)>.apply(<input.function_parameters:{p | <p>};separator=", ">)<\\>
+<elseif(input.function_name && input.function_parameters)><input.function_name>.apply(<input.function_parameters:{p | <p>};separator=", ">)<\\>
+<elseif(input.function_name)><input.function_name>.apply()<endif>
+>>
+
+parens(text) ::= "(<text>)"
+
+cast_as(input) ::= <<
+<if(input.java_type && input.variable_name)><type_declaration(input.java_type):parens()> <input.variable_name><\\>
+<elseif(input.java_type && input.expression)><type_declaration(input.java_type):parens()><parens(expression(input.expression))><endif>
+>>
+
+lambda(input) ::= <<
+<if(input.parameters)>(<input.parameters:method_parameter()>) -> <\\>
+<if(input.code_block)><code_block(input)><\\>
+<elseif(input.expression)><expression(input.expression)><endif>
+<endif>
+>>
+
+method_reference(input) ::= <<
+<if(input.type_name && input.method_name)><input.type_name>::<input.method_name><\\>
+<elseif(input.method && input.type_name)><input.type_name>::<input.method.name><endif>
+>>
+
+all_but_last(input=[]) ::= "<trunc(input)>"
