@@ -1,0 +1,61 @@
+import "wrappable_conjunct_factory_type.stg"
+
+
+mappable_conjunct_factory_type(class_name,
+                               implemented_type,
+                               container_type,
+                               package=[],
+                               witness_type="WT",
+                               type_variables=[],
+                               next_type_variable="",
+                               next_type_variable_sequences=[],
+                               map_all_type_variables=[]) ::= <<
+package <package; separator=".">;
+
+<ensemble_type_import(implemented_type.type_name, implemented_type.type_package)>
+<ensemble_type_import(container_type.type_name, container_type.type_package)>
+<null_check_import()>
+<java_util_func_import()>
+
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
+
+<type_variables,next_type_variable_sequences:{tv, ntvs | <conjunct_map_method(container_type, type_variables, tv, next_type_variable, i, witness_type, ntvs)>};separator="\n\n">
+
+<conjunct_map_all_method(container_type, type_variables, map_all_type_variables, witness_type)>
+
+}
+>>
+
+conjunct_map_method(container_type, type_variables, current_type_variable, next_type_variable, numeric_suffix="", witness_type="WT", next_type_variable_sequence=[]) ::= <<
+    default \<<next_type_variable>\> <ensemble_type_declaration(container_type.type_name, witness_type, next_type_variable_sequence)> map<numeric_suffix>(<[conjunct_map_method_container_parameter(container_type, witness_type, type_variables), conjunct_map_method_function_parameter(current_type_variable, next_type_variable)];anchor,separator=",\n">) {
+        <null_check("container")>;
+        <null_check("mapper")>;
+        return this.unwrap(container, (<type_variables:{tv | <tv> input<tv>};anchor,separator=",\n">) -> {
+            final <next_type_variable> input<next_type_variable> = mapper.apply(input<current_type_variable>);
+            return this.wrap(<next_type_variable_sequence:{tv | input<tv>};anchor,separator=",\n">);
+        });
+    }
+>>
+
+conjunct_map_method_container_parameter(container_type, witness_type="WT", type_variables=[]) ::= <<
+final <ensemble_type_declaration(container_type.type_name, witness_type, type_variables)> container
+>>
+
+conjunct_map_method_function_parameter(current_type_variable, next_type_variable) ::= <<
+final Function\<? super <current_type_variable>, ? extends <next_type_variable>\> mapper
+>>
+
+conjunct_map_all_method(container_type, type_variables, map_all_type_variables, witness_type="WT") ::= <<
+    default \<<map_all_type_variables:{tv_pair| <tv_pair.next>};separator=", ">\> <ensemble_type_declaration(container_type.type_name, witness_type, [map_all_type_variables:{p | <p.next>}])> mapAll(<[conjunct_map_method_container_parameter(container_type, witness_type, type_variables), map_all_type_variables:{p | <conjunct_map_all_method_parameter(p, i)>}];anchor,separator=",\n">) {
+        <null_check("container")>;
+        <map_all_type_variables:{p | mapper<i>}:null_check();separator=";\n">;
+        return this.unwrap(container, (<type_variables:{tv|<tv> input<tv>};anchor,separator=",\n">) -> {
+            <map_all_type_variables:{p | final <p.next> output<p.next> = mapper<i>.apply(input<p.given>)};separator=";\n">;
+            return this.\<<map_all_type_variables:{p | <p.next>};separator=", ">\>wrap(<map_all_type_variables:{p | output<p.next>};anchor,separator=",\n">);
+        });
+    }
+>>
+
+conjunct_map_all_method_parameter(pair, index="0") ::= <<
+final Function\<? super <pair.given>, ? extends <pair.next>\> mapper<index>
+>>

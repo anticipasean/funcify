@@ -3,16 +3,15 @@ plugins {
 }
 
 allprojects {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = sourceCompatibility
+    targetCompatibility = targetCompatibility
 
     repositories {
-        jcenter()
         mavenCentral()
     }
 }
 
 subprojects {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = sourceCompatibility
+    targetCompatibility = targetCompatibility
 }

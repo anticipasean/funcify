@@ -27,10 +27,4 @@ public enum WildcardJavaTypeBound implements JavaType {
         return "?";
     }
 
-    @JsonProperty("parameterized")
-    @Override
-    public boolean isParameterized() {
-        return false;
-    }
-
 }

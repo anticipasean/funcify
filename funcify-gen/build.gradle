@@ -1,17 +1,30 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+}
+
+mainClassName = 'funcify.FuncifyClassGenerator'
+
+shadow {
+
+}
+
+shadowJar {
+    mainClassName = 'funcify.FuncifyClassGenerator'
+    classifier = ''
 }
 
 dependencies {
-    
     implementation("org.antlr:ST4:${stringTemplateVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     compileClasspath("org.projectlombok:lombok:${lombokVersion}")
-    compileClasspath("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-    compileClasspath("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}")
-    compileClasspath("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
-    compileClasspath("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
     implementation "info.picocli:picocli:${picoCliVersion}"
+    implementation("ch.qos.logback:logback-classic:${logbackVersion}")
 
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     testCompileClasspath("org.projectlombok:lombok:${lombokVersion}")
@@ -21,8 +34,34 @@ dependencies {
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}")
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
     testImplementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+    testImplementation("ch.qos.logback:logback-classic:${logbackVersion}")
+}
+
+jar {
+    manifest.attributes("Main-Class": application.mainClassName)
+    enabled = false
 }
 
 test {
     useJUnitPlatform()
+}
+
+task generateSources(dependsOn: shadowJar) {
+    doLast {
+        File funcifyGenJar = shadowJar.outputs.getFiles().filter({ File f -> f.getName().endsWith(".jar") }).singleFile
+        if (funcifyGenJar) {
+            File funcifyCoreMainJavaSourceSetDir = project(":funcify-core").sourceSets.main.java.srcDirs.stream().findFirst().orElseThrow({
+                -> new IllegalStateException("no destination directory found for main java source set")
+            })
+            delete { DeleteSpec ds ->
+                ds.delete(funcifyCoreMainJavaSourceSetDir)
+            }
+            javaexec {
+                main = "-jar"
+                args = [funcifyGenJar.getAbsolutePath(),
+                        "-d", funcifyCoreMainJavaSourceSetDir.getAbsolutePath()]
+                println getCommandLine()
+            }
+        }
+    }
 }

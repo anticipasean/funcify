@@ -1,7 +1,7 @@
 package funcify.typedef.javaexpr;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import funcify.tool.container.SyncList;
+import funcify.tool.container.SyncMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,13 +20,10 @@ import lombok.Setter;
 @Getter
 public class TemplatedExpression implements JavaExpression {
 
-    @JsonProperty("is_lambda")
-    private final boolean lambda = false;
+    @JsonProperty("template_function")
+    private String templateFunction;
 
-    @JsonProperty("template_call")
-    private String templateCall;
-
-    @JsonProperty("template_parameters")
-    private SyncList<String> templateParameters;
+    @JsonProperty("input")
+    private SyncMap<String, Object> input;
 
 }

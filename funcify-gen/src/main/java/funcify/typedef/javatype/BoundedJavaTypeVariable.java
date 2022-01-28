@@ -23,23 +23,18 @@ import lombok.ToString;
 @ToString
 public class BoundedJavaTypeVariable implements JavaType {
 
-    @JsonProperty("parameterized")
-    private final boolean parameterized = true;
+    @JsonProperty("base_type")
+    private JavaType baseType;
+    @Default
+    @JsonProperty("lower_bound_types")
+    private SyncList<JavaType> lowerBoundTypes = SyncList.empty();
+    @Default
+    @JsonProperty("upper_bound_types")
+    private SyncList<JavaType> upperBoundTypes = SyncList.empty();
 
     @Override
     public String getName() {
         return getBaseType().getName();
     }
-
-    @JsonProperty("base_type")
-    private JavaType baseType;
-
-    @Default
-    @JsonProperty("lower_bound_types")
-    private SyncList<JavaType> lowerBoundTypes = SyncList.empty();
-
-    @Default
-    @JsonProperty("upper_bound_types")
-    private SyncList<JavaType> upperBoundTypes = SyncList.empty();
 
 }

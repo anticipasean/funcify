@@ -1,9 +1,10 @@
 package funcify.typedef.javastatement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import funcify.tool.container.SyncList;
+import funcify.typedef.JavaAnnotation;
 import funcify.typedef.javaexpr.JavaExpression;
 import funcify.typedef.javatype.JavaType;
-import funcify.tool.container.SyncList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,10 @@ import lombok.Setter;
 @Builder
 @Getter
 public class AssignmentStatement implements JavaStatement {
+
+    @JsonProperty("annotations")
+    @Default
+    private SyncList<JavaAnnotation> annotations = SyncList.empty();
 
     @JsonProperty("assignee_type")
     private JavaType assigneeType;

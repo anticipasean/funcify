@@ -8,9 +8,5 @@ import funcify.typedef.Definition;
  */
 public interface JavaExpression extends Definition<JavaExpression> {
 
-    default boolean isLambda() {
-        return false;
-    }
-
 
 }

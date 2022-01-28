@@ -24,4 +24,11 @@ public class JavaPackage {
     @JsonProperty("name")
     private String name;
 
+    @JsonProperty("directory_path")
+    public String asDirectoryPathString() {
+        final String pathSeparator = System.getProperty("file.separator");
+        return getName() != null ? getName().replaceAll("\\.",
+                                                        pathSeparator) : "";
+    }
+
 }

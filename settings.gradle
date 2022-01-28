@@ -1,9 +1,11 @@
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         mavenLocal()
     }
 }
 
 rootProject.name = 'funcify'
-include ':funcify'
+include ':funcify-sample'
 include ':funcify-gen'
+include ':funcify-core'

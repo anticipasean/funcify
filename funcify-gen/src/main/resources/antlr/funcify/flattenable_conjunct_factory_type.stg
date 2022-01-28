@@ -1,0 +1,44 @@
+import "wrappable_conjunct_factory_type.stg"
+
+
+flattenable_conjunct_factory_type(class_name,
+                                  implemented_type,
+                                  container_type,
+                                  package=[],
+                                  witness_type="WT",
+                                  type_variables=[],
+                                  next_type_variable="",
+                                  next_type_variable_sequences=[]) ::= <<
+package <package; separator=".">;
+
+<ensemble_type_import(implemented_type.type_name, implemented_type.type_package)>
+<ensemble_type_import(container_type.type_name, container_type.type_package)>
+<null_check_import()>
+<java_util_func_import()>
+import funcify.function.Fn<length(type_variables)>;
+
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
+
+<type_variables,next_type_variable_sequences:{tv, ntvs | <conjunct_flat_map_method(container_type, type_variables, tv, next_type_variable, i, witness_type, ntvs)>};separator="\n\n">
+
+}
+>>
+
+conjunct_flat_map_method(container_type, type_variables, current_type_variable, next_type_variable, numeric_suffix="", witness_type="WT", next_type_variable_sequence=[]) ::= <<
+    default \<<next_type_variable>\> <ensemble_type_declaration(container_type.type_name, witness_type, next_type_variable_sequence)> flatMap<numeric_suffix>(<[conjunct_flat_map_method_container_parameter(container_type, witness_type, type_variables), conjunct_flat_map_method_function_parameter(container_type, witness_type, type_variables, next_type_variable_sequence)];anchor,separator=",\n">) {
+        <null_check("container")>;
+        <null_check("flatMapper")>;
+        return this.unwrap(container, (<type_variables:{tv | <tv> input<tv>};anchor,separator=",\n">) -> {
+            final <ensemble_type_declaration(container_type.type_name, witness_type, next_type_variable_sequence)> newContainer = flatMapper.apply(<type_variables:{tv | input<tv>};anchor,separator=",\n">);
+            return newContainer;
+        });
+    }
+>>
+
+conjunct_flat_map_method_container_parameter(container_type, witness_type="WT", type_variables=[]) ::= <<
+final <ensemble_type_declaration(container_type.type_name, witness_type, type_variables)> container
+>>
+
+conjunct_flat_map_method_function_parameter(container_type, witness_type="WT", type_variables=[], next_type_variable_sequence=[]) ::= <<
+final Fn<length(type_variables)>\<<type_variables:{tv| ? super <tv>};separator=", ">, ? extends <ensemble_type_declaration(container_type.type_name, witness_type, next_type_variable_sequence)>\> flatMapper
+>>
