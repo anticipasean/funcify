@@ -11,6 +11,8 @@ import funcify.ensemble.function.ErrableFunctionTypeTemplate;
 import funcify.ensemble.function.FunctionTypeTemplate;
 import funcify.ensemble.trait.design.flattenable.FlattenableConjunctDesignTypeTemplate;
 import funcify.ensemble.trait.design.flattenable.FlattenableDisjunctDesignTypeTemplate;
+import funcify.ensemble.trait.design.mappable.MappableConjunctDesignTypeTemplate;
+import funcify.ensemble.trait.design.mappable.MappableDisjunctDesignTypeTemplate;
 import funcify.ensemble.trait.factory.flattenable.FlattenableConjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.factory.flattenable.FlattenableDisjunctFactoryTypeTemplate;
 import funcify.ensemble.trait.factory.mappable.MappableConjunctFactoryTypeTemplate;
@@ -81,7 +83,9 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
                            TraversableConjunctFactoryTypeTemplate.of(),
                            TraversableDisjunctFactoryTypeTemplate.of(),
                            FlattenableConjunctDesignTypeTemplate.of(),
-                           FlattenableDisjunctDesignTypeTemplate.of());
+                           FlattenableDisjunctDesignTypeTemplate.of(),
+                           MappableConjunctDesignTypeTemplate.of(),
+                           MappableDisjunctDesignTypeTemplate.of());
     }
 
     private static <V, R> TypeGenerationSession<V, R> applyEachTemplateToSession(final TypeGenerationSession<V, R> session) {
