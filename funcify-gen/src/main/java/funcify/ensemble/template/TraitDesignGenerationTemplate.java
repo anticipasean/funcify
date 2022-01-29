@@ -34,9 +34,9 @@ public interface TraitDesignGenerationTemplate<V, R> extends TraitGenerationTemp
     @Override
     default JsonNode getImplementedTypeInstance(final EnsembleKind ek, final Trait... traits) {
         return SyncMap.of("type_name",
-                          Trait.generateTraitNameFrom(ek, traits).replaceAll("$", "Design"),
+                          Trait.generateTraitNameFrom(ek, traits),
                           "type_package",
-                          Stream.concat(Stream.of("funcify", "trait", "design"),
+                          Stream.concat(Stream.of("funcify", "ensemble"),
                                         Stream.of(traits)
                                               .sorted(Trait::relativeTo)
                                               .map(Trait::name)
