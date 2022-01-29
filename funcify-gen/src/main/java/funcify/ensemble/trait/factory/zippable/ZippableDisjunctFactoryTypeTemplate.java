@@ -1,4 +1,4 @@
-package funcify.ensemble.trait.zippable;
+package funcify.ensemble.trait.factory.zippable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

@@ -1,4 +1,4 @@
-package funcify.ensemble.trait.mappable;
+package funcify.ensemble.trait.factory.mappable;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.template.TraitFactoryGenerationTemplate;

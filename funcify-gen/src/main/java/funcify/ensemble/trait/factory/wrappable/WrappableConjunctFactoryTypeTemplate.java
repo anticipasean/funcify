@@ -1,4 +1,4 @@
-package funcify.ensemble.trait.wrappable;
+package funcify.ensemble.trait.factory.wrappable;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.template.TraitFactoryGenerationTemplate;

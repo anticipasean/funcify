@@ -1,4 +1,4 @@
-package funcify.ensemble.trait.flattenable;
+package funcify.ensemble.trait.factory.flattenable;
 
 import funcify.ensemble.EnsembleKind;
 import funcify.ensemble.template.TraitFactoryGenerationTemplate;

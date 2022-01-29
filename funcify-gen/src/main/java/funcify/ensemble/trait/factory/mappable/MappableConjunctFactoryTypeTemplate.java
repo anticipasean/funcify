@@ -1,4 +1,4 @@
-package funcify.ensemble.trait.traversable;
+package funcify.ensemble.trait.factory.mappable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -26,50 +26,48 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * @author smccarron
  * @created 2021-08-29
  */
 @AllArgsConstructor(staticName = "of")
-public class TraversableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGenerationTemplate<V, R> {
+public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGenerationTemplate<V, R> {
 
-    private static final Logger logger = LoggerFactory.getLogger(TraversableDisjunctFactoryTypeTemplate.class);
+    private static final Logger logger = LoggerFactory.getLogger(MappableConjunctFactoryTypeTemplate.class);
 
     @Override
     public Set<Trait> getTraits() {
-        return EnumSet.of(Trait.DISJUNCT, Trait.TRAVERSABLE);
+        return EnumSet.of(Trait.CONJUNCT, Trait.MAPPABLE);
     }
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "factory", "traversable", "disjunct");
+        return Arrays.asList("funcify", "trait", "factory", "mappable", "conjunct");
     }
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "traversable_disjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "mappable_conjunct_factory_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
-        logger.debug("create_types_for_session: [ {} ]",
-                     SyncMap.empty().put("types", "TraversableDisjunctEnsembleFactory[1..n]"));
+        logger.debug("create_types_for_session: [ {} ]", SyncMap.empty().put("types", "ConjunctMappableEnsembleFactory[1..n]"));
         try {
-            final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = SyncMap.empty();
-            final SyncList<EnsembleKind> ensembleKinds = session.getEnsembleKinds().copy();
-            // The max ek must be removed because the func type with the max ek will only support max_ek.num_of_params - 1
+            final SyncList<EnsembleKind> ensembleKindsToUse = session.getEnsembleKinds().copy();
             session.getEnsembleKinds()
                    .stream()
                    .max(Comparator.comparing(EnsembleKind::getNumberOfValueParameters))
-                   .filter(ek -> ek.getNumberOfValueParameters() > 1)
-                   .ifPresent(ensembleKinds::removeValue);
-            for (EnsembleKind ek : ensembleKinds) {
+                   .ifPresent(ensembleKindsToUse::removeValue);
+            final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getConjunctMappableEnsembleFactoryTypeResults();
+            for (EnsembleKind ek : ensembleKindsToUse) {
                 final String className = getTraitNameForEnsembleKind(ek) + "Factory";
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
@@ -77,15 +75,19 @@ public class TraversableDisjunctFactoryTypeTemplate<V, R> implements TraitFactor
                                                                   className,
                                                                   "type_variables",
                                                                   CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(ek.getNumberOfValueParameters())
-                                                                              .collect(Collectors.toList()))
+                                                                              .collect(Collectors.toList()),
+                                                                  "next_type_variable",
+                                                                  CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters()))
                                                               .put("implemented_type",
                                                                    getImplementedTypeInstance(ek,
-                                                                                              Trait.DISJUNCT,
-                                                                                              Trait.WRAPPABLE))
+                                                                                              Trait.WRAPPABLE,
+                                                                                              Trait.CONJUNCT))
+                                                              .put("next_type_variable_sequences",
+                                                                   nextTypeVariableSequences(ek.getNumberOfValueParameters()))
                                                               .put("container_type",
-                                                                   getContainerTypeJsonInstanceFor(ek, Trait.DISJUNCT))
-                                                              .put("disjunct_to_list_sequences",
-                                                                   determineDisjunctToListSequencesForEnsembleKind(ek));
+                                                                   getContainerTypeJsonInstanceFor(ek, Trait.CONJUNCT))
+                                                              .put("map_all_type_variables",
+                                                                   mapAllMethodTypeVariablePairs(ek.getNumberOfValueParameters()));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
@@ -103,7 +105,7 @@ public class TraversableDisjunctFactoryTypeTemplate<V, R> implements TraitFactor
                 }
                 results.put(ek, writeResult);
             }
-            return session.withDisjunctTraversableEnsembleFactoryTypeResults(results);
+            return session.withConjunctMappableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
                          t.getClass().getSimpleName(),
@@ -116,26 +118,33 @@ public class TraversableDisjunctFactoryTypeTemplate<V, R> implements TraitFactor
         }
     }
 
-    private JsonNode determineDisjunctToListSequencesForEnsembleKind(final EnsembleKind ensembleKind) {
-        final int numberOfTypeVariables = Optional.ofNullable(ensembleKind)
-                                                  .map(EnsembleKind::getNumberOfValueParameters)
-                                                  .orElse(-1);
-        if (numberOfTypeVariables <= 0) {
-            return JsonNodeFactory.instance.arrayNode();
-        }
-        final ArrayNode typeVariables = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(numberOfTypeVariables)
-                                                    .reduce(JsonNodeFactory.instance.arrayNode(),
-                                                            ArrayNode::add,
-                                                            ArrayNode::addAll);
-        return IntStream.range(0, numberOfTypeVariables).mapToObj(i -> {
-            final ArrayNode foldMethodParameterNodes = IntStream.range(0, numberOfTypeVariables).mapToObj(j -> {
-                return ((ObjectNode) JsonNodeFactory.instance.objectNode()
-                                                             .set("type_variable", typeVariables.get(j))).put("empty", i != j);
-            }).reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll);
-            return ((ObjectNode) JsonNodeFactory.instance.objectNode()
-                                                         .set("fold_method_parameter_nodes", foldMethodParameterNodes));
-        }).reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll);
+    private List<List<String>> nextTypeVariableSequences(final int numberOfValueParameters) {
+        final String nextTypeVariable = CharacterOps.uppercaseLetterByIndexWithNumericExtension(numberOfValueParameters);
+        final String[] array = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(numberOfValueParameters)
+                                           .toArray(String[]::new);
+        return IntStream.range(0, numberOfValueParameters).mapToObj(i -> {
+            return Stream.concat(Stream.concat(Arrays.stream(array, 0, i), Stream.of(nextTypeVariable)),
+                                 Arrays.stream(array, i + 1, numberOfValueParameters)).collect(Collectors.toList());
+        }).collect(Collectors.toList());
+
     }
 
-
+    private JsonNode mapAllMethodTypeVariablePairs(final int numberOfValueParameters) {
+        final Spliterator<String> nextTypeVariables = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(
+                                                                          numberOfValueParameters * 2)
+                                                                  //Need to make a list first rather than directly using the
+                                                                  //stream's spliterator so the result spliterator is SIZED
+                                                                  .collect(Collectors.toList()).spliterator();
+        final Spliterator<String> givenTypeVariables = nextTypeVariables.trySplit();
+        final String[] typeVariablePairHolder = new String[2];
+        ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
+        while (givenTypeVariables.tryAdvance(s -> typeVariablePairHolder[0] = s) &&
+               nextTypeVariables.tryAdvance(s -> typeVariablePairHolder[1] = s)) {
+            final ObjectNode objNode = JsonNodeFactory.instance.objectNode()
+                                                               .put("given", typeVariablePairHolder[0])
+                                                               .put("next", typeVariablePairHolder[1]);
+            arrayNode = arrayNode.add(objNode);
+        }
+        return arrayNode;
+    }
 }
