@@ -36,6 +36,12 @@ public class TypeGenerationSession<V, R> {
     private final SyncMap<EnsembleKind, WriteResult<R>> ensembleTypeResultsByEnsembleKind = SyncMap.empty();
 
     @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctEnsembleTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctEnsembleTypeResults = SyncMap.empty();
+
+    @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> disjunctWrappableEnsembleFactoryTypeResults = SyncMap.empty();
 
     @Default

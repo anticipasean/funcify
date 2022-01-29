@@ -56,7 +56,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "zippable", "disjunct");
+        return Arrays.asList("funcify", "trait", "factory", "zippable", "disjunct");
     }
 
     @Override

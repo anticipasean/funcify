@@ -38,7 +38,7 @@ public class WrappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryG
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "wrappable", "disjunct");
+        return Arrays.asList("funcify", "trait", "factory", "wrappable", "disjunct");
     }
 
     @Override

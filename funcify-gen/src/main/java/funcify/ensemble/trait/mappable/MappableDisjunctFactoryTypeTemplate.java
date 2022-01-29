@@ -42,7 +42,7 @@ public class MappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "mappable", "disjunct");
+        return Arrays.asList("funcify", "trait", "factory", "mappable", "disjunct");
     }
 
     @Override

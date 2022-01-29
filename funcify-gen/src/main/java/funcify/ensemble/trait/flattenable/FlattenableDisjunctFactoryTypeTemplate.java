@@ -42,7 +42,7 @@ public class FlattenableDisjunctFactoryTypeTemplate<V, R> implements TraitFactor
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "flattenable", "disjunct");
+        return Arrays.asList("funcify", "trait", "factory", "flattenable", "disjunct");
     }
 
     @Override

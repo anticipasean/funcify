@@ -41,7 +41,7 @@ public class TraversableConjunctFactoryTypeTemplate<V, R> implements TraitFactor
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "traversable", "conjunct");
+        return Arrays.asList("funcify", "trait", "factory", "traversable", "conjunct");
     }
 
     @Override
@@ -54,16 +54,14 @@ public class TraversableConjunctFactoryTypeTemplate<V, R> implements TraitFactor
         logger.debug("create_types_for_session: [ {} ]",
                      SyncMap.empty().put("types", "TraversableConjunctEnsembleFactory[1..n]"));
         try {
-            final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = SyncMap.empty();
-            final SyncList<EnsembleKind> ensembleKinds = session.getEnsembleKinds().copy();
-            // The max ek must be removed because the func type with the max ek will only support max_ek.num_of_params - 1
+            final SyncList<EnsembleKind> ensembleKindsToUse = session.getEnsembleKinds().copy();
             session.getEnsembleKinds()
                    .stream()
                    .max(Comparator.comparing(EnsembleKind::getNumberOfValueParameters))
-                   .filter(ek -> ek.getNumberOfValueParameters() > 1)
-                   .ifPresent(ensembleKinds::removeValue);
-            for (EnsembleKind ek : ensembleKinds) {
+                   .ifPresent(ensembleKindsToUse::removeValue);
+            final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getConjunctTraversableEnsembleFactoryTypeResults();
+            for (EnsembleKind ek : ensembleKindsToUse) {
                 final String className = getTraitNameForEnsembleKind(ek) + "Factory";
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),

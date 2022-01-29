@@ -53,7 +53,7 @@ public class DisjunctEnsembleTypeTemplate<V, R> implements TraitGenerationTempla
                             .put("types", "DisjunctEnsemble[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctWrappableEnsembleFactoryTypeResults();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctEnsembleTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
                 final String className = getTraitNameForEnsembleKind(ek);
                 final SyncMap<String, Object> params = SyncMap.of("package",
@@ -82,7 +82,7 @@ public class DisjunctEnsembleTypeTemplate<V, R> implements TraitGenerationTempla
                 final WriteResult<R> writeResult = templateWriter.write(spec);
                 results.put(ek, writeResult);
             }
-            return session.withDisjunctWrappableEnsembleFactoryTypeResults(results);
+            return session.withDisjunctEnsembleTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
                          t.getClass()

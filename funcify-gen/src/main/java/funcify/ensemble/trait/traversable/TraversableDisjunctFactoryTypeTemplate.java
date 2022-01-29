@@ -47,7 +47,7 @@ public class TraversableDisjunctFactoryTypeTemplate<V, R> implements TraitFactor
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "traversable", "disjunct");
+        return Arrays.asList("funcify", "trait", "factory", "traversable", "disjunct");
     }
 
     @Override

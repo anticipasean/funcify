@@ -11,13 +11,19 @@ import funcify.session.TypeGenerationSession;
 import funcify.spec.DefaultStringTemplateSpec;
 import funcify.spec.StringTemplateSpec;
 import funcify.tool.CharacterOps;
+import funcify.tool.container.SyncList;
 import funcify.tool.container.SyncMap;
 import funcify.trait.Trait;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.WriteResult;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -25,9 +31,6 @@ import java.util.Spliterator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author smccarron
@@ -45,7 +48,7 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "mappable", "conjunct");
+        return Arrays.asList("funcify", "trait", "factory", "mappable", "conjunct");
     }
 
     @Override
@@ -55,13 +58,16 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
-        logger.debug("create_types_for_session: [ {} ]",
-                     SyncMap.empty()
-                            .put("types", "ConjunctMappableEnsembleFactory[1..n]"));
+        logger.debug("create_types_for_session: [ {} ]", SyncMap.empty().put("types", "ConjunctMappableEnsembleFactory[1..n]"));
         try {
+            final SyncList<EnsembleKind> ensembleKindsToUse = session.getEnsembleKinds().copy();
+            session.getEnsembleKinds()
+                   .stream()
+                   .max(Comparator.comparing(EnsembleKind::getNumberOfValueParameters))
+                   .ifPresent(ensembleKindsToUse::removeValue);
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getConjunctMappableEnsembleFactoryTypeResults();
-            for (EnsembleKind ek : session.getEnsembleKinds()) {
+            for (EnsembleKind ek : ensembleKindsToUse) {
                 final String className = getTraitNameForEnsembleKind(ek) + "Factory";
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
@@ -85,26 +91,24 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
-                                                                             getDestinationTypePackagePathSegments())
+                                                                                 getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName(getStringTemplateGroupFileName())
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(
-                                                                             getStringTemplateGroupFilePath())
+                                                                                 getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
                 if (writeResult.isFailure()) {
-                    throw writeResult.getFailureValue()
-                                     .orElseThrow(() -> new FuncifyCodeGenException("failure value missing"));
+                    throw writeResult.getFailureValue().orElseThrow(() -> new FuncifyCodeGenException("failure value missing"));
                 }
                 results.put(ek, writeResult);
             }
             return session.withConjunctMappableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
-                         t.getClass()
-                          .getSimpleName(),
+                         t.getClass().getSimpleName(),
                          t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
@@ -118,28 +122,24 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         final String nextTypeVariable = CharacterOps.uppercaseLetterByIndexWithNumericExtension(numberOfValueParameters);
         final String[] array = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(numberOfValueParameters)
                                            .toArray(String[]::new);
-        return IntStream.range(0, numberOfValueParameters)
-                        .mapToObj(i -> {
-                            return Stream.concat(Stream.concat(Arrays.stream(array, 0, i), Stream.of(nextTypeVariable)),
-                                                 Arrays.stream(array, i + 1, numberOfValueParameters))
-                                         .collect(Collectors.toList());
-                        })
-                        .collect(Collectors.toList());
+        return IntStream.range(0, numberOfValueParameters).mapToObj(i -> {
+            return Stream.concat(Stream.concat(Arrays.stream(array, 0, i), Stream.of(nextTypeVariable)),
+                                 Arrays.stream(array, i + 1, numberOfValueParameters)).collect(Collectors.toList());
+        }).collect(Collectors.toList());
 
     }
 
     private JsonNode mapAllMethodTypeVariablePairs(final int numberOfValueParameters) {
         final Spliterator<String> nextTypeVariables = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(
-            numberOfValueParameters * 2)
+                                                                          numberOfValueParameters * 2)
                                                                   //Need to make a list first rather than directly using the
                                                                   //stream's spliterator so the result spliterator is SIZED
-                                                                  .collect(Collectors.toList())
-                                                                  .spliterator();
+                                                                  .collect(Collectors.toList()).spliterator();
         final Spliterator<String> givenTypeVariables = nextTypeVariables.trySplit();
         final String[] typeVariablePairHolder = new String[2];
         ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
-        while (givenTypeVariables.tryAdvance(s -> typeVariablePairHolder[0] = s)
-               && nextTypeVariables.tryAdvance(s -> typeVariablePairHolder[1] = s)) {
+        while (givenTypeVariables.tryAdvance(s -> typeVariablePairHolder[0] = s) &&
+               nextTypeVariables.tryAdvance(s -> typeVariablePairHolder[1] = s)) {
             final ObjectNode objNode = JsonNodeFactory.instance.objectNode()
                                                                .put("given", typeVariablePairHolder[0])
                                                                .put("next", typeVariablePairHolder[1]);

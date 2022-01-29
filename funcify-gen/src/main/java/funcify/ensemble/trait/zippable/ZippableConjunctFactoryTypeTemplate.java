@@ -16,19 +16,20 @@ import funcify.tool.container.SyncMap;
 import funcify.trait.Trait;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.WriteResult;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author smccarron
@@ -46,7 +47,7 @@ public class ZippableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public List<String> getDestinationTypePackagePathSegments() {
-        return Arrays.asList("funcify", "trait", "zippable", "conjunct");
+        return Arrays.asList("funcify", "trait", "factory", "zippable", "conjunct");
     }
 
     @Override
@@ -56,13 +57,16 @@ public class ZippableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
-        logger.debug("create_types_for_session: [ {} ]",
-                     SyncMap.empty()
-                            .put("types", "ZippableConjunctEnsembleFactory[1..n]"));
+        logger.debug("create_types_for_session: [ {} ]", SyncMap.empty().put("types", "ZippableConjunctEnsembleFactory[1..n]"));
         try {
+            final SyncList<EnsembleKind> ensembleKindsToUse = session.getEnsembleKinds().copy();
+            session.getEnsembleKinds()
+                   .stream()
+                   .max(Comparator.comparing(EnsembleKind::getNumberOfValueParameters))
+                   .ifPresent(ensembleKindsToUse::removeValue);
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = SyncMap.empty();
-            for (EnsembleKind ek : session.getEnsembleKinds()) {
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getConjunctZippableEnsembleFactoryTypeResults();
+            for (EnsembleKind ek : ensembleKindsToUse) {
                 final String className = getTraitNameForEnsembleKind(ek) + "Factory";
                 final SyncMap<String, Object> params = SyncMap.of("package",
                                                                   getDestinationTypePackagePathSegments(),
@@ -82,26 +86,24 @@ public class ZippableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
-                                                                             getDestinationTypePackagePathSegments())
+                                                                                 getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName(getStringTemplateGroupFileName())
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(
-                                                                             getStringTemplateGroupFilePath())
+                                                                                 getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
                 if (writeResult.isFailure()) {
-                    throw writeResult.getFailureValue()
-                                     .orElseThrow(() -> new FuncifyCodeGenException("failure value missing"));
+                    throw writeResult.getFailureValue().orElseThrow(() -> new FuncifyCodeGenException("failure value missing"));
                 }
                 results.put(ek, writeResult);
             }
             return session.withConjunctZippableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
-                         t.getClass()
-                          .getSimpleName(),
+                         t.getClass().getSimpleName(),
                          t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
@@ -135,25 +137,20 @@ public class ZippableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
     private JsonNode determineFunctionTypeParametersForZipperMethodParameter(final int zipMethodIndex,
                                                                              final int numberOfTypeParameters) {
 
-        final List<Iterator<String>> iterators = IntStream.range(0, zipMethodIndex + 2)
-                                                          .mapToObj(zi -> {
-                                                              return IntStream.range(numberOfTypeParameters * zi,
-                                                                                     numberOfTypeParameters * (zi + 1))
-                                                                              .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                                                              .iterator();
-                                                          })
-                                                          .collect(Collectors.toList());
-        return IntStream.range(0, numberOfTypeParameters)
-                        .mapToObj(i -> {
-                            final ArrayNode functionParamSet = JsonNodeFactory.instance.arrayNode(numberOfTypeParameters + 1);
-                            for (Iterator<String> iter : iterators) {
-                                if (iter.hasNext()) {
-                                    functionParamSet.add(iter.next());
-                                }
-                            }
-                            return functionParamSet;
-                        })
-                        .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll);
+        final List<Iterator<String>> iterators = IntStream.range(0, zipMethodIndex + 2).mapToObj(zi -> {
+            return IntStream.range(numberOfTypeParameters * zi, numberOfTypeParameters * (zi + 1))
+                            .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                            .iterator();
+        }).collect(Collectors.toList());
+        return IntStream.range(0, numberOfTypeParameters).mapToObj(i -> {
+            final ArrayNode functionParamSet = JsonNodeFactory.instance.arrayNode(numberOfTypeParameters + 1);
+            for (Iterator<String> iter : iterators) {
+                if (iter.hasNext()) {
+                    functionParamSet.add(iter.next());
+                }
+            }
+            return functionParamSet;
+        }).reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll);
 
     }
 
@@ -166,27 +163,24 @@ public class ZippableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     private JsonNode determineNewTypeVariablesForZipMethod(final int zipMethodIndex,
                                                            final int numberOfTypeParameters) {
-        return IntStream.range(numberOfTypeParameters, numberOfTypeParameters * (zipMethodIndex + Math.max(2, numberOfTypeParameters)))
+        return IntStream.range(numberOfTypeParameters,
+                               numberOfTypeParameters * (zipMethodIndex + Math.max(2, numberOfTypeParameters)))
                         .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
                         .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll);
     }
 
     private ArrayNode determineContainerParametersForZipMethod(final int zipMethodIndex,
                                                                final int numberOfTypeParameters) {
-        return IntStream.range(1, Math.max(2, zipMethodIndex + 2))
-                        .mapToObj(zi -> {
-                            final ObjectNode containerParam = JsonNodeFactory.instance.objectNode();
-                            containerParam.put("index", zi);
-                            containerParam.set("type_variables", IntStream.range((numberOfTypeParameters * (zi - 1)),
-                                                                                 (numberOfTypeParameters * (zi - 1))
-                                                                                 + numberOfTypeParameters)
-                                                                          .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                                                          .reduce(JsonNodeFactory.instance.arrayNode(),
-                                                                                  ArrayNode::add,
-                                                                                  ArrayNode::addAll));
-                            return containerParam;
-                        })
-                        .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll);
+        return IntStream.range(1, Math.max(2, zipMethodIndex + 2)).mapToObj(zi -> {
+            final ObjectNode containerParam = JsonNodeFactory.instance.objectNode();
+            containerParam.put("index", zi);
+            containerParam.set("type_variables",
+                               IntStream.range((numberOfTypeParameters * (zi - 1)),
+                                               (numberOfTypeParameters * (zi - 1)) + numberOfTypeParameters)
+                                        .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                        .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+            return containerParam;
+        }).reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll);
     }
 
 }
