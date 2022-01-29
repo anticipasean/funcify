@@ -48,6 +48,12 @@ public class TypeGenerationSession<V, R> {
     private final SyncMap<EnsembleKind, WriteResult<R>> errableFunctionTypeResults = SyncMap.empty();
 
     @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> consumerFunctionTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> errableConsumerFunctionTypeResults = SyncMap.empty();
+
+    @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> conjunctMappableEnsembleFactoryTypeResults = SyncMap.empty();
 
     @Default
