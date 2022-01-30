@@ -1,0 +1,83 @@
+import "antlr/funcify/ensemble/trait/design/wrappable/wrappable_conjunct_design_type.stg"
+
+
+traversable_conjunct_design_type(class_name,
+                                 implemented_type,
+                                 container_type,
+                                 package=[],
+                                 witness_type="WT",
+                                 type_variables=[],
+                                 ensemble_type_package=[]) ::= <<
+package <package; separator=".">;
+
+<ensemble_type_import(implemented_type.type_name, implemented_type.type_package)>
+import java.util.Collections;
+import java.util.List;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.stream.Stream;
+
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
+
+<type_variables:{tv | <conjunct_to_list_method(container_type=container_type,
+                                               witness_type=witness_type,
+                                               current_type_variable=tv,
+                                               type_variables=type_variables,
+                                               suffix=i)>};separator="\n\n">
+
+
+<type_variables:{tv | <conjunct_iterator_method(container_type=container_type,
+                                                witness_type=witness_type,
+                                                current_type_variable=tv,
+                                                type_variables=type_variables,
+                                                suffix=i)>};separator="\n\n">
+
+
+<type_variables:{tv | <conjunct_spliterator_method(container_type=container_type,
+                                                   witness_type=witness_type,
+                                                   current_type_variable=tv,
+                                                   type_variables=type_variables,
+                                                   suffix=i)>};separator="\n\n">
+
+
+<type_variables:{tv | <conjunct_stream_method(container_type=container_type,
+                                              witness_type=witness_type,
+                                              current_type_variable=tv,
+                                              type_variables=type_variables,
+                                              suffix=i)>};separator="\n\n">
+
+
+}
+>>
+
+conjunct_to_list_method(container_type,
+                        witness_type="WT",
+                        current_type_variable="",
+                        suffix="",
+                        type_variables=[]) ::= <<
+    List\<<current_type_variable>\> toList<suffix>();
+>>
+
+conjunct_iterator_method(container_type,
+                         witness_type="WT",
+                         current_type_variable="",
+                         suffix="",
+                         type_variables=[]) ::= <<
+    Iterator\<<current_type_variable>\> iterator<suffix>();
+>>
+
+conjunct_spliterator_method(container_type,
+                            witness_type="WT",
+                            current_type_variable="",
+                            suffix="",
+                            type_variables=[]) ::= <<
+    Spliterator\<<current_type_variable>\> spliterator<suffix>();
+>>
+
+conjunct_stream_method(container_type,
+                       witness_type="WT",
+                       current_type_variable="",
+                       suffix="",
+                       type_variables=[]) ::= <<
+    Stream\<<current_type_variable>\> stream<suffix>();
+>>
