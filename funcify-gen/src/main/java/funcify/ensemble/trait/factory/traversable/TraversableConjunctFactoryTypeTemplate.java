@@ -46,7 +46,7 @@ public class TraversableConjunctFactoryTypeTemplate<V, R> implements TraitFactor
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "traversable_conjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "factory", "traversable", "traversable_conjunct_factory_type.stg");
     }
 
     @Override

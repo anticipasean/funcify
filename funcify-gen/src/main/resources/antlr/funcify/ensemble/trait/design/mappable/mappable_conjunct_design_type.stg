@@ -1,4 +1,4 @@
-import "wrappable_conjunct_design_type.stg"
+import "antlr/funcify/ensemble/trait/design/wrappable/wrappable_conjunct_design_type.stg"
 
 
 mappable_conjunct_design_type(class_name,

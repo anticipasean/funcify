@@ -1,4 +1,4 @@
-import "ensemble_type.stg"
+import "antlr/funcify/ensemble/basetype/ensemble_type.stg"
 
 consumer_function_type(ensemble_type_name,
                        arity="",

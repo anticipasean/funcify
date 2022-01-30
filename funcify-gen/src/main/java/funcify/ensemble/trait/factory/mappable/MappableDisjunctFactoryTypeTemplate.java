@@ -11,6 +11,10 @@ import funcify.tool.container.SyncMap;
 import funcify.trait.Trait;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.WriteResult;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -22,9 +26,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author smccarron
@@ -47,14 +48,12 @@ public class MappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "mappable_disjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "factory", "mappable", "mappable_disjunct_factory_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
-        logger.debug("create_types_for_session: [ {} ]",
-                     SyncMap.empty()
-                            .put("types", "MappableDisjunctEnsembleFactory[1..n]"));
+        logger.debug("create_types_for_session: [ {} ]", SyncMap.empty().put("types", "MappableDisjunctEnsembleFactory[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctMappableEnsembleFactoryTypeResults();
@@ -77,35 +76,33 @@ public class MappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                                    nextTypeVariableSequences(ek.getNumberOfValueParameters()))
                                                               .put("map_impl_sequences",
                                                                    createMapImplementationSequences(CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(
-                                                                       ek.getNumberOfValueParameters())
+                                                                                                                        ek.getNumberOfValueParameters())
                                                                                                                 .collect(
-                                                                                                                    Collectors.toList()),
+                                                                                                                        Collectors.toList()),
                                                                                                     nextTypeVariableSequences(ek.getNumberOfValueParameters())))
                                                               .put("container_type",
                                                                    getContainerTypeJsonInstanceFor(ek, Trait.DISJUNCT));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
-                                                                             getDestinationTypePackagePathSegments())
+                                                                                 getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName(getStringTemplateGroupFileName())
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(
-                                                                             getStringTemplateGroupFilePath())
+                                                                                 getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
                 if (writeResult.isFailure()) {
-                    throw writeResult.getFailureValue()
-                                     .orElseThrow(() -> new FuncifyCodeGenException("failure value missing"));
+                    throw writeResult.getFailureValue().orElseThrow(() -> new FuncifyCodeGenException("failure value missing"));
                 }
                 results.put(ek, writeResult);
             }
             return session.withDisjunctMappableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
-                         t.getClass()
-                          .getSimpleName(),
+                         t.getClass().getSimpleName(),
                          t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
@@ -117,54 +114,48 @@ public class MappableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     private List<List<String>> createMapImplementationSequences(final List<String> typeVariables,
                                                                 final List<List<String>> nextTypeVariableSequences) {
-        return nextTypeVariableSequences.stream()
-                                        .reduce(new ArrayList<>(), (seqList, seq) -> {
-                                            final Iterator<String> typeVarIter = typeVariables.iterator();
-                                            final Iterator<String> nextTypeVarSeqIter = seq.iterator();
-                                            final List<String> currentSeq = new ArrayList<>();
-                                            int index = 0;
-                                            while (typeVarIter.hasNext() && nextTypeVarSeqIter.hasNext()) {
-                                                final String typeVar = typeVarIter.next();
-                                                final String nextTypeVar = nextTypeVarSeqIter.next();
-                                                final String text;
-                                                if (typeVar.equals(nextTypeVar)) {
-                                                    text = String.format("(%s input%s) -> this.<%s>wrap%d(input%s)",
-                                                                         typeVar,
-                                                                         typeVar,
-                                                                         seq.stream()
-                                                                            .collect(Collectors.joining(", ")),
-                                                                         ++index,
-                                                                         typeVar);
-                                                } else {
-                                                    text = String.format("(%s input%s) -> this.<%s>wrap%d(mapper.apply(input%s))",
-                                                                         typeVar,
-                                                                         typeVar,
-                                                                         seq.stream()
-                                                                            .collect(Collectors.joining(", ")),
-                                                                         ++index,
-                                                                         typeVar);
-                                                }
-                                                currentSeq.add(text);
-                                            }
-                                            seqList.add(currentSeq);
-                                            return seqList;
-                                        }, (l1, l2) -> {
-                                            l1.addAll(l2);
-                                            return l1;
-                                        });
+        return nextTypeVariableSequences.stream().reduce(new ArrayList<>(), (seqList, seq) -> {
+            final Iterator<String> typeVarIter = typeVariables.iterator();
+            final Iterator<String> nextTypeVarSeqIter = seq.iterator();
+            final List<String> currentSeq = new ArrayList<>();
+            int index = 0;
+            while (typeVarIter.hasNext() && nextTypeVarSeqIter.hasNext()) {
+                final String typeVar = typeVarIter.next();
+                final String nextTypeVar = nextTypeVarSeqIter.next();
+                final String text;
+                if (typeVar.equals(nextTypeVar)) {
+                    text = String.format("(%s input%s) -> this.<%s>wrap%d(input%s)",
+                                         typeVar,
+                                         typeVar,
+                                         seq.stream().collect(Collectors.joining(", ")),
+                                         ++index,
+                                         typeVar);
+                } else {
+                    text = String.format("(%s input%s) -> this.<%s>wrap%d(mapper.apply(input%s))",
+                                         typeVar,
+                                         typeVar,
+                                         seq.stream().collect(Collectors.joining(", ")),
+                                         ++index,
+                                         typeVar);
+                }
+                currentSeq.add(text);
+            }
+            seqList.add(currentSeq);
+            return seqList;
+        }, (l1, l2) -> {
+            l1.addAll(l2);
+            return l1;
+        });
     }
 
     private List<List<String>> nextTypeVariableSequences(final int numberOfValueParameters) {
         final String nextTypeVariable = CharacterOps.uppercaseLetterByIndexWithNumericExtension(numberOfValueParameters);
         final String[] array = CharacterOps.firstNUppercaseLettersWithNumericIndexExtension(numberOfValueParameters)
                                            .toArray(String[]::new);
-        return IntStream.range(0, numberOfValueParameters)
-                        .mapToObj(i -> {
-                            return Stream.concat(Stream.concat(Arrays.stream(array, 0, i), Stream.of(nextTypeVariable)),
-                                                 Arrays.stream(array, i + 1, numberOfValueParameters))
-                                         .collect(Collectors.toList());
-                        })
-                        .collect(Collectors.toList());
+        return IntStream.range(0, numberOfValueParameters).mapToObj(i -> {
+            return Stream.concat(Stream.concat(Arrays.stream(array, 0, i), Stream.of(nextTypeVariable)),
+                                 Arrays.stream(array, i + 1, numberOfValueParameters)).collect(Collectors.toList());
+        }).collect(Collectors.toList());
 
     }
 }

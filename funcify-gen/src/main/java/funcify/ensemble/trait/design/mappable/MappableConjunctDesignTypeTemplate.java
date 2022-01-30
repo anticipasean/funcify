@@ -53,7 +53,7 @@ public class MappableConjunctDesignTypeTemplate<V, R> implements TraitDesignGene
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "mappable_conjunct_design_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "design", "mappable", "mappable_conjunct_design_type.stg");
     }
 
     @Override

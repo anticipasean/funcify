@@ -1,4 +1,4 @@
-import "ensemble_type.stg"
+import "antlr/funcify/ensemble/basetype/ensemble_type.stg"
 
 wrappable_disjunct_design_type(class_name, container_type, package=[], witness_type="WT", type_variables=[], next_type_variable="") ::= <<
 package <package; separator=".">;

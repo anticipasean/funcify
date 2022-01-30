@@ -47,7 +47,7 @@ public class ConjunctEnsembleTypeTemplate<V, R> implements TraitGenerationTempla
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "conjunct_ensemble_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "basetype", "conjunct_ensemble_type.stg");
     }
 
     @Override

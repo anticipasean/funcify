@@ -1,4 +1,4 @@
-import "wrappable_conjunct_factory_type.stg"
+import "antlr/funcify/ensemble/trait/factory/wrappable/wrappable_conjunct_factory_type.stg"
 
 
 flattenable_conjunct_factory_type(class_name,

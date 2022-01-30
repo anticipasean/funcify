@@ -47,7 +47,7 @@ public class WrappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryG
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "wrappable_conjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "factory", "wrappable", "wrappable_conjunct_factory_type.stg");
     }
 
     @Override

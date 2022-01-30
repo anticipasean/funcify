@@ -1,6 +1,11 @@
-import "ensemble_type.stg"
+import "antlr/funcify/ensemble/basetype/ensemble_type.stg"
 
-wrappable_conjunct_factory_type(class_name, container_type, package=[], witness_type="WT", type_variables=[], next_type_variable="") ::= <<
+wrappable_conjunct_design_type(class_name,
+                               container_type,
+                               package=[],
+                               witness_type="WT",
+                               type_variables=[],
+                               next_type_variable="") ::= <<
 package <package; separator=".">;
 
 <ensemble_type_import(container_type.type_name, container_type.type_package)>

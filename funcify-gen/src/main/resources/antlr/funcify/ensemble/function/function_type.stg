@@ -1,33 +1,38 @@
-import "ensemble_type.stg"
+import "antlr/funcify/ensemble/basetype/ensemble_type.stg"
 
-errable_function_type(ensemble_type_name,
-                      arity="",
-                      ensemble_type_package=[],
-                      package=[],
-                      witness_type="WT",
-                      next_type_variable="",
-                      type_variables=[]) ::= <<
+function_type(ensemble_type_name, arity="", ensemble_type_package=[], package=[], witness_type="WT", next_type_variable="", type_variables=[], implements_supplier=false, implements_function=false) ::= <<
 package <package; separator=".">;
 
 <null_check_import()>
 <ensemble_type_import(ensemble_type_name, ensemble_type_package)>
-import <package; separator=".">.ErrableFn<arity>.<witness_type>;
+import <package; separator=".">.Fn<arity>.<witness_type>;
+<if(implements_supplier)>
+import java.util.function.Supplier;
 
+@FunctionalInterface
+public interface <function_type_declaration(arity, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)>, Supplier\<<first(type_variables)>\> {
+<elseif(implements_function)>
+<ensemble_type_import("Solo", ensemble_type_package)>
+<java_util_func_import()>
+
+public interface <function_type_declaration(arity, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)>, Function\<<type_variables; separator=", ">\> {
+<else>
 <ensemble_type_import("Solo", ensemble_type_package)>
 
-public interface <errable_function_type_declaration(arity, type_variables)> extends <errable_ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
+public interface <function_type_declaration(arity, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
+<endif>
 
 <witness_type_definition(witness_type)>
 
-<narrow_kind_functions(arity, type_variables, witness_type, ensemble_type_name)>
+<narrow_kind_functions(arity, type_variables, witness_type, ensemble_type_name, implements_supplier)>
 
-<apply_method(type_variables)>
+<apply_method(type_variables, implements_supplier)>
 
 <map_method(arity, type_variables, next_type_variable)>
 
-<and_then_method(arity, type_variables, next_type_variable)>
+<and_then_method(arity, type_variables, next_type_variable, implements_function)>
 
-<flat_map_method(arity, type_variables, next_type_variable)>
+<flat_map_method(arity, type_variables, next_type_variable, implements_supplier, implements_function)>
 
 <curry_method(type_variables)>
 
@@ -36,13 +41,9 @@ public interface <errable_function_type_declaration(arity, type_variables)> exte
 }
 >>
 
-errable_function_type_declaration(arity="0", type_variables=[]) ::= "ErrableFn<arity>\<<type_variables; separator={, }>, THR extends Throwable>"
+function_type_declaration(arity="0", type_variables=[]) ::= "Fn<arity>\<<type_variables; separator={, }>>"
 
-function_type_declaration(arity="0", type_variables=[]) ::= "ErrableFn<arity>\<<type_variables; separator={, }>, THR>"
-
-function_type_parameter_declaration(type_variables, next_type_variable) ::= "final ErrableFn1\<<type_variables:{tv | ? super <tv>};separator={, }>, ? extends <next_type_variable>, THR> function"
-
-errable_ensemble_type_declaration(ensemble_type_name, witness_type="WT", type_variables=[]) ::= "<ensemble_type_name>\<<witness_type>, <type_variables; separator={, }>, THR>"
+function_type_parameter_declaration(type_variables, next_type_variable) ::= "final Fn1\<<type_variables:{tv | ? super <tv>};separator={, }>, ? extends <next_type_variable>> function"
 
 witness_type_definition(witness_type) ::= <<
 
@@ -53,19 +54,19 @@ witness_type_definition(witness_type) ::= <<
 
 narrow_kind_functions(arity="0", type_variables=[], witness_type="WT", ensemble_type_name="", implements_supplier=false) ::= <<
 
-    static \<<type_variables; separator=", ">, THR extends Throwable> <function_type_declaration(arity, type_variables)> narrowK(final <recursive_solo_type_declaration(witness_type, [type_variables,"THR"])> wideInstance) {
+    static \<<type_variables; separator=", ">\> <function_type_declaration(arity, type_variables)> narrowK(final <recursive_solo_type_declaration(witness_type, type_variables)> wideInstance) {
         return (<function_type_declaration(arity, type_variables)>) wideInstance;
     }
 
 <if(!implements_supplier)>
-    static \<<type_variables; separator=", ">, THR extends Throwable> <function_type_declaration(arity, type_variables)> narrowK(final <errable_ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> wideInstance) {
+    static \<<type_variables; separator=", ">\> <function_type_declaration(arity, type_variables)> narrowK(final <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> wideInstance) {
         return (<function_type_declaration(arity, type_variables)>) wideInstance;
     }
 <endif>
 >>
 
 apply_method(type_variables=[], implements_supplier=false) ::= <<
-    <last(type_variables)> apply(<trunc(type_variables):{tv | final <tv> input<i>};anchor,separator=",\n">) throws THR;
+    <last(type_variables)> apply(<trunc(type_variables):{tv | final <tv> input<i>};anchor,separator=",\n">);
 
 <if(implements_supplier)>
     @Override
@@ -78,7 +79,7 @@ apply_method(type_variables=[], implements_supplier=false) ::= <<
 map_method(arity="0", type_variables=[], next_type_variable="") ::= <<
     default \<<next_type_variable>\> <function_type_declaration(arity, [trunc(type_variables), next_type_variable])> map(<function_type_parameter_declaration(last(type_variables), next_type_variable)>) {
         <null_check("function")>;
-        return (<trunc(type_variables):{tv | <tv> input<i>};anchor,separator=",\n">) -> {
+        return (<trunc(type_variables):{tv | <tv> input<i>};separator=", ">) -> {
             return function.apply(this.apply(<trunc(type_variables):{tv | input<i>};anchor,separator=",\n">));
         };
     }
@@ -93,20 +94,20 @@ and_then_method(arity="0", type_variables=[], next_type_variable="", implements_
     <endif>
 >>
 
-flat_map_method(arity="0", type_variables=[], next_type_variable="") ::= <<
-    default \<<next_type_variable>\> <function_type_declaration(arity, [trunc(type_variables), next_type_variable])> flatMap(<flat_map_method_parameter(arity, type_variables, next_type_variable)>) {
+flat_map_method(arity="0", type_variables=[], next_type_variable="", implements_supplier=false, implements_function=false) ::= <<
+    default \<<next_type_variable>\> <function_type_declaration(arity, [trunc(type_variables), next_type_variable])> flatMap(<flat_map_method_parameter(arity, type_variables, next_type_variable, implements_supplier, implements_function)>) {
         <null_check("function")>;
-        return (<trunc(type_variables):{tv | <tv> input<i>};anchor,separator=",\n">) -> {
+        return (<trunc(type_variables):{tv | <tv> input<i>};separator=", ">) -> {
             return function.apply(this.apply(<trunc(type_variables):{tv | input<i>};anchor,separator=",\n">)).apply(<trunc(type_variables):{tv | input<i>};anchor,separator=",\n">);
         };
     }
 >>
 
-flat_map_method_parameter(arity="0", type_variables=[], next_type_variable="") ::= <<
-<if(!rest(type_variables))><\\>
-final ErrableFn1\<? super <last(type_variables)>, ? extends ErrableFn<arity>\<? extends <next_type_variable>, THR>, THR> function<\\>
+flat_map_method_parameter(arity="0", type_variables=[], next_type_variable="", implements_supplier=false, implements_function=false) ::= <<
+<if(implements_supplier)><\\>
+final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<? extends <next_type_variable>\>> function<\\>
 <else><\\>
-final ErrableFn1\<? super <last(type_variables)>, ? extends ErrableFn<arity>\<<trunc(type_variables):{tv | ? super <tv>};separator=", ">, ? extends <next_type_variable>, THR>, THR> function<\\>
+final Fn1\<? super <last(type_variables)>, ? extends Fn<arity>\<<trunc(type_variables):{tv | ? super <tv>};separator=", ">, ? extends <next_type_variable>\>> function<\\>
 <endif>
 >>
 
@@ -122,10 +123,10 @@ curry_method(type_variables=[]) ::= <<
 
 curry_method_return_type(current_type_variable="",
                          remaining_type_variables=[]) ::= <<
-ErrableFn1\<<current_type_variable>, <if(rest(remaining_type_variables))><curry_method_return_type(first(remaining_type_variables),
-                                                                                                   rest(remaining_type_variables))><\\>
-                                     <else><first(remaining_type_variables)><\\>
-                                     <endif>, THR>
+Fn1\<<current_type_variable>, <if(rest(remaining_type_variables))><curry_method_return_type(first(remaining_type_variables),
+                                                                                            rest(remaining_type_variables))><\\>
+                              <else><first(remaining_type_variables)><\\>
+                              <endif>\>
 >>
 
 curry_method_return_function(all_type_variables=[],
@@ -143,7 +144,7 @@ curry_method_return_function(all_type_variables=[],
 uncurry_method(arity="0",
                type_variables=[]) ::= <<
 <if(rest(rest(type_variables)))>
-    static \<<type_variables; separator=", ">, THR extends Throwable> <function_type_declaration(arity, type_variables)> uncurry(final <curry_method_return_type(first(type_variables), rest(type_variables))> function) {
+    static \<<type_variables; separator=", ">\> <function_type_declaration(arity, type_variables)> uncurry(final <curry_method_return_type(first(type_variables), rest(type_variables))> function) {
         <null_check("function")>;
         return (<trunc(type_variables):{tv|<tv> input<tv>};anchor,separator=",\n">) -> {
                 return function<uncurry_method_apply(first(type_variables), rest(type_variables))>;

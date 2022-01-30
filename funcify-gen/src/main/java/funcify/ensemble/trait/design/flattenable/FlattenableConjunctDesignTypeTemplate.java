@@ -48,13 +48,12 @@ public class FlattenableConjunctDesignTypeTemplate<V, R> implements TraitDesignG
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "flattenable_conjunct_design_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "design", "flattenable", "flattenable_conjunct_design_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
-        logger.debug("create_types_for_session: [ {} ]",
-                     SyncMap.empty().put("types", "ConjunctFlattenableEnsembleDesign[1..n]"));
+        logger.debug("create_types_for_session: [ {} ]", SyncMap.empty().put("types", "ConjunctFlattenableEnsembleDesign[1..n]"));
         try {
             final SyncList<EnsembleKind> ensembleKindsToUse = session.getEnsembleKinds().copy();
             session.getEnsembleKinds()
@@ -75,8 +74,7 @@ public class FlattenableConjunctDesignTypeTemplate<V, R> implements TraitDesignG
                                                                   "next_type_variable",
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters()))
                                                               .put("implemented_type",
-                                                                   getImplementedTypeInstance(ek,
-                                                                                              Trait.CONJUNCT))
+                                                                   getImplementedTypeInstance(ek, Trait.CONJUNCT))
                                                               .put("next_type_variable_sequences",
                                                                    nextTypeVariableSequences(ek.getNumberOfValueParameters()))
                                                               .put("container_type",

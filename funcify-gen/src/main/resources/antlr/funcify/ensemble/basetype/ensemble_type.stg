@@ -1,4 +1,4 @@
-import "funcify.stg"
+import "antlr/funcify/funcify.stg"
 
 ensemble_type_import(class_name, package=[]) ::= <<
 import <package; separator=".">.<class_name>;

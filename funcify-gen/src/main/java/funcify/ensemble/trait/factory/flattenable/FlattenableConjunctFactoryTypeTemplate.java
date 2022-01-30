@@ -48,7 +48,7 @@ public class FlattenableConjunctFactoryTypeTemplate<V, R> implements TraitFactor
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "flattenable_conjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "factory", "flattenable", "flattenable_conjunct_factory_type.stg");
     }
 
     @Override

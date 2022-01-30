@@ -36,7 +36,7 @@ public class ConsumerFunctionTypeTemplate<V, R> implements TypeGenerationTemplat
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "consumer_function_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "function", "consumer_function_type.stg");
     }
 
     @Override

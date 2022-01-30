@@ -52,7 +52,7 @@ public class ZippableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "zippable_conjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "factory", "zippable", "zippable_conjunct_factory_type.stg");
     }
 
     @Override

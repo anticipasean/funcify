@@ -52,7 +52,7 @@ public class TraversableDisjunctFactoryTypeTemplate<V, R> implements TraitFactor
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "traversable_disjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "factory", "traversable", "traversable_disjunct_factory_type.stg");
     }
 
     @Override

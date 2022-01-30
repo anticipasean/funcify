@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +47,7 @@ public class FlattenableDisjunctDesignTypeTemplate<V, R> implements TraitDesignG
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "flattenable_disjunct_design_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "design", "flattenable", "flattenable_disjunct_design_type.stg");
     }
 
     @Override

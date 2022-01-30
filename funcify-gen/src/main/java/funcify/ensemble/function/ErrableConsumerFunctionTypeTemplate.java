@@ -38,7 +38,7 @@ public class ErrableConsumerFunctionTypeTemplate<V, R> implements TypeGeneration
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "errable_consumer_function_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "function", "errable_consumer_function_type.stg");
     }
 
     @Override

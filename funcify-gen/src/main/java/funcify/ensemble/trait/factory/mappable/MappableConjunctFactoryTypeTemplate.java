@@ -53,7 +53,7 @@ public class MappableConjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "mappable_conjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "factory", "mappable", "mappable_conjunct_factory_type.stg");
     }
 
     @Override

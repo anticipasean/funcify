@@ -1,4 +1,4 @@
-import "wrappable_disjunct_factory_type.stg"
+import "antlr/funcify/ensemble/trait/factory/wrappable/wrappable_disjunct_factory_type.stg"
 
 
 mappable_disjunct_factory_type(class_name,

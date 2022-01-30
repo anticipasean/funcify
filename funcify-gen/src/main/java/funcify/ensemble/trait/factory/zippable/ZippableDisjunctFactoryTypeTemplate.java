@@ -16,6 +16,15 @@ import funcify.tool.container.SyncMap;
 import funcify.trait.Trait;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.WriteResult;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.With;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -31,14 +40,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.With;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author smccarron
@@ -61,14 +62,12 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "zippable_disjunct_factory_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "trait", "factory", "zippable", "zippable_disjunct_factory_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
-        logger.debug("create_types_for_session: [ {} ]",
-                     SyncMap.empty()
-                            .put("types", "ZippableDisjunctEnsembleFactory[1..n]"));
+        logger.debug("create_types_for_session: [ {} ]", SyncMap.empty().put("types", "ZippableDisjunctEnsembleFactory[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final SyncMap<EnsembleKind, WriteResult<R>> results = SyncMap.empty();
@@ -93,26 +92,24 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
-                                                                             getDestinationTypePackagePathSegments())
+                                                                                 getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName(getStringTemplateGroupFileName())
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(
-                                                                             getStringTemplateGroupFilePath())
+                                                                                 getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
                 if (writeResult.isFailure()) {
-                    throw writeResult.getFailureValue()
-                                     .orElseThrow(() -> new FuncifyCodeGenException("failure value missing"));
+                    throw writeResult.getFailureValue().orElseThrow(() -> new FuncifyCodeGenException("failure value missing"));
                 }
                 results.put(ek, writeResult);
             }
             return session.withDisjunctZippableEnsembleFactoryTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
-                         t.getClass()
-                          .getSimpleName(),
+                         t.getClass().getSimpleName(),
                          t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
@@ -134,37 +131,35 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
             return JsonNodeFactory.instance.objectNode();
         }
         final ObjectNode containerNodes = JsonNodeFactory.instance.objectNode();
-        containerNodes.set("other", IntStream.range(numberOfTypeParameters,
-                                                    (zipMethodIndex * numberOfTypeParameters) + numberOfTypeParameters)
-                                             .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                             .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
-        containerNodes.set("next", IntStream.range((numberOfTypeParameters * zipMethodIndex) + numberOfTypeParameters,
-                                                   (zipMethodIndex * numberOfTypeParameters) + (numberOfTypeParameters * 2))
-                                            .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                            .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
-        containerNodes.set("given", IntStream.range(0, numberOfTypeParameters)
-                                             .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
-                                             .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+        containerNodes.set("other",
+                           IntStream.range(numberOfTypeParameters,
+                                           (zipMethodIndex * numberOfTypeParameters) + numberOfTypeParameters)
+                                    .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                    .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+        containerNodes.set("next",
+                           IntStream.range((numberOfTypeParameters * zipMethodIndex) + numberOfTypeParameters,
+                                           (zipMethodIndex * numberOfTypeParameters) + (numberOfTypeParameters * 2))
+                                    .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                    .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
+        containerNodes.set("given",
+                           IntStream.range(0, numberOfTypeParameters)
+                                    .mapToObj(CharacterOps::uppercaseLetterByIndexWithNumericExtension)
+                                    .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll));
         final ArrayNode containerNodeArr = JsonNodeFactory.instance.arrayNode();
         for (int i = 0; i < numberOfTypeParameters; i++) {
             final ObjectNode zipMethodContainer = JsonNodeFactory.instance.objectNode();
             zipMethodContainer.put("method_name", "zip" + zipMethodIndex + "on" + (i + 1));
-            zipMethodContainer.set("new_type_variables", StreamSupport.stream(containerNodes.get("other")
-                                                                                            .spliterator(), false)
-                                                                      .limit(zipMethodIndex)
-                                                                      .reduce(JsonNodeFactory.instance.arrayNode(),
-                                                                              ArrayNode::add,
-                                                                              ArrayNode::addAll)
-                                                                      .add(containerNodes.get("next")
-                                                                                         .get(0)));
+            zipMethodContainer.set("new_type_variables",
+                                   StreamSupport.stream(containerNodes.get("other").spliterator(), false)
+                                                .limit(zipMethodIndex)
+                                                .reduce(JsonNodeFactory.instance.arrayNode(), ArrayNode::add, ArrayNode::addAll)
+                                                .add(containerNodes.get("next").get(0)));
             final ArrayNode returnTypeVariables = JsonNodeFactory.instance.arrayNode();
             for (int ri = 0; ri < numberOfTypeParameters; ri++) {
                 if (ri == i) {
-                    returnTypeVariables.add(containerNodes.get("next")
-                                                          .get(0));
+                    returnTypeVariables.add(containerNodes.get("next").get(0));
                 } else {
-                    returnTypeVariables.add(containerNodes.get("given")
-                                                          .get(ri));
+                    returnTypeVariables.add(containerNodes.get("given").get(ri));
                 }
             }
             zipMethodContainer.set("return_type_variables", returnTypeVariables);
@@ -173,29 +168,24 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
             containerParams.add(JsonNodeFactory.instance.objectNode()
                                                         .put("index", 1)
                                                         .set("type_variables", containerNodes.get("given")));
-            functionParams.add(containerNodes.get("given")
-                                             .get(i));
+            functionParams.add(containerNodes.get("given").get(i));
             for (int z = 1; z < zipMethodIndex + 1; z++) {
                 final ObjectNode containerNode = JsonNodeFactory.instance.objectNode();
                 containerNode.put("index", z + 1);
                 final ArrayNode typeVariables = JsonNodeFactory.instance.arrayNode();
                 for (int j = 0; j < numberOfTypeParameters; j++) {
                     if (j == i) {
-                        typeVariables.add(containerNodes.get("other")
-                                                        .get(z - 1));
-                        functionParams.add(containerNodes.get("other")
-                                                         .get(z - 1));
+                        typeVariables.add(containerNodes.get("other").get(z - 1));
+                        functionParams.add(containerNodes.get("other").get(z - 1));
                     } else {
-                        typeVariables.add(containerNodes.get("given")
-                                                        .get(j));
+                        typeVariables.add(containerNodes.get("given").get(j));
                     }
                 }
                 containerNode.set("type_variables", typeVariables);
                 containerParams.add(containerNode);
             }
             zipMethodContainer.set("container_params", containerParams);
-            functionParams.add(containerNodes.get("next")
-                                             .get(0));
+            functionParams.add(containerNodes.get("next").get(0));
             zipMethodContainer.set("function_params", functionParams);
             addPathsNodeToContainer(zipMethodContainer);
             containerNodeArr.add(zipMethodContainer);
@@ -229,21 +219,15 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                    .build();
 
         try {
-            final ContainerRef topContainerRef = ContainerRef.builder()
-                                                             .containerSuffix(String.valueOf(1))
-                                                             .build();
-            context.getComponentStack()
-                   .push(topContainerRef);
+            final ContainerRef topContainerRef = ContainerRef.builder().containerSuffix(String.valueOf(1)).build();
+            context.getComponentStack().push(topContainerRef);
             visitor.visit(context, topContainerRef);
         } catch (final Throwable t) {
             logger.error("add_paths_node_to_container: [ status: failed ] with error [ type: {}, message: {} ]",
-                         t.getClass()
-                          .getSimpleName(),
+                         t.getClass().getSimpleName(),
                          t.getMessage());
         }
-        zipMethodContainer.put("body",
-                               context.getMethodTextBuilder()
-                                      .toString());
+        zipMethodContainer.put("body", context.getMethodTextBuilder().toString());
     }
 
     private static interface MethodBodyComponent {
@@ -307,9 +291,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         }
 
         public int getTotalNumberOfTypeVariables() {
-            return getContainerParams().size() == 0 ? 0 : getContainerParams().get(0)
-                                                                              .get("type_variables")
-                                                                              .size();
+            return getContainerParams().size() == 0 ? 0 : getContainerParams().get(0).get("type_variables").size();
         }
 
     }
@@ -473,8 +455,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                    .append("return ")
                    .append(String.join("", containerRef.getContainerName(), containerRef.getContainerSuffix()));
             visit(context, foldMethodCall);
-            context.getMethodTextBuilder()
-                   .append(";\n");
+            context.getMethodTextBuilder().append(";\n");
 
 
         }
@@ -483,8 +464,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         public void visit(final MethodContext context,
                           final FoldMethodCall foldMethodCall) {
 
-            final MethodBodyComponent currentContainerRef = context.getComponentStack()
-                                                                   .pollFirst();
+            final MethodBodyComponent currentContainerRef = context.getComponentStack().pollFirst();
             if (currentContainerRef == null) {
                 throw new IllegalStateException("current container ref expected but not present on stack");
             }
@@ -493,12 +473,9 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                .map(ContainerRef.class::cast)
                                                .map(ContainerRef::getContainerIndex)
                                                .orElse(-1);
-            context.getComponentStack()
-                   .push(currentContainerRef);
-            context.getMethodTextBuilder()
-                   .append(".fold(");
-            context.getComponentStack()
-                   .push(foldMethodCall);
+            context.getComponentStack().push(currentContainerRef);
+            context.getMethodTextBuilder().append(".fold(");
+            context.getComponentStack().push(foldMethodCall);
             final int totalNumberOfTypeVariables = context.getTotalNumberOfTypeVariables();
             for (int i = 0; i < totalNumberOfTypeVariables; i++) {
                 final int typeVariableIndex = i;
@@ -517,34 +494,28 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                       .distinct()
                                                       .count() == 1;
                 final FunctionParameterValue functionParameterValue = FunctionParameterValue.builder()
-                                                                                            .inputParameterSuffix(
-                                                                                                isUnhappyPath ? String.join("",
-                                                                                                                            typeVariable,
-                                                                                                                            String.valueOf(
-                                                                                                                                containerIndex
-                                                                                                                                + 1))
-                                                                                                    : typeVariable)
+                                                                                            .inputParameterSuffix(isUnhappyPath ?
+                                                                                                                  String.join("",
+                                                                                                                              typeVariable,
+                                                                                                                              String.valueOf(
+                                                                                                                                      containerIndex +
+                                                                                                                                      1)) :
+                                                                                                                  typeVariable)
                                                                                             .containerIndex(containerIndex)
                                                                                             .typeVariableIndex(typeVariableIndex)
                                                                                             .isUnhappyPath(isUnhappyPath)
                                                                                             .build();
                 visit(context, functionParameterValue);
                 if (i < totalNumberOfTypeVariables - 1) {
-                    context.getMethodTextBuilder()
-                           .append(",\n");
+                    context.getMethodTextBuilder().append(",\n");
                 }
                 if (totalNumberOfTypeVariables == 1) {
-                    visit(context,
-                          EmptyCallReturnValue.builder()
-                                              .build());
+                    visit(context, EmptyCallReturnValue.builder().build());
                 }
             }
-            context.getMethodTextBuilder()
-                   .append(")");
-            if (context.getComponentStack()
-                       .peekFirst() instanceof FoldMethodCall) {
-                context.getComponentStack()
-                       .pop();
+            context.getMethodTextBuilder().append(")");
+            if (context.getComponentStack().peekFirst() instanceof FoldMethodCall) {
+                context.getComponentStack().pop();
             }
 
         }
@@ -552,11 +523,9 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         @Override
         public void visit(final MethodContext context,
                           final FunctionParameterValue functionParameterValue) {
-            context.getComponentStack()
-                   .push(functionParameterValue);
+            context.getComponentStack().push(functionParameterValue);
             if (functionParameterValue.getTypeVariableIndex() != 0) {
-                context.getMethodTextBuilder()
-                       .append(getNFourSpaceIndent(functionParameterValue.getContainerIndex()));
+                context.getMethodTextBuilder().append(getNFourSpaceIndent(functionParameterValue.getContainerIndex()));
             }
             context.getMethodTextBuilder()
                    .append("(")
@@ -569,13 +538,9 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                    .append(") -> {\n");
             final FunctionBody functionBody = FunctionBody.of();
             visit(context, functionBody);
-            context.getMethodTextBuilder()
-                   .append(getNFourSpaceIndent(functionParameterValue.getContainerIndex()))
-                   .append("}");
-            if (context.getComponentStack()
-                       .peekFirst() instanceof FunctionParameterValue) {
-                context.getComponentStack()
-                       .pop();
+            context.getMethodTextBuilder().append(getNFourSpaceIndent(functionParameterValue.getContainerIndex())).append("}");
+            if (context.getComponentStack().peekFirst() instanceof FunctionParameterValue) {
+                context.getComponentStack().pop();
             }
 
         }
@@ -584,8 +549,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
         public void visit(final MethodContext context,
                           final FunctionBody functionBody) {
 
-            context.getComponentStack()
-                   .push(functionBody);
+            context.getComponentStack().push(functionBody);
             final Optional<FunctionParameterValue> functionParameterValueForBody = Optional.ofNullable(context.getComponentStack())
                                                                                            .map(Deque::stream)
                                                                                            .orElseGet(Stream::empty)
@@ -593,16 +557,11 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                                                            .map(FunctionParameterValue.class::cast)
                                                                                            .findFirst();
 
-            if (functionParameterValueForBody.filter(FunctionParameterValue::isUnhappyPath)
-                                             .isPresent()
-                && functionParameterValueForBody.map(FunctionParameterValue::getTypeVariableIndex)
-                                                .orElse(-1) >= 0) {
+            if (functionParameterValueForBody.filter(FunctionParameterValue::isUnhappyPath).isPresent() &&
+                functionParameterValueForBody.map(FunctionParameterValue::getTypeVariableIndex).orElse(-1) >= 0) {
                 final int typeVariableIndex = functionParameterValueForBody.map(FunctionParameterValue::getTypeVariableIndex)
                                                                            .orElse(-1);
-                visit(context,
-                      WrapCallReturnValue.builder()
-                                         .methodSuffix(String.valueOf(typeVariableIndex + 1))
-                                         .build());
+                visit(context, WrapCallReturnValue.builder().methodSuffix(String.valueOf(typeVariableIndex + 1)).build());
             } else {
                 final long numOfContainersTraversed = Optional.ofNullable(context.getComponentStack())
                                                               .map(Deque::stream)
@@ -625,13 +584,10 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                                       .containerIndex(nextContainerIndex)
                                                                       .containerSuffix(String.valueOf(nextContainerIndex + 1))
                                                                       .build();
-                        context.getComponentStack()
-                               .push(containerRef);
+                        context.getComponentStack().push(containerRef);
                         visit(context, containerRef);
-                        if (context.getComponentStack()
-                                   .peekFirst() instanceof ContainerRef) {
-                            context.getComponentStack()
-                                   .pop();
+                        if (context.getComponentStack().peekFirst() instanceof ContainerRef) {
+                            context.getComponentStack().pop();
                         }
                     }
                 } else {
@@ -645,17 +601,15 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                                                                              .orElse(-1);
                     final ZipperFunctionCallReturnValue zipperFunctionCallReturnValue = ZipperFunctionCallReturnValue.builder()
                                                                                                                      .wrapFunctionSuffix(
-                                                                                                                         String.valueOf(
-                                                                                                                             closestFuncParamValTypeVariableIndex
-                                                                                                                             + 1))
+                                                                                                                             String.valueOf(
+                                                                                                                                     closestFuncParamValTypeVariableIndex +
+                                                                                                                                     1))
                                                                                                                      .build();
                     visit(context, zipperFunctionCallReturnValue);
                 }
             }
-            if (context.getComponentStack()
-                       .peekFirst() instanceof FunctionBody) {
-                context.getComponentStack()
-                       .pop();
+            if (context.getComponentStack().peekFirst() instanceof FunctionBody) {
+                context.getComponentStack().pop();
             }
 
         }
@@ -685,8 +639,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                    .append("return this.")
                    .append(new StringJoiner("", "<", ">").add(context.getReturnTypeVariables()
                                                                      .stream()
-                                                                     .collect(Collectors.joining(", ")))
-                                                         .toString())
+                                                                     .collect(Collectors.joining(", "))).toString())
                    .append(zipperFunctionCallReturnValue.getWrapFunctionName())
                    .append(zipperFunctionCallReturnValue.getWrapFunctionSuffix())
                    .append("(")
@@ -739,8 +692,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
                        .append("return this.")
                        .append(new StringJoiner("", "<", ">").add(context.getReturnTypeVariables()
                                                                          .stream()
-                                                                         .collect(Collectors.joining(", ")))
-                                                             .toString())
+                                                                         .collect(Collectors.joining(", "))).toString())
                        .append(wrapCallReturnValue.getWrapMethodName())
                        .append(wrapCallReturnValue.getMethodSuffix())
                        .append("(")
@@ -765,9 +717,7 @@ public class ZippableDisjunctFactoryTypeTemplate<V, R> implements TraitFactoryGe
     }
 
     private static String getNFourSpaceIndent(final int numberOfIndents) {
-        return Stream.generate(() -> " ")
-                     .limit(numberOfIndents * 4L)
-                     .collect(Collectors.joining());
+        return Stream.generate(() -> " ").limit(numberOfIndents * 4L).collect(Collectors.joining());
     }
 
 }
