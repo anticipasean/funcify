@@ -15,6 +15,7 @@ import <package; separator=".">.ErrableFn<arity>.<witness_type>;
 
 <ensemble_type_import("Solo", ensemble_type_package)>
 
+<code_generated_comment()>
 public interface <errable_function_type_declaration(arity, type_variables)> extends <errable_ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
 
 <witness_type_definition(witness_type)>

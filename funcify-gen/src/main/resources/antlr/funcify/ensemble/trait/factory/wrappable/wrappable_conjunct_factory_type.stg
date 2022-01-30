@@ -8,6 +8,7 @@ package <package; separator=".">;
 <java_util_func_import()>
 import funcify.function.Fn<length(type_variables)>;
 
+<code_generated_comment()>
 public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> {
 
 <conjunct_wrap_method(container_type, witness_type, type_variables)>

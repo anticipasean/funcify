@@ -8,6 +8,7 @@ package <package; separator=".">;
 <java_util_func_import()>
 <if(!rest(type_variables))><java_util_supp_import()><endif>
 
+<code_generated_comment()>
 public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
 
 <disjunct_fold_method(next_type_variable, type_variables)>

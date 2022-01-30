@@ -17,6 +17,7 @@ package <package; separator=".">;
 <java_util_func_import()>
 <["2","3","4"]:{fi|import funcify.function.Fn<fi>};separator=";\n">;
 
+<code_generated_comment()>
 public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
 
 <zip_impl_sequences:{zis | <disjunct_zip_methods(container_type, zis, witness_type)>};separator="\n\n">

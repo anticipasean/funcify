@@ -18,6 +18,7 @@ package <package; separator=".">;
 <null_check_import()>
 <java_util_func_import()>
 
+<code_generated_comment()>
 public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
 
 <type_variables,next_type_variable_sequences,map_impl_sequences:{tv, ntvs, mis | <disjunct_map_method(container_type, type_variables, tv, next_type_variable, i, witness_type, ntvs, mis)>};separator="\n\n">

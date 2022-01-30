@@ -10,15 +10,18 @@ import <package; separator=".">.Fn<arity>.<witness_type>;
 import java.util.function.Supplier;
 
 @FunctionalInterface
+<code_generated_comment()>
 public interface <function_type_declaration(arity, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)>, Supplier\<<first(type_variables)>\> {
 <elseif(implements_function)>
 <ensemble_type_import("Solo", ensemble_type_package)>
 <java_util_func_import()>
 
+<code_generated_comment()>
 public interface <function_type_declaration(arity, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)>, Function\<<type_variables; separator=", ">\> {
 <else>
 <ensemble_type_import("Solo", ensemble_type_package)>
 
+<code_generated_comment()>
 public interface <function_type_declaration(arity, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
 <endif>
 

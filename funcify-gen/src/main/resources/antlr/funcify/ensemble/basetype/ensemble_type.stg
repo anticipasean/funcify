@@ -11,6 +11,7 @@ recursive_solo_type_declaration(witness_type="WT", type_variables=[]) ::= "<type
 base_ensemble_type(package=[], witness_type="WT") ::= <<
 package <package; separator=".">;
 
+<code_generated_comment()>
 public interface Ensemble\<<witness_type>\> {
 
 }
@@ -23,8 +24,10 @@ import java.util.function.Function;
 import java.util.Objects;
 
 <if(is_solo)>
+<code_generated_comment()>
 public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends Ensemble\<<witness_type>\> {
 <else>
+<code_generated_comment()>
 public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <type_variables:{ tv | Solo\<}><witness_type>, <type_variables:{ tv | <tv>\>};separator=", "> {
 <endif>
 

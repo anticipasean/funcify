@@ -18,6 +18,7 @@ import <package; separator=".">.ConsumerFn<arity>.<witness_type>;
 <ensemble_type_import("Solo", ensemble_type_package)>
 <endif>
 
+<code_generated_comment()>
 public interface <function_type_declaration(arity, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)><implement_consumer_if_fits(type_variables)> {
 
 <witness_type_definition(witness_type)>

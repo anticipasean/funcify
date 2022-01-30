@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.stream.Stream;
 
+<code_generated_comment()>
 public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
 
 <type_variables:{tv | <conjunct_to_list_method(container_type=container_type,
