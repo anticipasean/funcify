@@ -1,0 +1,65 @@
+import "antlr/funcify/ensemble/trait/design/wrappable/wrappable_disjunct_design_type.stg"
+
+
+zippable_disjunct_design_type(class_name,
+                              implemented_type,
+                              container_type,
+                              package=[],
+                              witness_type="WT",
+                              type_variables=[],
+                              ensemble_type_package=[],
+                              zip_impl_sequences=[]) ::= <<
+package <package; separator=".">;
+
+<ensemble_type_import(implemented_type.type_name, implemented_type.type_package)>
+<java_util_func_import()>
+<["2","3","4"]:{fi|import funcify.function.Fn<fi>};separator=";\n">;
+
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(implemented_type.type_name, witness_type, type_variables)> {
+
+<zip_impl_sequences:{zis | <disjunct_zip_methods(container_type, zis, witness_type)>};separator="\n\n">
+
+}
+>>
+
+disjunct_zip_methods(container_type, zip_impl_seq, witness_type="WT") ::= <<
+<zip_impl_seq.containers:{c|<disjunct_zip_method_container(c, container_type, witness_type)>};separator="\n">
+>>
+
+disjunct_zip_method_container(container, container_type, witness_type="WT") ::= <<
+<disjunct_zip_method(container_type,
+                     witness_type,
+                     container.method_name,
+                     container.return_type_variables,
+                     container.container_params,
+                     container.new_type_variables,
+                     container.function_params)>
+>>
+
+disjunct_zip_method(container_type,
+                    witness_type,
+                    method_name,
+                    return_type_variables=[],
+                    container_params=[],
+                    new_type_variables=[],
+                    function_params=[]) ::= <<
+    \<<new_type_variables:{ntv|<ntv.(i0)>};separator=", ">\> <ensemble_type_declaration(container_type.type_name,
+                                                                                        witness_type,
+                                                                                        return_type_variables:{tv|<tv.(i0)>})> <method_name>(<disjunct_zip_method_parameters(container_type,
+                                                                                                                                                                             witness_type,
+                                                                                                                                                                             container_params,
+                                                                                                                                                                             function_params)>);
+
+>>
+
+disjunct_zip_method_parameters(container_type, witness_type, container_params, function_params) ::= <<
+<disjunct_zip_method_function_parameter(function_params)>
+>>
+
+disjunct_zip_method_container_parameter(container_type, witness_type="WT", type_variables=[], suffix="") ::= <<
+final <ensemble_type_declaration(container_type.type_name, witness_type, type_variables:{tv | <tv.(i0)>})> container<suffix>
+>>
+
+disjunct_zip_method_function_parameter(type_variables) ::= <<
+final Fn<length(trunc(type_variables))>\<<trunc(type_variables):{tv|? super <tv.(i0)>};separator=", ">, ? extends <last(type_variables).("0")>\> zipper
+>>

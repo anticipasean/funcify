@@ -107,4 +107,10 @@ public class TypeGenerationSession<V, R> {
     @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> disjunctTraversableDesignTypeResults = SyncMap.empty();
 
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctZippableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctZippableDesignTypeResults = SyncMap.empty();
+
 }
