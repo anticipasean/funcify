@@ -1,0 +1,36 @@
+import "ensemble_type.stg"
+
+disjunct_ensemble_type(class_name, ensemble_type_name, package=[], witness_type="WT", type_variables=[], next_type_variable="", ensemble_type_package=[]) ::= <<
+package <package; separator=".">;
+
+<ensemble_type_import(ensemble_type_name, ensemble_type_package)>
+<null_check_import()>
+<java_util_func_import()>
+<if(!rest(type_variables))><java_util_supp_import()><endif>
+
+<code_generated_comment()>
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <ensemble_type_declaration(ensemble_type_name, witness_type, type_variables)> {
+
+<disjunct_fold_method(next_type_variable, type_variables)>
+
+}
+>>
+
+disjunct_fold_method(next_type_variable, type_variables=[]) ::=  <<
+    \<<next_type_variable>\> <next_type_variable> fold(<\\>
+<if(!rest(type_variables))><[disjunct_fold_method_parameter(first(type_variables), next_type_variable, ""),disjunct_solo_empty_case_parameter(next_type_variable)];anchor,separator=",\n">);
+<else><\\>
+<type_variables:{tv | <disjunct_fold_method_parameter(tv, next_type_variable, i)>};anchor,separator=",\n">);
+<endif>
+>>
+
+disjunct_fold_method_parameter(type_variable, next_type_variable, numeric_suffix="") ::= "final Function\<? super <type_variable>, ? extends <next_type_variable>> function<numeric_suffix>"
+
+disjunct_solo_empty_case_parameter(next_type_variable) ::= <<
+final Supplier\<? extends <next_type_variable>\> defaultValueSupplier
+>>
+
+join_name_parts(name=[]) ::= <<
+<! <type_variables:{tv | <join_name_parts(["unwrapper", i]):null_check()>};anchor,separator="\n">; !>
+<name;separator="">
+>>

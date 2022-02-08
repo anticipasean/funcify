@@ -1,0 +1,26 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version "${kotlinVersion}"
+}
+
+configurations {
+    kotlinDeps {
+        dependencies {
+            implementation("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
+            implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+            implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+            implementation("org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}")
+            implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:${kotlinxImmutableCollectionsVersion}")
+            testImplementation("org.jetbrains.kotlin:kotlin-test:${kotlinVersion}")
+            testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${kotlinVersion}")
+            testImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+            testImplementation("org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}")
+            testImplementation("org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:${kotlinxImmutableCollectionsVersion}")
+        }
+    }
+    arrow {
+        dependencies {
+            implementation("io.arrow-kt:arrow-core:${arrowVersion}")
+            testImplementation("io.arrow-kt:arrow-core:${arrowVersion}")
+        }
+    }
+}

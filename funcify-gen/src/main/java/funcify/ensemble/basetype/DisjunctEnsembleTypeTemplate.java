@@ -11,6 +11,10 @@ import funcify.tool.container.SyncMap;
 import funcify.trait.Trait;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.WriteResult;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -18,9 +22,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author smccarron
@@ -43,17 +44,15 @@ public class DisjunctEnsembleTypeTemplate<V, R> implements TraitGenerationTempla
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "disjunct_ensemble_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "basetype", "disjunct_ensemble_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
-        logger.debug("create_types_for_session: [ {} ]",
-                     SyncMap.empty()
-                            .put("types", "DisjunctEnsemble[1..n]"));
+        logger.debug("create_types_for_session: [ {} ]", SyncMap.empty().put("types", "DisjunctEnsemble[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctWrappableEnsembleFactoryTypeResults();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getDisjunctEnsembleTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
                 final String className = getTraitNameForEnsembleKind(ek);
                 final SyncMap<String, Object> params = SyncMap.of("package",
@@ -71,22 +70,21 @@ public class DisjunctEnsembleTypeTemplate<V, R> implements TraitGenerationTempla
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typeName(className)
                                                                          .typePackagePathSegments(
-                                                                             getDestinationTypePackagePathSegments())
+                                                                                 getDestinationTypePackagePathSegments())
                                                                          .templateFunctionName(getStringTemplateGroupFileName())
                                                                          .fileTypeExtension(".java")
                                                                          .stringTemplateGroupFilePath(
-                                                                             getStringTemplateGroupFilePath())
+                                                                                 getStringTemplateGroupFilePath())
                                                                          .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                          .templateFunctionParameterInput(params)
                                                                          .build();
                 final WriteResult<R> writeResult = templateWriter.write(spec);
                 results.put(ek, writeResult);
             }
-            return session.withDisjunctWrappableEnsembleFactoryTypeResults(results);
+            return session.withDisjunctEnsembleTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
-                         t.getClass()
-                          .getSimpleName(),
+                         t.getClass().getSimpleName(),
                          t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;

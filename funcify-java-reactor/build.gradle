@@ -1,0 +1,26 @@
+plugins {
+    id 'java-library'
+}
+
+configurations {
+    lombok {
+        dependencies {
+            annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+            implementation("org.projectlombok:lombok:${lombokVersion}")
+            testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+            testImplementation("org.projectlombok:lombok:${lombokVersion}")
+        }
+    }
+}
+
+dependencies {
+    implementation("io.projectreactor:reactor-core:${reactorCoreVersion}")
+    implementation("io.projectreactor.addons:reactor-extra:${reactorExtraVersion}")
+    testImplementation("io.projectreactor:reactor-core:${reactorCoreVersion}")
+    testImplementation("io.projectreactor.addons:reactor-extra:${reactorExtraVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter:${jUnit5Version}")
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -32,13 +32,17 @@ public interface TraitFactoryGenerationTemplate<V, R> extends TraitGenerationTem
 
     @Override
     default JsonNode getImplementedTypeInstance(final EnsembleKind ek, final Trait... traits) {
-        final JsonNode implementedTypeInstance = TraitGenerationTemplate.super.getImplementedTypeInstance(ek, traits);
-        if (implementedTypeInstance instanceof ObjectNode) {
-            return ((ObjectNode) implementedTypeInstance).put("type_name",
-                                                              implementedTypeInstance.get("type_name")
-                                                                                     .asText("null")
-                                                                                     .replaceAll("$", "Factory"));
-        }
-        return implementedTypeInstance;
+        return SyncMap.of("type_name",
+                          Trait.generateTraitNameFrom(ek, traits).replaceAll("$", "Factory"),
+                          "type_package",
+                          Stream.concat(Stream.of("funcify", "trait", "factory"),
+                                        Stream.of(traits)
+                                              .sorted(Trait::relativeTo)
+                                              .map(Trait::name)
+                                              .map(String::toLowerCase))
+                                .collect(Collectors.joining(".")))
+                      .foldLeft(JsonNodeFactory.instance.objectNode(), (objNode, tup) -> {
+                          return (ObjectNode) objNode.set(tup._1(), JsonNodeFactory.instance.textNode(tup._2()));
+                      });
     }
 }

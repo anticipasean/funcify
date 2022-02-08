@@ -9,16 +9,24 @@ import funcify.ensemble.function.ConsumerFunctionTypeTemplate;
 import funcify.ensemble.function.ErrableConsumerFunctionTypeTemplate;
 import funcify.ensemble.function.ErrableFunctionTypeTemplate;
 import funcify.ensemble.function.FunctionTypeTemplate;
-import funcify.ensemble.trait.flattenable.FlattenableConjunctFactoryTypeTemplate;
-import funcify.ensemble.trait.flattenable.FlattenableDisjunctFactoryTypeTemplate;
-import funcify.ensemble.trait.mappable.MappableConjunctFactoryTypeTemplate;
-import funcify.ensemble.trait.mappable.MappableDisjunctFactoryTypeTemplate;
-import funcify.ensemble.trait.traversable.TraversableConjunctFactoryTypeTemplate;
-import funcify.ensemble.trait.traversable.TraversableDisjunctFactoryTypeTemplate;
-import funcify.ensemble.trait.wrappable.WrappableConjunctFactoryTypeTemplate;
-import funcify.ensemble.trait.wrappable.WrappableDisjunctFactoryTypeTemplate;
-import funcify.ensemble.trait.zippable.ZippableConjunctFactoryTypeTemplate;
-import funcify.ensemble.trait.zippable.ZippableDisjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.design.flattenable.FlattenableConjunctDesignTypeTemplate;
+import funcify.ensemble.trait.design.flattenable.FlattenableDisjunctDesignTypeTemplate;
+import funcify.ensemble.trait.design.mappable.MappableConjunctDesignTypeTemplate;
+import funcify.ensemble.trait.design.mappable.MappableDisjunctDesignTypeTemplate;
+import funcify.ensemble.trait.design.traversable.TraversableConjunctDesignTypeTemplate;
+import funcify.ensemble.trait.design.traversable.TraversableDisjunctDesignTypeTemplate;
+import funcify.ensemble.trait.design.zippable.ZippableConjunctDesignTypeTemplate;
+import funcify.ensemble.trait.design.zippable.ZippableDisjunctDesignTypeTemplate;
+import funcify.ensemble.trait.factory.flattenable.FlattenableConjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.factory.flattenable.FlattenableDisjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.factory.mappable.MappableConjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.factory.mappable.MappableDisjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.factory.traversable.TraversableConjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.factory.traversable.TraversableDisjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.factory.wrappable.WrappableConjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.factory.wrappable.WrappableDisjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.factory.zippable.ZippableConjunctFactoryTypeTemplate;
+import funcify.ensemble.trait.factory.zippable.ZippableDisjunctFactoryTypeTemplate;
 import funcify.file.JavaSourceFile;
 import funcify.session.TypeGenerationSession;
 import funcify.template.TypeGenerationTemplate;
@@ -77,7 +85,15 @@ public class FuncifyClassGenerator implements Callable<TypeGenerationSession<?, 
                            ZippableDisjunctFactoryTypeTemplate.of(),
                            ZippableConjunctFactoryTypeTemplate.of(),
                            TraversableConjunctFactoryTypeTemplate.of(),
-                           TraversableDisjunctFactoryTypeTemplate.of());
+                           TraversableDisjunctFactoryTypeTemplate.of(),
+                           FlattenableConjunctDesignTypeTemplate.of(),
+                           FlattenableDisjunctDesignTypeTemplate.of(),
+                           MappableConjunctDesignTypeTemplate.of(),
+                           MappableDisjunctDesignTypeTemplate.of(),
+                           TraversableConjunctDesignTypeTemplate.of(),
+                           TraversableDisjunctDesignTypeTemplate.of(),
+                           ZippableConjunctDesignTypeTemplate.of(),
+                           ZippableDisjunctDesignTypeTemplate.of());
     }
 
     private static <V, R> TypeGenerationSession<V, R> applyEachTemplateToSession(final TypeGenerationSession<V, R> session) {
