@@ -10,14 +10,15 @@ import funcify.tool.CharacterOps;
 import funcify.tool.container.SyncMap;
 import funcify.writer.StringTemplateWriter;
 import funcify.writer.WriteResult;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author smccarron
@@ -35,31 +36,27 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "ensemble_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "basetype", "ensemble_type.stg");
     }
 
     @Override
     public TypeGenerationSession<V, R> createTypesForSession(final TypeGenerationSession<V, R> session) {
         logger.debug("create_types_for_session: [ {} ]",
-                     SyncMap.empty()
-                            .put("types", "Ensemble")
-                            .put("ensemble_kinds.count",
-                                 session.getEnsembleKinds()
-                                        .size()));
+                     SyncMap.empty().put("types", "Ensemble").put("ensemble_kinds.count", session.getEnsembleKinds().size()));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
             final StringTemplateSpec ensembleBaseTypeSpec = DefaultStringTemplateSpec.builder()
                                                                                      .typePackagePathSegments(
-                                                                                         getDestinationTypePackagePathSegments())
+                                                                                             getDestinationTypePackagePathSegments())
                                                                                      .stringTemplateGroupFilePath(
-                                                                                         getStringTemplateGroupFilePath())
+                                                                                             getStringTemplateGroupFilePath())
                                                                                      .typeName("Ensemble")
                                                                                      .fileTypeExtension(".java")
                                                                                      .templateFunctionName("base_ensemble_type")
                                                                                      .destinationParentDirectoryPath(session.getDestinationDirectoryPath())
                                                                                      .templateFunctionParameterInput(SyncMap.of(
-                                                                                         "package",
-                                                                                         getDestinationTypePackagePathSegments()))
+                                                                                             "package",
+                                                                                             getDestinationTypePackagePathSegments()))
                                                                                      .build();
 
             final WriteResult<R> baseEnsembleTypeResult = templateWriter.write(ensembleBaseTypeSpec);
@@ -83,9 +80,9 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
                                                                   CharacterOps.uppercaseLetterByIndexWithNumericExtension(ek.getNumberOfValueParameters()));
                 final StringTemplateSpec spec = DefaultStringTemplateSpec.builder()
                                                                          .typePackagePathSegments(
-                                                                             getDestinationTypePackagePathSegments())
+                                                                                 getDestinationTypePackagePathSegments())
                                                                          .stringTemplateGroupFilePath(
-                                                                             getStringTemplateGroupFilePath())
+                                                                                 getStringTemplateGroupFilePath())
                                                                          .typeName(ek.getSimpleClassName())
                                                                          .fileTypeExtension(".java")
                                                                          .templateFunctionName("ensemble_type")
@@ -102,8 +99,7 @@ public class EnsembleTypesTemplate<V, R> implements TypeGenerationTemplate<V, R>
             return updatedSession.withEnsembleTypeResultsByEnsembleKind(ensembleTypeResultsByEnsembleKind);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
-                         t.getClass()
-                          .getSimpleName(),
+                         t.getClass().getSimpleName(),
                          t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;

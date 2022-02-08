@@ -1,0 +1,60 @@
+import "antlr/funcify/funcify.stg"
+
+ensemble_type_import(class_name, package=[]) ::= <<
+import <package; separator=".">.<class_name>;
+>>
+
+ensemble_type_declaration(ensemble_type_name, witness_type="WT", type_variables=[]) ::= "<ensemble_type_name>\<<witness_type>, <type_variables; separator={, }>>"
+
+recursive_solo_type_declaration(witness_type="WT", type_variables=[]) ::= "<type_variables:{ tv | Solo\<}><witness_type>, <type_variables:{ tv | <tv>>};separator={, }>"
+
+base_ensemble_type(package=[], witness_type="WT") ::= <<
+package <package; separator=".">;
+
+<code_generated_comment()>
+public interface Ensemble\<<witness_type>\> {
+
+}
+>>
+
+ensemble_type(class_name, package=[], is_solo=false, witness_type="WT", type_variables=[], next_type_variable="") ::= <<
+package <package; separator=".">;
+
+import java.util.function.Function;
+import java.util.Objects;
+
+<if(is_solo)>
+<code_generated_comment()>
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends Ensemble\<<witness_type>\> {
+<else>
+<code_generated_comment()>
+public interface <ensemble_type_declaration(class_name, witness_type, type_variables)> extends <type_variables:{ tv | Solo\<}><witness_type>, <type_variables:{ tv | <tv>\>};separator=", "> {
+<endif>
+
+<if(is_solo)>
+    /**
+     * Convert this ensemble type into another value
+     */
+    default \<<next_type_variable>\> <next_type_variable> convert(final Function\<? super <class_name>\<<witness_type>, <type_variables; separator=", ">\>, ? extends <next_type_variable>\> converter){
+        return <null_check("converter")>.apply(this);
+    }
+<else>
+    /**
+     * Convert this ensemble type into another value
+     */
+    default \<<next_type_variable>\> <next_type_variable> convert(final Function\<? super <recursive_solo_type_declaration(witness_type, type_variables)>, ? extends <next_type_variable>\> converter){
+        return <null_check("converter")>.apply(this);
+    }
+<endif>
+
+<if(is_solo)>
+    /**
+     * Narrow this ensemble type to the concrete or interface type with this witness type \<<witness_type>\>
+     */
+    @SuppressWarnings("unchecked")
+    default \<S extends Solo\<<witness_type>, ? super A\>> S narrow(){
+        return (S) this;
+    }
+<endif>
+}
+>>

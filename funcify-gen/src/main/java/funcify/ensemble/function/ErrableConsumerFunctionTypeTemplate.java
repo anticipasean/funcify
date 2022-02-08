@@ -38,7 +38,7 @@ public class ErrableConsumerFunctionTypeTemplate<V, R> implements TypeGeneration
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "errable_consumer_function_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "function", "errable_consumer_function_type.stg");
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ErrableConsumerFunctionTypeTemplate<V, R> implements TypeGeneration
         logger.debug("create_types_for_session: [ {} ]", SyncMap.empty().put("types", "ErrableConsumerFn[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getFunctionTypeResults();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getErrableConsumerFunctionTypeResults();
             final SyncList<EnsembleKind> ensembleKinds = session.getEnsembleKinds().copy();
             // remove the ek with max value param count since fn.n = ek.n + 1 and errable_fn.n = fn.n + 1
             session.getEnsembleKinds()
@@ -86,7 +86,7 @@ public class ErrableConsumerFunctionTypeTemplate<V, R> implements TypeGeneration
                 }
                 results.put(inputEnsembleKind, writeResult);
             }
-            return session.withFunctionTypeResults(results);
+            return session.withErrableConsumerFunctionTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
                          t.getClass().getSimpleName(),

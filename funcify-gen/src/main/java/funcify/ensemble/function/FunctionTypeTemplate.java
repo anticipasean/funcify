@@ -35,7 +35,7 @@ public class FunctionTypeTemplate<V, R> implements TypeGenerationTemplate<V, R> 
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "function_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "function", "function_type.stg");
     }
 
     @Override

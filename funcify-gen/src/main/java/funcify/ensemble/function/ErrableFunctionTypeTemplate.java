@@ -38,7 +38,7 @@ public class ErrableFunctionTypeTemplate<V, R> implements TypeGenerationTemplate
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "errable_function_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "function", "errable_function_type.stg");
     }
 
     @Override

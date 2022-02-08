@@ -36,7 +36,7 @@ public class ConsumerFunctionTypeTemplate<V, R> implements TypeGenerationTemplat
 
     @Override
     public Path getStringTemplateGroupFilePath() {
-        return Paths.get("antlr", "funcify", "consumer_function_type.stg");
+        return Paths.get("antlr", "funcify", "ensemble", "function", "consumer_function_type.stg");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ConsumerFunctionTypeTemplate<V, R> implements TypeGenerationTemplat
         logger.debug("create_types_for_session: [ {} ]", SyncMap.empty().put("types", "ConsumerFn[1..n]"));
         try {
             final StringTemplateWriter<V, R> templateWriter = session.getTemplateWriter();
-            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getFunctionTypeResults();
+            final SyncMap<EnsembleKind, WriteResult<R>> results = session.getConsumerFunctionTypeResults();
             for (EnsembleKind ek : session.getEnsembleKinds()) {
                 final int arity = ek.getNumberOfValueParameters();
                 final String className = "ConsumerFn" + arity;
@@ -75,7 +75,7 @@ public class ConsumerFunctionTypeTemplate<V, R> implements TypeGenerationTemplat
                 }
                 results.put(ek, writeResult);
             }
-            return session.withFunctionTypeResults(results);
+            return session.withConsumerFunctionTypeResults(results);
         } catch (final Throwable t) {
             logger.debug("create_types_for_session: [ status: failed ] due to [ type: {}, message: {} ]",
                          t.getClass().getSimpleName(),

@@ -36,6 +36,12 @@ public class TypeGenerationSession<V, R> {
     private final SyncMap<EnsembleKind, WriteResult<R>> ensembleTypeResultsByEnsembleKind = SyncMap.empty();
 
     @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctEnsembleTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctEnsembleTypeResults = SyncMap.empty();
+
+    @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> disjunctWrappableEnsembleFactoryTypeResults = SyncMap.empty();
 
     @Default
@@ -46,6 +52,12 @@ public class TypeGenerationSession<V, R> {
 
     @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> errableFunctionTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> consumerFunctionTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> errableConsumerFunctionTypeResults = SyncMap.empty();
 
     @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> conjunctMappableEnsembleFactoryTypeResults = SyncMap.empty();
@@ -70,5 +82,35 @@ public class TypeGenerationSession<V, R> {
 
     @Default
     private final SyncMap<EnsembleKind, WriteResult<R>> disjunctTraversableEnsembleFactoryTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctWrappableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctWrappableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctFlattenableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctFlattenableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctMappableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctMappableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctTraversableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctTraversableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> conjunctZippableDesignTypeResults = SyncMap.empty();
+
+    @Default
+    private final SyncMap<EnsembleKind, WriteResult<R>> disjunctZippableDesignTypeResults = SyncMap.empty();
 
 }
