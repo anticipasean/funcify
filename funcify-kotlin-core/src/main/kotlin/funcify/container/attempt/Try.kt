@@ -104,9 +104,9 @@ interface Try<out S> {
         fun <I, O> liftNullable(function: (I) -> O?): (I) -> Try<O> {
             return liftNullable(function) { input: I ->
                 val message = """
-                    |input [ type: %s ] resulted in null value for function
-                    |${input?.let { it::class.java.name }}
-                """.trimMargin()
+                    |input [ type: ${input?.let { it::class.qualifiedName }} ] 
+                    |resulted in null value for function
+                    """
                 IllegalArgumentException(message)
             }
         }
@@ -139,10 +139,10 @@ interface Try<out S> {
         fun <I1, I2, O> liftNullable(function: (I1, I2) -> O?): (I1, I2) -> Try<O> {
             return liftNullable(function) { i1: I1, i2: I2 ->
                 val message = """
-                    |inputs [ i1.type: ${i1?.let { it::class.java.name }}, 
-                    |i2.type: ${i2?.let { it::class.java.name }} ] 
-                    |resulted in null value for function
-                    |""".trimMargin()
+                    |inputs [ i1.type: ${i1?.let { it::class.qualifiedName }}, 
+                    |i2.type: ${i2?.let { it::class.qualifiedName }} ] 
+                    |resulted in null value for function",
+                """.trimMargin()
                 IllegalArgumentException(message)
             }
         }
@@ -196,7 +196,10 @@ interface Try<out S> {
 
         fun <S> attemptRetryable(function: () -> S, numberOfRetries: Int): Try<S> {
             if (numberOfRetries < 0) {
-                val message = "number_of_retries must be greater than or equal to 0: [ actual: $numberOfRetries ]"
+                val message = """
+                    |number_of_retries must be greater 
+                    |than or equal to 0: [ actual: $numberOfRetries ]
+                    |""".trimMargin()
                 return failure<S>(IllegalArgumentException(message))
             }
             var attempt: Try<S> = attempt(function)
@@ -216,7 +219,7 @@ interface Try<out S> {
                 val message = """
                     |number_of_retries must be greater 
                     |than or equal to 0: [ actual: $numberOfRetries ]
-                    """.trimMargin();
+                    |""".trimMargin()
                 return failure<S>(IllegalArgumentException(message))
             }
             var attempt: Try<S> = attempt(function)
@@ -235,7 +238,7 @@ interface Try<out S> {
             return attempt
         }
 
-        fun <S, F : Throwable?> attemptWithTimeout(function: () -> S, timeout: Long, unit: TimeUnit): Try<S> {
+        fun <S> attemptWithTimeout(function: () -> S, timeout: Long, unit: TimeUnit): Try<S> {
             val validatedTimeout = Math.max(0, timeout)
             return try {
                 CompletableFuture.supplyAsync {
@@ -245,10 +248,10 @@ interface Try<out S> {
             } catch (t: Throwable) {
                 if (t is TimeoutException) {
                     val message = """
-                        |attempt_with_timeout: [ operation reached limit of 
-                        |$validatedTimeout 
-                        |${unit.name.lowercase(Locale.getDefault())} ]
-                        """.trimMargin()
+                        attempt_with_timeout: [ operation reached limit of 
+                        $validatedTimeout 
+                        ${unit.name.lowercase(Locale.getDefault())} ]
+                        """.trimIndent()
                     return failure<S>(TimeoutException(message))
                 }
                 if (t is CompletionException) {
@@ -271,10 +274,9 @@ interface Try<out S> {
                         .get(validatedTimeout, unit)
             } catch (t: Throwable) {
                 if (t is TimeoutException) {
-                    val message = """
-                        |attempt_with_timeout: [ operation reached limit 
-                        |of $validatedTimeout ${unit.name.lowercase(Locale.getDefault())} ]
-                        """
+                    val message = String.format("attempt_with_timeout: [ operation reached limit of %d %s ]",
+                                                validatedTimeout,
+                                                unit.name.lowercase(Locale.getDefault()))
                     return failure<Option<S>>(TimeoutException(message))
                 }
                 if (t is CompletionException) {
@@ -307,13 +309,13 @@ interface Try<out S> {
         })
     }
 
-    fun filter(condition: (S) -> Boolean, unmetConditionFailureSupplier: () -> Throwable): Try<S> {
+    fun filter(condition: (S) -> Boolean, ifConditionUnmet: () -> Throwable): Try<S> {
         return fold({ s: S ->
                         try {
                             if (condition.invoke(s)) {
                                 success<S>(s)
                             } else {
-                                failure<S>(unmetConditionFailureSupplier.invoke())
+                                failure<S>(ifConditionUnmet.invoke())
                             }
                         } catch (t: Throwable) {
                             failure<S>(t)
@@ -321,7 +323,7 @@ interface Try<out S> {
                     }) { throwable: Throwable -> failure(throwable) }
     }
 
-    fun <T : Any> ofKtType(targetType: KClass<T>, unmetConditionFailureSupplier: () -> Throwable): Try<T> {
+    fun <T : Any> ofKtType(targetType: KClass<T>, ifNotTargetType: () -> Throwable): Try<T> {
         return fold({ input: S ->
                         if (targetType.isInstance(input)) {
                             try {
@@ -359,12 +361,12 @@ interface Try<out S> {
                     }) { throwable: Throwable -> failure(throwable) }
     }
 
-    fun <R> mapNullable(mapper: (S) -> R?, nonNullResultSupplier: () -> R): Try<R> {
+    fun <R> mapNullable(mapper: (S) -> R?, ifNull: () -> R): Try<R> {
         return fold({ input: S ->
                         try {
                             val result: Option<R> = Option.fromNullable(mapper.invoke(input))
                             result.fold({
-                                            success<R>(nonNullResultSupplier.invoke())
+                                            success<R>(ifNull.invoke())
                                         }) { r -> success<R>(r) }
                         } catch (t: Throwable) {
                             failure<R>(t)
@@ -453,6 +455,19 @@ interface Try<out S> {
                     }) { throwable: Throwable -> failure(throwable) }
     }
 
+    fun <A, B, R> zip2(otherAttempt1: Try<A>, otherAttempt2: Try<B>, combiner: (S, A, B) -> R): Try<R> {
+        return fold({ s: S ->
+                        otherAttempt1.fold({ a: A ->
+                                               otherAttempt2.fold({ b: B ->
+                                                                      try {
+                                                                          success(combiner.invoke(s, a, b))
+                                                                      } catch (t: Throwable) {
+                                                                          failure(t)
+                                                                      }
+                                                                  }) { throwable: Throwable -> failure(throwable) }
+                                           }) { throwable: Throwable -> failure(throwable) }
+                    }) { throwable: Throwable -> failure(throwable) }
+    }
 
     fun <A, R> zip(optional: Optional<A>, combiner: (S, A) -> R): Try<R> {
         return zip(fromOptional<A>(optional), combiner)
@@ -589,6 +604,5 @@ interface Try<out S> {
      * value is of more significance than the failure case and its return value
      */
     fun <R> fold(successHandler: (S) -> R, failureHandler: (Throwable) -> R): R
-
 
 }
