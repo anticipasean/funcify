@@ -103,8 +103,10 @@ interface Try<out S> {
 
         fun <I, O> liftNullable(function: (I) -> O?): (I) -> Try<O> {
             return liftNullable(function) { input: I ->
-                val message = String.format("input [ type: %s ] resulted in null value for function",
-                                            if (input == null) "null" else input.javaClass.name)
+                val message = """
+                    |input [ type: %s ] resulted in null value for function
+                    |${input?.let { it::class.java.name }}
+                """.trimMargin()
                 IllegalArgumentException(message)
             }
         }
@@ -136,9 +138,11 @@ interface Try<out S> {
 
         fun <I1, I2, O> liftNullable(function: (I1, I2) -> O?): (I1, I2) -> Try<O> {
             return liftNullable(function) { i1: I1, i2: I2 ->
-                val message = String.format("inputs [ i1.type: %s, i2.type: %s ] resulted in null value for function",
-                                            if (i1 == null) "null" else i1.javaClass.name,
-                                            if (i2 == null) "null" else i2.javaClass.name)
+                val message = """
+                    |inputs [ i1.type: ${i1?.let { it::class.java.name }}, 
+                    |i2.type: ${i2?.let { it::class.java.name }} ] 
+                    |resulted in null value for function
+                    |""".trimMargin()
                 IllegalArgumentException(message)
             }
         }
@@ -241,10 +245,10 @@ interface Try<out S> {
             } catch (t: Throwable) {
                 if (t is TimeoutException) {
                     val message = """
-                        attempt_with_timeout: [ operation reached limit of 
-                        $validatedTimeout 
-                        ${unit.name.lowercase(Locale.getDefault())} ]
-                        """.trimIndent()
+                        |attempt_with_timeout: [ operation reached limit of 
+                        |$validatedTimeout 
+                        |${unit.name.lowercase(Locale.getDefault())} ]
+                        """.trimMargin()
                     return failure<S>(TimeoutException(message))
                 }
                 if (t is CompletionException) {
@@ -267,9 +271,10 @@ interface Try<out S> {
                         .get(validatedTimeout, unit)
             } catch (t: Throwable) {
                 if (t is TimeoutException) {
-                    val message = String.format("attempt_with_timeout: [ operation reached limit of %d %s ]",
-                                                validatedTimeout,
-                                                unit.name.lowercase(Locale.getDefault()))
+                    val message = """
+                        |attempt_with_timeout: [ operation reached limit 
+                        |of $validatedTimeout ${unit.name.lowercase(Locale.getDefault())} ]
+                        """
                     return failure<Option<S>>(TimeoutException(message))
                 }
                 if (t is CompletionException) {
