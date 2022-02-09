@@ -23,4 +23,12 @@ configurations {
             testImplementation("io.arrow-kt:arrow-core:${arrowVersion}")
         }
     }
+    reactor {
+        dependencies {
+            implementation("io.projectreactor:reactor-core:${reactorCoreVersion}")
+            implementation("io.projectreactor.addons:reactor-extra:${reactorExtraVersion}")
+            testImplementation("io.projectreactor:reactor-core:${reactorCoreVersion}")
+            testImplementation("io.projectreactor.addons:reactor-extra:${reactorExtraVersion}")
+        }
+    }
 }
