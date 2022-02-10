@@ -8,8 +8,7 @@ import arrow.core.none
 import arrow.core.right
 import arrow.core.some
 import arrow.core.toOption
-import funcify.container.attempt.TryFactory.Failure
-import funcify.container.attempt.TryFactory.Success
+
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
@@ -31,11 +30,11 @@ interface Try<out S> {
     companion object {
 
         fun <S> success(successfulResult: S): Try<S> {
-            return Success(successfulResult);
+            return TryFactory.Success(successfulResult);
         }
 
         fun <S> failure(throwable: Throwable): Try<S> {
-            return Failure<S>(throwable)
+            return TryFactory.Failure<S>(throwable)
         }
 
         fun <S> nullableSuccess(successfulResult: S): Try<S> {
@@ -323,13 +322,13 @@ interface Try<out S> {
         })
     }
 
-    fun filter(condition: (S) -> Boolean, ifConditionUnmet: () -> Throwable): Try<S> {
+    fun filter(condition: (S) -> Boolean, ifConditionUnmet: (S) -> Throwable): Try<S> {
         return fold({ s: S ->
                         try {
                             if (condition.invoke(s)) {
                                 success<S>(s)
                             } else {
-                                failure<S>(ifConditionUnmet.invoke())
+                                failure<S>(ifConditionUnmet.invoke(s))
                             }
                         } catch (t: Throwable) {
                             failure<S>(t)
@@ -441,7 +440,7 @@ interface Try<out S> {
     }
 
     fun consumeFailure(consumer: (Throwable) -> Unit): Try<Unit> {
-        return fold({ input: S ->
+        return fold({
                         emptySuccess()
                     }, { throwable: Throwable ->
                         try {
@@ -528,7 +527,7 @@ interface Try<out S> {
     fun orElse(defaultValue: @UnsafeVariance S): S {
         return fold({ input: S ->
                         input
-                    }, { throwable: Throwable ->
+                    }, {
                         defaultValue
                     })
     }
@@ -546,7 +545,7 @@ interface Try<out S> {
     fun orElseGet(defaultValueSupplier: () -> @UnsafeVariance S): S {
         return fold({ input: S ->
                         input
-                    }, { throwable: Throwable ->
+                    }, {
                         defaultValueSupplier.invoke()
                     })
     }
@@ -560,7 +559,6 @@ interface Try<out S> {
      * @return the result value if a success, or else throws an exception wrapping the error that occurred in the process
      * @throws F - the wrapper type for the exception
      */
-    @Throws(Throwable::class)
     fun <F : Throwable> orElseThrow(exceptionWrapper: (Throwable) -> F): S {
         return fold({ input: S ->
                         input
@@ -577,8 +575,7 @@ interface Try<out S> {
      * @return the result value if a success, or else throws an unchecked exception
      * @throws F - the unchecked exception type or a wrapped checked exception in a [java.lang.RuntimeException]
      */
-    @Throws(Throwable::class)
-    fun <F : Throwable> orElseThrow(): S {
+    fun orElseThrow(): S {
         return fold({ input: S ->
                         input
                     }, { throwable: Throwable ->
@@ -617,7 +614,7 @@ interface Try<out S> {
     fun sequence(): Sequence<S> {
         return fold({ input: S ->
                         sequenceOf(input)
-                    }, { throwable: Throwable ->
+                    }, {
                         emptySequence()
                     })
     }
