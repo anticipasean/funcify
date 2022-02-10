@@ -1,6 +1,5 @@
 package funcify.container.attempt
 
-
 /**
  *
  * @author smccarron
