@@ -31,4 +31,11 @@ configurations {
             testImplementation("io.projectreactor.addons:reactor-extra:${reactorExtraVersion}")
         }
     }
+    junit {
+        dependencies {
+            testImplementation(platform("org.junit:junit-bom:${jUnitJupiterVersion}"))
+            testImplementation("org.junit.jupiter:junit-jupiter")
+        }
+    }
+
 }
