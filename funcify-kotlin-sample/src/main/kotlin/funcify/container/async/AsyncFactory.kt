@@ -1,5 +1,6 @@
 package funcify.container.async
 
+import kotlinx.collections.immutable.PersistentList
 import reactor.core.publisher.Flux
 import java.util.concurrent.CompletionStage
 import java.util.stream.Stream
@@ -19,9 +20,9 @@ object AsyncFactory {
         data class FluxValue<V>(val inputFlux: Flux<V>) : DeferredValue<V>()
     }
 
-    data class AsyncCompletedSuccess<V>(val valueStream: Stream<out V>) : Async<V> {
+    data class AsyncCompletedSuccess<V>(val valueStream: PersistentList<V>) : Async<V> {
 
-        override fun <R> fold(succeededHandler: (Stream<out V>) -> R,
+        override fun <R> fold(succeededHandler: (PersistentList<V>) -> R,
                               erroredHandler: (Throwable) -> R,
                               deferredHandler: (DeferredValue<V>) -> R): R {
             return succeededHandler.invoke(valueStream)
@@ -31,7 +32,7 @@ object AsyncFactory {
 
     data class AsyncCompletedFailure<V>(val throwable: Throwable) : Async<V> {
 
-        override fun <R> fold(succeededHandler: (Stream<out V>) -> R,
+        override fun <R> fold(succeededHandler: (PersistentList<V>) -> R,
                               erroredHandler: (Throwable) -> R,
                               deferredHandler: (DeferredValue<V>) -> R): R {
             return erroredHandler.invoke(throwable)
@@ -41,7 +42,7 @@ object AsyncFactory {
 
     data class AsyncDeferredValue<V>(val deferredValue: DeferredValue<V>) : Async<V> {
 
-        override fun <R> fold(succeededHandler: (Stream<out V>) -> R,
+        override fun <R> fold(succeededHandler: (PersistentList<V>) -> R,
                               erroredHandler: (Throwable) -> R,
                               deferredHandler: (DeferredValue<V>) -> R): R {
             return deferredHandler.invoke(deferredValue)

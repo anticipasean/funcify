@@ -1,14 +1,13 @@
 package funcify.container.async
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.getOrElse
-import arrow.core.some
-import arrow.core.toOption
+import arrow.core.*
 import funcify.container.async.AsyncFactory.DeferredValue
 import funcify.container.async.AsyncFactory.DeferredValue.CompletionStageValue
 import funcify.container.async.AsyncFactory.DeferredValue.FluxValue
 import funcify.container.attempt.Try
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
@@ -31,8 +30,8 @@ interface Async<out V> : Iterable<V> {
 
     companion object {
 
-        fun <V> succeeded(valueStream: Stream<V>): Async<V> {
-            return AsyncFactory.AsyncCompletedSuccess<V>(valueStream)
+        fun <V> succeeded(values: PersistentList<V>): Async<V> {
+            return AsyncFactory.AsyncCompletedSuccess<V>(values)
         }
 
         fun <V> errored(throwable: Throwable): Async<V> {
@@ -44,11 +43,11 @@ interface Async<out V> : Iterable<V> {
         }
 
         fun <V> succeededSingle(value: V): Async<V> {
-            return succeeded(Stream.of(value))
+            return succeeded(persistentListOf(value))
         }
 
         fun <V> empty(): Async<V> {
-            return succeeded(Stream.empty())
+            return succeeded(persistentListOf())
         }
 
         fun <V> deferFromSupplier(executor: Executor, supplier: () -> V): Async<V> {
@@ -79,7 +78,8 @@ interface Async<out V> : Iterable<V> {
 
         fun <V> fromStreamAttempt(attempt: Try<Stream<V>>): Async<V> {
             return attempt.fold({ v: Stream<V> ->
-                                    succeeded(v)
+                                    succeeded(v.asSequence()
+                                                      .toPersistentList())
                                 }, { throwable: Throwable ->
                                     errored(throwable)
                                 })
@@ -121,7 +121,10 @@ interface Async<out V> : Iterable<V> {
                 completionStage.toCompletableFuture().isDone -> {
                     Try.attempt(completionStage.toCompletableFuture()::join)
                             .getSuccess()
-                            .map { vStream -> succeeded<V>(vStream) }
+                            .map { vStream ->
+                                succeeded<V>(vStream.asSequence()
+                                                     .toPersistentList())
+                            }
                             .getOrElse { errored<V>(IllegalArgumentException("completion_stage output is missing successful result value despite not completing exceptionally")) }
                 }
                 else -> {
@@ -145,7 +148,9 @@ interface Async<out V> : Iterable<V> {
                                 succeeded<V>(vStream.flatMap { v ->
                                     v.toOption()
                                             .fold({ Stream.empty() }, { nonNullV -> Stream.of(nonNullV) })
-                                })
+                                }
+                                                     .asSequence()
+                                                     .toPersistentList())
                             }
                             .getOrElse { errored<V>(IllegalArgumentException("completion_stage output is missing successful result value despite not completing exceptionally")) }
                 }
@@ -172,7 +177,7 @@ interface Async<out V> : Iterable<V> {
                     Try.attemptNullable(completionStage.toCompletableFuture()::get)
                             .getSuccess()
                             .map { vOpt ->
-                                vOpt.fold({ succeeded<V>(Stream.empty()) }) { v ->
+                                vOpt.fold({ succeeded<V>(persistentListOf()) }) { v ->
                                     succeededSingle<V>(v)
                                 }
                             }
@@ -221,8 +226,8 @@ interface Async<out V> : Iterable<V> {
      * Blocking method
      */
     fun sequence(): Sequence<V> {
-        return fold({ vStream ->
-                        vStream.asSequence()
+        return fold({ pList ->
+                        pList.asSequence()
                     }, {
                         emptySequence()
                     }, { defVal ->
@@ -243,45 +248,51 @@ interface Async<out V> : Iterable<V> {
     }
 
 
-    fun <R> map(function: (V) -> R): Async<R> {
-        return fold({ vStream ->
-                        fromStreamAttempt(Try.attempt { vStream.map(function::invoke) })
+    fun <R> map(mapper: (V) -> R): Async<R> {
+        return fold({ vList ->
+                        succeeded(vList.asIterable()
+                                          .map(mapper::invoke)
+                                          .toPersistentList())
                     }, { throwable: Throwable ->
                         errored<R>(throwable)
                     }, { deferredValue: DeferredValue<V> ->
                         when (deferredValue) {
                             is CompletionStageValue -> {
-                                fromCompletionStage<R>(deferredValue.inputStreamStage.thenApply { stream -> stream.map(function::invoke) })
+                                fromCompletionStage<R>(deferredValue.inputStreamStage.thenApply { stream -> stream.map(mapper::invoke) })
                             }
                             is FluxValue -> {
-                                fromFlux<R>(deferredValue.inputFlux.map(function::invoke))
+                                fromFlux<R>(deferredValue.inputFlux.map(mapper::invoke))
                             }
                         }
                     })
     }
 
-    fun <R> map(executor: Executor, function: (V) -> R): Async<R> {
-        return fold({ vStream ->
-                        fromCompletionStage(CompletableFuture.supplyAsync({ vStream.map(function::invoke) }, executor))
+    fun <R> map(executor: Executor, mapper: (V) -> R): Async<R> {
+        return fold({ vList ->
+                        fromCompletionStage(CompletableFuture.supplyAsync({
+                                                                              vList.stream()
+                                                                                      .map(mapper::invoke)
+                                                                          }, executor))
                     }, { throwable: Throwable ->
                         errored<R>(throwable)
                     }, { deferredValue: DeferredValue<V> ->
                         when (deferredValue) {
                             is CompletionStageValue -> {
-                                fromCompletionStage<R>(deferredValue.inputStreamStage.thenApplyAsync({ vStream -> vStream.map(function::invoke) },
+                                fromCompletionStage<R>(deferredValue.inputStreamStage.thenApplyAsync({ vStream -> vStream.map(mapper::invoke) },
                                                                                                      executor))
                             }
                             is FluxValue -> {
                                 fromFlux<R>(deferredValue.inputFlux.publishOn(Schedulers.fromExecutor(executor))
-                                                    .map(function::invoke))
+                                                    .map(mapper::invoke))
                             }
                         }
                     })
     }
 
-    fun <R> flatMap(function: (V) -> Async<R>): Async<R> {
-        return fold({ vStream ->
-                        Try.fromOptional(vStream.map { v -> function.invoke(v) }
+    fun <R> flatMap(mapper: (V) -> Async<R>): Async<R> {
+        return fold({ vList ->
+                        Try.fromOptional(vList.stream()
+                                                 .map { v -> mapper.invoke(v) }
                                                  .map { asyncV ->
                                                      asyncV.toFlux()
                                                              .map { r -> r }
@@ -294,7 +305,7 @@ interface Async<out V> : Iterable<V> {
                         when (deferredValue) {
                             is CompletionStageValue -> {
                                 fromCompletionStage<R>(deferredValue.inputStreamStage.thenCompose { vStream ->
-                                    vStream.map(function::invoke)
+                                    vStream.map(mapper::invoke)
                                             .map { asyncV -> asyncV.toCompletionStage() }
                                             .reduce { streamStage1, streamStage2 ->
                                                 streamStage1.thenCombine(streamStage2) { s1, s2 ->
@@ -307,7 +318,7 @@ interface Async<out V> : Iterable<V> {
                             }
                             is FluxValue -> {
                                 fromFlux<R>(deferredValue.inputFlux.flatMap { v ->
-                                    function.invoke(v)
+                                    mapper.invoke(v)
                                             .toFlux()
                                             .map { r -> r }
                                 })
@@ -316,11 +327,11 @@ interface Async<out V> : Iterable<V> {
                     })
     }
 
-    fun <R> flatMap(executor: Executor, function: (V) -> Async<R>): Async<R> {
-        return fold({ vStream ->
-                        fromFlux(Flux.fromStream(vStream)
+    fun <R> flatMap(executor: Executor, mapper: (V) -> Async<R>): Async<R> {
+        return fold({ vList ->
+                        fromFlux(Flux.fromStream(vList.stream())
                                          .publishOn(Schedulers.fromExecutor(executor))
-                                         .map { v -> function.invoke(v) }
+                                         .map { v -> mapper.invoke(v) }
                                          .flatMap { asyncV ->
                                              asyncV.toFlux()
                                          })
@@ -330,7 +341,7 @@ interface Async<out V> : Iterable<V> {
                         when (deferredValue) {
                             is CompletionStageValue -> {
                                 fromCompletionStage<R>(deferredValue.inputStreamStage.thenComposeAsync({ vStream ->
-                                                                                                           vStream.map(function::invoke)
+                                                                                                           vStream.map(mapper::invoke)
                                                                                                                    .map { asyncV -> asyncV.toCompletionStage() }
                                                                                                                    .reduce { streamStage1, streamStage2 ->
                                                                                                                        streamStage1.thenCombine(
@@ -347,7 +358,7 @@ interface Async<out V> : Iterable<V> {
                             }
                             is FluxValue -> {
                                 fromFlux<R>(deferredValue.inputFlux.flatMap { v ->
-                                    function.invoke(v)
+                                    mapper.invoke(v)
                                             .toFlux()
                                             .map { r -> r }
                                 })
@@ -356,12 +367,35 @@ interface Async<out V> : Iterable<V> {
                     })
     }
 
-    fun filter(function: (V) -> Boolean): Async<Option<V>> {
-        return fold({ vStream ->
-                        succeeded(vStream.map { v ->
-                            v.some()
-                                    .filter(function::invoke)
-                        })
+    fun filter(condition: (V) -> Boolean): Async<V> {
+        return fold({ vList ->
+                        succeeded(vList.asIterable()
+                                          .filter(condition::invoke)
+                                          .toPersistentList())
+                    }, { thr ->
+                        errored(thr)
+                    }, { deferredValue ->
+                        when (deferredValue) {
+                            is CompletionStageValue -> {
+                                fromCompletionStage(deferredValue.inputStreamStage.thenApply { vStream ->
+                                    vStream.filter(condition::invoke)
+                                })
+                            }
+                            is FluxValue -> {
+                                fromFlux(deferredValue.inputFlux.filter(condition::invoke))
+                            }
+                        }
+                    })
+    }
+
+    fun filterToOption(condition: (V) -> Boolean): Async<Option<V>> {
+        return fold({ vList ->
+                        succeeded(vList.asSequence()
+                                          .map { v ->
+                                              v.some()
+                                                      .filter(condition::invoke)
+                                          }
+                                          .toPersistentList())
                     }, { thr ->
                         errored(thr)
                     }, { deferredValue ->
@@ -370,27 +404,28 @@ interface Async<out V> : Iterable<V> {
                                 fromCompletionStage(deferredValue.inputStreamStage.thenApply { vStream ->
                                     vStream.map { v ->
                                         v.some()
-                                                .filter(function::invoke)
+                                                .filter(condition::invoke)
                                     }
                                 })
                             }
                             is FluxValue -> {
                                 fromFlux(deferredValue.inputFlux.map { v ->
                                     v.some()
-                                            .filter(function::invoke)
+                                            .filter(condition::invoke)
                                 })
                             }
                         }
                     })
     }
 
-    fun filter(function: (V) -> Boolean, ifConditionNotMet: (V) -> Throwable): Async<V> {
-        return fold({ vStream ->
-                        fromStreamOfAttempts(vStream.map { v ->
-                            v.some()
-                                    .filter(function::invoke)
-                                    .fold({ Try.failure(ifConditionNotMet.invoke(v)) }, { filteredV -> Try.success(filteredV) })
-                        })
+    fun filter(condition: (V) -> Boolean, ifConditionNotMet: (V) -> Throwable): Async<V> {
+        return fold({ vList ->
+                        fromFlux(Flux.fromStream(vList::stream)
+                                         .flatMap { v ->
+                                             Try.success(v)
+                                                     .filter(condition::invoke, ifConditionNotMet::invoke)
+                                                     .fold({ s -> Flux.just(s) }, { thr -> Flux.error(thr) })
+                                         })
                     }, { thr ->
                         errored(thr)
                     }, { deferredValue ->
@@ -399,7 +434,7 @@ interface Async<out V> : Iterable<V> {
                                 fromCompletionStage(deferredValue.inputStreamStage.thenApply { vStream ->
                                     vStream.map { v ->
                                         Try.success(v)
-                                                .filter(function::invoke, ifConditionNotMet::invoke)
+                                                .filter(condition::invoke, ifConditionNotMet::invoke)
                                                 .orElseThrow()
                                     }
                                 })
@@ -407,7 +442,7 @@ interface Async<out V> : Iterable<V> {
                             is FluxValue -> {
                                 fromFlux(deferredValue.inputFlux.flatMap { v ->
                                     Try.success(v)
-                                            .filter(function::invoke, ifConditionNotMet::invoke)
+                                            .filter(condition::invoke, ifConditionNotMet::invoke)
                                             .fold({ s -> Flux.just(s) }, { thr -> Flux.error(thr) })
                                 })
                             }
@@ -416,10 +451,10 @@ interface Async<out V> : Iterable<V> {
     }
 
     fun <A, R> zip(other: Async<A>, combiner: (V, A) -> R): Async<R> {
-        return fold({ vStream ->
+        return fold({ vList ->
                         other.fold({ aStream ->
                                        fromStreamAttempt(Try.attempt({
-                                                                         vStream.asSequence()
+                                                                         vList.asSequence()
                                                                                  .zip(aStream.asSequence(), combiner::invoke)
                                                                      })
                                                                  .map { seq ->
@@ -430,14 +465,14 @@ interface Async<out V> : Iterable<V> {
                                    }, { defVal ->
                                        when (defVal) {
                                            is CompletionStageValue -> {
-                                               fromCompletionStage(defVal.inputStreamStage.thenCombine(CompletableFuture.completedFuture(vStream)) { aValStream, vValStream ->
+                                               fromCompletionStage(defVal.inputStreamStage.thenCombine(CompletableFuture.completedFuture(vList)) { aValStream, vValStream ->
                                                    vValStream.asSequence()
                                                            .zip(aValStream.asSequence(), combiner::invoke)
                                                            .asStream()
                                                })
                                            }
                                            is FluxValue -> {
-                                               fromFlux(Flux.fromStream(vStream)
+                                               fromFlux(Flux.fromStream(vList::stream)
                                                                 .zipWith(defVal.inputFlux, combiner::invoke))
                                            }
                                        }
@@ -467,17 +502,17 @@ interface Async<out V> : Iterable<V> {
     }
 
     fun <A, R> zip(executor: Executor, other: Async<A>, combiner: (V, A) -> R): Async<R> {
-        return fold({ vStream ->
-                        other.fold({ aStream ->
-                                       fromFlux(Flux.fromStream(vStream)
+        return fold({ vList ->
+                        other.fold({ aList ->
+                                       fromFlux(Flux.fromStream(vList::stream)
                                                         .publishOn(Schedulers.fromExecutor(executor))
-                                                        .zipWith(Flux.fromStream(aStream), combiner::invoke))
+                                                        .zipWith(Flux.fromStream(aList::stream), combiner::invoke))
                                    }, { thr ->
                                        errored(thr)
                                    }, { defVal ->
                                        when (defVal) {
                                            is CompletionStageValue -> {
-                                               fromCompletionStage(defVal.inputStreamStage.thenCombineAsync(CompletableFuture.completedFuture(vStream),
+                                               fromCompletionStage(defVal.inputStreamStage.thenCombineAsync(CompletableFuture.completedFuture(vList),
                                                                                                             { aValStream, vValStream ->
                                                                                                                 vValStream.asSequence()
                                                                                                                         .zip(aValStream.asSequence(),
@@ -487,7 +522,7 @@ interface Async<out V> : Iterable<V> {
                                                                                                             executor))
                                            }
                                            is FluxValue -> {
-                                               fromFlux(Flux.fromStream(vStream)
+                                               fromFlux(Flux.fromStream(vList::stream)
                                                                 .publishOn(Schedulers.fromExecutor(executor))
                                                                 .zipWith(defVal.inputFlux, combiner::invoke))
                                            }
@@ -520,8 +555,8 @@ interface Async<out V> : Iterable<V> {
     }
 
     fun blockFirst(): Try<V> {
-        return fold({ vStream ->
-                        Try.fromOptional(vStream.findFirst())
+        return fold({ vList ->
+                        Try.fromOption(vList.firstOrNone())
                     }, { thr ->
                         Try.failure(thr)
                     }, { defVal ->
@@ -540,9 +575,18 @@ interface Async<out V> : Iterable<V> {
         return blockFirst().getSuccess()
     }
 
+    fun blockFirstOrElseGet(defaultSupplier: () -> @UnsafeVariance V): V {
+        return blockFirst().getSuccess()
+                .getOrElse(defaultSupplier)
+    }
+
+    fun blockFirstOrElseThrow(): V {
+        return blockFirst().orElseThrow()
+    }
+
     fun block(): Try<Stream<out V>> {
-        return fold({ vStream ->
-                        Try.success(vStream)
+        return fold({ vList ->
+                        Try.success(vList.stream())
                     }, { thr ->
                         Try.failure(thr)
                     }, { defVal ->
@@ -555,9 +599,25 @@ interface Async<out V> : Iterable<V> {
                     })
     }
 
+    fun blockOrElseThrow(): Stream<out V> {
+        return block().orElseThrow()
+    }
+
+    fun blockOrElseGet(defaultSupplier: () -> Stream<@UnsafeVariance V>): Stream<out V> {
+        return block().orElseGet(defaultSupplier)
+    }
+
     fun blockLast(): Try<V> {
         return fold({ vStream ->
-                        Try.fromOptional(vStream.findFirst()) { nse -> nse }
+                        Try.attempt { vStream.toList() }
+                                .map { l ->
+                                    if (l.isEmpty()) {
+                                        None
+                                    } else {
+                                        l[l.size - 1].some()
+                                    }
+                                }
+                                .flatMap { vOpt -> Try.fromOption(vOpt) }
                     }, { thr ->
                         Try.failure(thr)
                     }, { defVal ->
@@ -572,15 +632,8 @@ interface Async<out V> : Iterable<V> {
     }
 
     fun blockLastOption(): Option<V> {
-        return fold({ vStream ->
-                        Try.attempt { vStream.collect(Collectors.toList()) }
-                                .map { list ->
-                                    list.takeLast(1)
-                                            .stream()
-                                            .findFirst()
-                                }
-                                .flatMap { rOpt -> Try.fromOptional(rOpt) }
-                                .getSuccess()
+        return fold({ vList ->
+                        vList.lastOrNone()
                     }, {
                         None
                     }, { defVal ->
@@ -602,9 +655,157 @@ interface Async<out V> : Iterable<V> {
                     })
     }
 
+    fun blockLastOrElseGet(defaultSupplier: () -> @UnsafeVariance V): V {
+        return blockLast().orElseGet(defaultSupplier)
+    }
+
+    fun blockLastOrElseThrow(): V {
+        return blockLast().orElseThrow()
+    }
+
+    fun <R> reduce(initial: R, accumulator: (R, V) -> R, combiner: (R, R) -> R = { _, r2 -> r2 }): Async<R> {
+        return fold({ vList ->
+                        succeededSingle(vList.stream()
+                                                .reduce(initial, accumulator::invoke, combiner::invoke))
+                    }, { thr ->
+                        errored(thr)
+                    }, { defVal ->
+                        when (defVal) {
+                            is CompletionStageValue -> {
+                                fromSingleValueCompletionStage(defVal.inputStreamStage.thenApply { vStream ->
+                                    vStream.reduce(initial, accumulator::invoke, combiner::invoke)
+                                })
+                            }
+                            is FluxValue -> {
+                                fromFlux(defVal.inputFlux.reduce(initial, accumulator::invoke)
+                                                 .flux())
+                            }
+                        }
+                    })
+    }
+
+    fun <R> reduce(executor: Executor, initial: R, accumulator: (R, V) -> R, combiner: (R, R) -> R = { _, r2 -> r2 }): Async<R> {
+        return fold({ vList ->
+                        fromSingleValueCompletionStage(CompletableFuture.supplyAsync({
+                                                                                         vList.stream()
+                                                                                                 .reduce(initial,
+                                                                                                         accumulator::invoke,
+                                                                                                         combiner::invoke)
+                                                                                     }, executor))
+                    }, { thr ->
+                        errored(thr)
+                    }, { defVal ->
+                        when (defVal) {
+                            is CompletionStageValue -> {
+                                fromSingleValueCompletionStage(defVal.inputStreamStage.thenApplyAsync({ vStream ->
+                                                                                                          vStream.reduce(initial,
+                                                                                                                         accumulator::invoke,
+                                                                                                                         combiner::invoke)
+                                                                                                      }, executor))
+                            }
+                            is FluxValue -> {
+                                fromFlux(defVal.inputFlux.publishOn(Schedulers.fromExecutor(executor))
+                                                 .reduce(initial, accumulator::invoke)
+                                                 .flux())
+                            }
+                        }
+                    })
+    }
+
+    /**
+     * In parallel reduction, a combiner function, one handling the combining of any two leaf nodes of any given set of reduction trees,
+     * must be provided to ensure values are not lost in the result:
+     * `parallelReduce(executor, persistentListOf<String>(), { pList, nextStr -> pList.add(nextStr) }, { pList1, pList2 -> pList1.addAll(pList2) })`
+     * When reduction is not done in parallel, there is only one leaf node, so the combiner function can be defaulted to `{ result1, result2 -> result2 }`
+     */
+    fun <R> parallelReduce(executor: Executor, initial: R, accumulator: (R, V) -> R, combiner: (R, R) -> R): Async<R> {
+        return fold({ vList ->
+                        fromSingleValueCompletionStage(CompletableFuture.supplyAsync({
+                                                                                         vList.stream()
+                                                                                                 .parallel()
+                                                                                                 .reduce(initial,
+                                                                                                         accumulator::invoke,
+                                                                                                         combiner::invoke)
+                                                                                     }, executor))
+                    }, { thr ->
+                        errored(thr)
+                    }, { defVal ->
+                        when (defVal) {
+                            is CompletionStageValue -> {
+                                fromSingleValueCompletionStage(defVal.inputStreamStage.thenApplyAsync({ vStream ->
+                                                                                                          vStream.parallel()
+                                                                                                                  .reduce(initial,
+                                                                                                                          accumulator::invoke,
+                                                                                                                          combiner::invoke)
+                                                                                                      }, executor))
+                            }
+                            is FluxValue -> {
+                                fromFlux(defVal.inputFlux.publishOn(Schedulers.fromExecutor(executor))
+                                                 .parallel()
+                                                 .reduce({ initial }, accumulator::invoke)
+                                                 .sequential())
+                            }
+                        }
+                    })
+    }
+
+    fun partition(condition: (V) -> Boolean): Async<Pair<Sequence<V>, Sequence<V>>> {
+        return fold({ vList ->
+                        vList.map({ v ->
+                                      v.some()
+                                              .filter(condition)
+                                              .fold({ v.right() }, { v.left() })
+                                  })
+                                .asSequence()
+                                .separateEither()
+                                .let { pair ->
+                                    succeededSingle(Pair(pair.first.map { v -> v }, pair.second.map { v -> v }))
+                                }
+                    }, { thr ->
+                        errored(thr)
+                    }, { deferredValue ->
+                        when (deferredValue) {
+                            is CompletionStageValue -> {
+                                fromSingleValueCompletionStage(deferredValue.inputStreamStage.thenApply { vStream ->
+                                    vStream.map({ v ->
+                                                    v.some()
+                                                            .filter(condition)
+                                                            .fold({ v.right() }, { v.left() })
+                                                })
+                                            .asSequence()
+                                            .separateEither()
+                                            .let { pair ->
+                                                Pair(pair.first.map { v -> v }, pair.second.map { v -> v })
+                                            }
+                                })
+                            }
+                            is FluxValue -> {
+                                fromFlux(deferredValue.inputFlux.map({ v ->
+                                                                         v.some()
+                                                                                 .filter(condition)
+                                                                                 .fold({ v.right() }, { v.left() })
+
+                                                                     })
+                                                 .collect({ Pair(Stream.builder(), Stream.builder()) },
+                                                          { pairStreamBuilders: Pair<Stream.Builder<V>, Stream.Builder<V>>, metUnmetEither: Either<V, V> ->
+                                                              metUnmetEither.fold({ lv -> pairStreamBuilders.first.add(lv) },
+                                                                                  { rv -> pairStreamBuilders.second.add(rv) })
+                                                          })
+                                                 .map({ pairStreamBuilders ->
+                                                          Pair(pairStreamBuilders.first.build()
+                                                                       .asSequence(),
+                                                               pairStreamBuilders.second.build()
+                                                                       .asSequence())
+                                                      })
+                                                 .flux())
+                            }
+                        }
+                    })
+    }
+
     fun toFlux(): Flux<out V> {
-        return fold({ vStream ->
-                        Flux.fromStream(vStream)
+        return fold({ vList ->
+                        Flux.fromStream(vList::stream)
                     }, { thr ->
                         Flux.error(thr)
                     }, { defVal ->
@@ -617,8 +818,8 @@ interface Async<out V> : Iterable<V> {
     }
 
     fun toCompletionStage(): CompletionStage<out Stream<out V>> {
-        return fold({ vStream ->
-                        CompletableFuture.completedFuture(vStream)
+        return fold({ vList ->
+                        CompletableFuture.completedFuture(vList.stream())
                     }, { thr ->
                         CompletableFuture<Stream<out V>>().apply { completeExceptionally(thr) }
                     }, { defVal ->
@@ -631,7 +832,7 @@ interface Async<out V> : Iterable<V> {
                     })
     }
 
-    fun <R> fold(succeededHandler: (Stream<out V>) -> R, erroredHandler: (Throwable) -> R, deferredHandler: (DeferredValue<V>) -> R): R
+    fun <R> fold(succeededHandler: (PersistentList<V>) -> R, erroredHandler: (Throwable) -> R, deferredHandler: (DeferredValue<V>) -> R): R
 
 
 }

@@ -6,8 +6,8 @@ pluginManagement {
 }
 
 rootProject.name = 'funcify'
-include ':funcify-sample'
-include ':funcify-gen'
+include ':funcify-java-sample'
+include ':funcify-java-gen'
 include ':funcify-java-core'
 include ':funcify-java-reactor'
-include ':funcify-kotlin-core'
+include ':funcify-kotlin-sample'
